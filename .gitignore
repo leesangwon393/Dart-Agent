@@ -1,0 +1,16 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+qdrant_data/
+*.egg-info/
+.DS_Store
+
+# 원본 코퍼스 데이터(5.2GB raw XML) — 코드 저장소에는 넣지 않는다.
+# 메타데이터(manifest.jsonl/universe.csv/README 등)는 가볍고 유용하니 유지.
+corpus/raw/
+corpus/universe.xlsx
+
+# .claude 세션/스케줄 상태 파일 — 저장소 코드가 아님
+.claude/
