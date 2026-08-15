@@ -1,0 +1,22 @@
+# Stage 14 Final E2E: efficiency
+
+**TEST SET (n=10, 최초/유일 사용)**
+
+## Metrics (n=10)
+
+- n: 10
+- n_test_set: 10
+- n_failures_total: 6
+- recall_at_5: 0.5333333333333334
+- recall_at_10: 0.5583333333333333
+- mrr: 0.32333333333333336
+- ndcg_at_10: 0.38625080218137364
+- task_success_rate: 0.7
+- faithfulness_rate: 1.0
+- citation_accuracy_rate: 1.0
+- overall_pass_rate: 1.0
+- mean_agent_latency_sec: 15.082999999999998
+- mean_answer_latency_sec: 7.981999999999999
+- mean_total_latency_sec: 23.066
+
+## Failures: 6/10

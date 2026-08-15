@@ -93,14 +93,14 @@ User Query → Entity Extraction + Query Normalize → Semantic Router(hint)
 
 ## 5. 현재 진행 중인 작업
 
-**Stage 12 완료.** Tool-calling(agent loop)은 HCX-007 로 질의당 1번만 실행해
-동일 Evidence Pack 을 만들고, 그 Pack 을 3개 모델(DASH-002/005/007)에 그대로
-줘서 답변 생성만 비교. **HCX-005 가 answer 역할에서는 1위**(overall_pass_
-rate=0.750, HCX-007 0.690, DASH-002 0.321) — Agent 역할(Stage 10, HCX-007)과
-다른 모델이 승리하는 역할별 분리 결론이 나왔다. 도중 HCX-007 전용
-프로덕션 버그(`maxTokens` 대신 `maxCompletionTokens` 필요) 발견/수정함.
-다음은 **Stage 14 — Final E2E**(test set 10개, 처음이자 마지막 사용)를
-시작할 차례.
+**전체 Ablation 실험(Stage 1~14) 완료.** Stage 14 에서 test set(n=10, 처음이자
+유일 사용)으로 efficiency(reranker off, 현재 production) vs best_quality
+(reranker on) 비교 — efficiency 가 task_success/pass_rate/latency 모두에서
+근소 우위(다만 n=10 이라 통계적으로 약함, MRR/NDCG 같은 순수 랭킹 지표는
+best_quality 가 나음). **reranker OFF 유지가 최종 결론**. 최종 확정
+configuration 은 §11 failure_analysis 참고. 다음(마지막) 작업은 `results/`
+전체를 종합한 최종 요약 문서 작성(사용자가 "이거 다 돌리고 폴더 하나 파서
+잘 정리해줘"라고 요청함) — 아직 미완료.
 
 ---
 
@@ -183,13 +183,22 @@ BGE-M3 591.7ms/chunk 기준 전체 코퍼스 임베딩 73시간).
 | 10 Agent HCX 모델 | HCX-007 | tool_acc=0.966 arg_acc=0.980 task_success=0.793(13.9s) vs HCX-005 tool_acc=0.897 arg_acc=0.883 task_success=0.552(20.3s) vs HCX-DASH-002 tool_acc=0.567 arg_acc=1.000 task_success=0.233(9.1s) — HCX-007 이 정확도·지연·API호출비용 전부 우위 |
 | 11 E2E RAG | 시나리오별 분리(§5 참고) | hybrid_reranker R@5=0.820 NDCG@10=0.783(5.4s) > hybrid_fusion R@5=0.661 NDCG@10=0.731(43ms) > full_agentic R@5=0.622 NDCG@10=0.545(15.7s) task_success=0.759 > bm25_only/dense_only |
 | 12 Answer HCX 모델 | HCX-005(answer 역할, Agent 역할과 다름) | pass_rate: HCX-005=0.750 > HCX-007=0.690 > DASH-002=0.321(citation 누락이 주원인) |
+| 14 Final E2E(TEST SET n=10, 최초/유일 사용) | efficiency(reranker off, 현재 baseline) | efficiency task_success=0.700 pass_rate=1.000(23.1s) vs best_quality(reranker on) task_success=0.667 pass_rate=0.889(31.1s) — 랭킹지표(MRR/NDCG)는 best_quality 우세하나 최종 답변 성공률/지연은 efficiency 우세, n=10 통계적으로 약함 |
 
-**현재까지 baseline 누적**: Section-aware+Parent-Child chunking + char_2gram(잠정,
-Kiwi 대안 검토중) tokenizer + BGE-M3 dense + Normalized Weighted Fusion +
-No-Reranker(CPU 배포 기준) + Rule-only Entity Extraction + HCX structured Router
-+ HCX-007 Agent 모델(`.env` HCX_MODEL 도 HCX-007 로 변경 완료). Stage 11 은
-이 baseline 조합(=full_agentic)을 유지하되, "정확도 최우선" 대안으로
-hybrid_reranker 를 별도 옵션으로 문서화(§11 failure_analysis 참고).
+**최종 확정 baseline (Stage 14 결론, 전체 실험 종료)**:
+Section-aware+Parent-Child chunking + **Kiwi** tokenizer(Stage 2 는
+char_2gram 을 수치상 잠정 1위로 기록했지만, Stage 4 이후 모든 실험은
+실제로는 Kiwi 로 진행됐다 — Kiwi 가 형태소 기반이라 도메인 사전
+확장(`config/financial_terms.txt`)이 가능하고 char_2gram 은 실무 적용
+경로가 불명확해 실질적 baseline 은 계속 Kiwi 였다는 뜻. char_2gram 채택은
+보류된 상태로 남겨둔다) + BGE-M3 dense + Normalized Weighted Fusion +
+No-Reranker(Stage 5 최초 결론, Stage 14 test set 재확인) + Rule-only Entity
+Extraction + HCX structured Router(HCX-005 고정) + **Agent=HCX-007**(Stage
+10) + **Answer=HCX-005**(Stage 12, Agent 와 다른 모델). `.env` 의
+`HCX_MODEL`은 agent 기본값 HCX-007 로 설정돼 있고, answer 전용 모델
+분리는 아직 프로덕션 코드에 반영 안 됨(`ask.py`가 단일 client 재사용 —
+§12 향후 과제로 문서화됨). Stage 11 은 이 baseline(=full_agentic)을
+유지하되 "정확도 최우선" 대안으로 hybrid_reranker 를 별도 옵션으로 문서화.
 
 **Stage 5 에서 발견한 프로덕션 버그(수정 완료)**: `CrossEncoderReranker` 가
 `max_length` 미지정이라 매우 긴 outlier chunk(최대 26,027자) 만나면 처리
@@ -281,43 +290,37 @@ hybrid_reranker 를 별도 옵션으로 문서화(§11 failure_analysis 참고).
       `results/e2e_rag/`(failure_analysis.md 포함) 커밋됨.
 - [x] **Stage 12 — Answer HCX 모델**: 완료. HCX-005 채택(answer 역할).
       `results/answer/`(failure_analysis.md 포함) 커밋됨.
-- [ ] **Stage 14 — Final E2E**: Best-quality config vs efficiency config,
-      **test set(10개, 지금까지 한 번도 안 씀)으로만** 최종 평가.
-- [ ] 각 Stage 리포트 형식: `[Experiment]/[Candidates]/[Metrics]/[Best]/
-      [Trade-off]/[Failure Cases]/[Recommendation]` (사용자 지정 형식).
-- [ ] 모든 실험 완료 후 `results/` 전체를 하나의 최종 요약 문서로 정리
-      (사용자가 "이거 다 돌리고 폴더 하나 파서 잘 정리해줘" 라고 요청함).
+- [x] **Stage 14 — Final E2E**: 완료. test set(n=10) 최초/유일 사용,
+      efficiency(reranker off) 유지 결론. `results/e2e_final/`
+      (failure_analysis.md 포함) 커밋됨.
+- [x] 각 Stage 리포트 형식 `[Experiment]/[Candidates]/[Metrics]/[Best]/
+      [Trade-off]/[Failure Cases]/[Recommendation]`: 매 Stage 완료 시
+      사용자에게 이 형식으로 보고 완료(대화 로그 참고, 별도 저장 파일 없음).
+- [ ] **모든 실험 완료 후 `results/` 전체를 하나의 최종 요약 문서로 정리**
+      (사용자가 "이거 다 돌리고 폴더 하나 파서 잘 정리해줘" 라고 요청함) —
+      **이것만 아직 안 함, 마지막 남은 작업.**
 
 ---
 
 ## 12. 다음에 바로 해야 할 작업
 
-1. **Stage 14 — Final E2E** 시작 (Task #25, pending → in_progress 전환).
-   **Test set(10개, id=4,8,...,40 — 지금까지 model/parameter 선택에 전혀
-   안 씀)으로 단 한 번만** 평가. 두 configuration 비교:
-   - **Best-quality**: chunking=section_aware_parent_child + bm25=kiwi +
-     dense=bge-m3 + fusion=normalized_weighted + **reranker=bge-reranker-
-     v2-m3 ON** + entity=rule_only + router=hcx_structured(HCX-005 고정) +
-     agent=HCX-007 + answer=HCX-005.
-   - **Efficiency**(현재 production baseline): 위와 동일하되 **reranker
-     OFF**. (answer 모델은 두 config 모두 HCX-005 로 통일 — DASH-002 는
-     Stage 12 에서 정확도 격차가 "미미한 수준"이 아니었으므로 지연
-     우선이라도 배제하는 게 사용자 지침의 "정확도 차이가 미미할 때만
-     latency 로 결정" 원칙과 일관됨. 즉 Stage 14 는 사실상 **reranker
-     on/off 가 test set 최종 답변 품질에 실질적으로 영향을 주는지**를
-     검증하는 실험이 된다.)
-   지표: retrieval(Recall/MRR/NDCG, Stage 11과 동일 공식) + answer
-   validation(faithfulness/citation/pass_rate, Stage 12와 동일) + latency.
-   `results/e2e_final/{config}/` 저장 + `comparison.json` + `failure_analysis.md`.
-   **주의**: test set 크기가 10개뿐이라 통계적으로 약함 — 결과 해석 시
-   반드시 이 표본 크기 한계를 명시할 것.
-2. Stage 14 완료 후: PROJECT_STATE.md §5/§8/§11/§12 갱신, git commit/push,
-   Task #25 completed.
-3. 모든 Stage 완료 후: `results/` 전체를 하나의 최종 요약 문서로 정리(사용자
-   요청 "이거 다 돌리고 폴더 하나 파서 잘 정리해줘") — 11개 스테이지 결과를
-   종합한 최종 리포트(마크다운 + Artifact 게시 고려)를 만들 것. 이게 이번
-   실험 arc 의 마지막 산출물.
-4. `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
+**Stage 1~14 실험 전부 완료.** 유일하게 남은 작업:
+
+1. **최종 요약 문서 작성** (Task #25 완료 처리는 이미 됨 — 이건 별도
+   마무리 작업). `results/` 밑 11개 스테이지(chunking/bm25/embedding/
+   fusion/reranker/entity/router/agent/answer/e2e_rag/e2e_final) 전체를
+   종합해 하나의 최종 리포트로 정리(사용자 요청: "이거 다 돌리고 폴더
+   하나 파서 잘 정리해줘"). 구성 제안:
+   - 각 Stage 의 `[Experiment]/[Candidates]/[Metrics]/[Best]/[Trade-off]/
+     [Failure Cases]/[Recommendation]` 요약(대화 중 이미 이 형식으로
+     보고했던 내용 재사용 가능)
+   - 최종 확정 baseline configuration 한눈에 보기 표(§8 "최종 확정
+     baseline" 문단 재사용)
+   - 스테이지 간 관통하는 공통 발견(예: ownership/보유비율 질의의 corpus
+     난이도가 4개 스테이지·2개 split 에서 반복 관찰됨, HCX-007 의 두 가지
+     파라미터 특이사항 등 §10 발견된 문제 재사용)
+   - 마크다운 파일로 저장 후 Artifact 로도 게시(사용자가 보기 편하게)
+2. `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
    `/tmp` 임시 파일들이 세션 재시작으로 사라졌다면, 아래 코드로 재생성:
    ```python
    # doc_ids 재생성 (삼성전자 33개 문서: periodic 최신 2 + major 전체 19 +

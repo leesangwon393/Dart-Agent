@@ -1,0 +1,22 @@
+# Stage 14 Final E2E: best_quality
+
+**TEST SET (n=10, 최초/유일 사용)**
+
+## Metrics (n=9)
+
+- n: 9
+- n_test_set: 10
+- n_failures_total: 6
+- recall_at_5: 0.48148148148148157
+- recall_at_10: 0.574074074074074
+- mrr: 0.4537037037037038
+- ndcg_at_10: 0.46093670209360205
+- task_success_rate: 0.6666666666666666
+- faithfulness_rate: 0.8888888888888888
+- citation_accuracy_rate: 1.0
+- overall_pass_rate: 0.8888888888888888
+- mean_agent_latency_sec: 21.89333333333333
+- mean_answer_latency_sec: 9.243333333333332
+- mean_total_latency_sec: 31.13666666666667
+
+## Failures: 6/10

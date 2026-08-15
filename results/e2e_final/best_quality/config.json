@@ -1,0 +1,13 @@
+{
+  "config": "best_quality",
+  "reranker": "bge-reranker-v2-m3",
+  "chunking": "section_aware_parent_child",
+  "bm25": "kiwi",
+  "dense": "bge-m3",
+  "fusion": "normalized_weighted",
+  "entity": "rule_only",
+  "router": "hcx_structured(HCX-005)",
+  "agent_model": "HCX-007",
+  "answer_model": "HCX-005",
+  "eval_split": "TEST (first/only use)"
+}
