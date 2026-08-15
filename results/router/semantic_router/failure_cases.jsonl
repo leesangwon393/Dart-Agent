@@ -1,0 +1,12 @@
+{"query": "[COMPANY] 2025년 사업보고서에서 매출액 알려줘", "expected": "single_lookup", "predicted": "calculation"}
+{"query": "[COMPANY] 연구개발비 얼마야?", "expected": "single_lookup", "predicted": "calculation"}
+{"query": "[COMPANY] 반도체 위탁생산 계약금액 얼마야?", "expected": "single_lookup", "predicted": "event_analysis"}
+{"query": "[COMPANY] 2026년 1월 자기주식 취득예정금액 얼마야?", "expected": "single_lookup", "predicted": "event_analysis"}
+{"query": "[COMPANY] 해외증권시장 상장 결정 내용 알려줘", "expected": "single_lookup", "predicted": "event_analysis"}
+{"query": "[COMPANY] 2025년 2월 자기주식취득 정정공시 내용 알려줘", "expected": "correction_analysis", "predicted": "event_analysis"}
+{"query": "[COMPANY] 최근 지분 변동 추이 알려줘", "expected": "multi_compare", "predicted": "ownership_analysis"}
+{"query": "[COMPANY] 2025년과 2026년 자기주식취득 규모 비교해줘", "expected": "multi_compare", "predicted": "event_analysis"}
+{"query": "[COMPANY] 사업보고서와 분기보고서 실적 비교해줘", "expected": "multi_compare", "predicted": "single_lookup"}
+{"query": "[COMPANY] 삼성물산 보유주식 변동 추이 알려줘", "expected": "multi_compare", "predicted": "ownership_analysis"}
+{"query": "[COMPANY] 반도체 위탁생산 계약금액이 최근매출액 대비 몇 %야?", "expected": "calculation", "predicted": "event_analysis"}
+{"query": "[COMPANY] 부채비율 계산해줘", "expected": "calculation", "predicted": "single_lookup"}

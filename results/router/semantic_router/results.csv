@@ -1,0 +1,13 @@
+query,expected,predicted
+"[COMPANY] 2025년 사업보고서에서 매출액 알려줘",single_lookup,calculation
+"[COMPANY] 연구개발비 얼마야?",single_lookup,calculation
+"[COMPANY] 반도체 위탁생산 계약금액 얼마야?",single_lookup,event_analysis
+"[COMPANY] 2026년 1월 자기주식 취득예정금액 얼마야?",single_lookup,event_analysis
+"[COMPANY] 해외증권시장 상장 결정 내용 알려줘",single_lookup,event_analysis
+"[COMPANY] 2025년 2월 자기주식취득 정정공시 내용 알려줘",correction_analysis,event_analysis
+"[COMPANY] 최근 지분 변동 추이 알려줘",multi_compare,ownership_analysis
+"[COMPANY] 2025년과 2026년 자기주식취득 규모 비교해줘",multi_compare,event_analysis
+"[COMPANY] 사업보고서와 분기보고서 실적 비교해줘",multi_compare,single_lookup
+"[COMPANY] 삼성물산 보유주식 변동 추이 알려줘",multi_compare,ownership_analysis
+"[COMPANY] 반도체 위탁생산 계약금액이 최근매출액 대비 몇 %야?",calculation,event_analysis
+"[COMPANY] 부채비율 계산해줘",calculation,single_lookup

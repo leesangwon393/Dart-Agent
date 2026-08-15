@@ -1,0 +1,30 @@
+{"query": "[COMPANY] 2025년 사업보고서에서 매출액 알려줘", "expected": "single_lookup", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 2026년 1분기 영업이익 얼마야?", "expected": "single_lookup", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 연구개발비 얼마야?", "expected": "single_lookup", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 반도체 위탁생산 계약금액 얼마야?", "expected": "single_lookup", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 2026년 1월 자기주식 취득예정금액 얼마야?", "expected": "single_lookup", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 해외증권시장 상장 결정 내용 알려줘", "expected": "single_lookup", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 2024년 11월 자기주식취득 공시 정정 전후로 뭐가 바뀌었어?", "expected": "correction_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 2025년 2월 자기주식취득 정정공시 내용 알려줘", "expected": "correction_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 단일판매공급계약체결 정정 전후 비교해줘", "expected": "correction_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 최근 정정공시 이력 알려줘", "expected": "correction_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 공급계약 계약상대방이 정정으로 어떻게 바뀌었어?", "expected": "correction_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 최근 지분 변동 추이 알려줘", "expected": "multi_compare", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 2025년과 2026년 자기주식취득 규모 비교해줘", "expected": "multi_compare", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 사업보고서와 분기보고서 실적 비교해줘", "expected": "multi_compare", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 삼성물산 보유주식 변동 추이 알려줘", "expected": "multi_compare", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 반도체 위탁생산 계약금액이 최근매출액 대비 몇 %야?", "expected": "calculation", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 영업이익률 계산해줘", "expected": "calculation", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 부채비율 계산해줘", "expected": "calculation", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 최대주주가 누구야?", "expected": "ownership_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 삼성물산 보유지분율 알려줘", "expected": "ownership_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 최근 대량보유상황보고서 내용 알려줘", "expected": "ownership_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 지분 보고자 특별관계자 현황 알려줘", "expected": "ownership_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 2025년 9월 지분보고 내용 알려줘", "expected": "ownership_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 2026년 1월 지분 변동 내역 알려줘", "expected": "ownership_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 최근 자기주식 취득 결정했어?", "expected": "event_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 최근 자기주식 처분 결정했어?", "expected": "event_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 해외 상장 관련 이벤트 있었어?", "expected": "event_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 최근 대규모 계약 체결 있었어?", "expected": "event_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 2026년 3월 자기주식 관련 결정 내용 알려줘", "expected": "event_analysis", "predicted": "__FALLBACK__"}
+{"query": "[COMPANY] 2025년 5월 자기주식처분 결정 내용 알려줘", "expected": "event_analysis", "predicted": "__FALLBACK__"}

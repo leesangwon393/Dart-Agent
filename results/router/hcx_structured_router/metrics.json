@@ -1,0 +1,7 @@
+{
+  "accuracy": 0.8,
+  "macro_f1": 0.8133385133385134,
+  "fallback_rate": 0.0,
+  "n": 30,
+  "mean_latency_sec": 4.5020671606063845
+}

@@ -1,0 +1,7 @@
+query,expected,predicted
+"[COMPANY] 2025년 2월 자기주식취득 정정공시 내용 알려줘",correction_analysis,single_lookup
+"[COMPANY] 최근 지분 변동 추이 알려줘",multi_compare,ownership_analysis
+"[COMPANY] 삼성물산 보유주식 변동 추이 알려줘",multi_compare,ownership_analysis
+"[COMPANY] 최근 대량보유상황보고서 내용 알려줘",ownership_analysis,single_lookup
+"[COMPANY] 2025년 9월 지분보고 내용 알려줘",ownership_analysis,single_lookup
+"[COMPANY] 최근 자기주식 처분 결정했어?",event_analysis,ownership_analysis

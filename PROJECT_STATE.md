@@ -93,9 +93,11 @@ User Query → Entity Extraction + Query Normalize → Semantic Router(hint)
 
 ## 5. 현재 진행 중인 작업
 
-**Stage 5 완료.** No-Reranker(Hybrid only) 를 baseline 으로 채택(CPU 환경
-쿼리당 11초는 대화형 서비스에 치명적 — §8 참고). 다음은 **Stage 8 — Entity
-Extraction 비교**(Rule only / Rule+HCX fallback / HCX only)를 시작할 차례.
+**Stage 9 완료.** Entity Extraction(Stage 8)은 Rule only 압승으로 종료,
+Router(Stage 9)는 hcx_structured_router 를 baseline 으로 채택(정확도 격차가
+커서 latency trade-off 원칙 적용 안 함 — §8/§9 결과 참고). 다음은
+**Stage 10 — Agent HCX 모델 비교**(HCX-DASH-002/HCX-005/HCX-007, 먼저 실제
+API 가용성부터 확인)를 시작할 차례.
 
 ---
 
@@ -173,10 +175,12 @@ BGE-M3 591.7ms/chunk 기준 전체 코퍼스 임베딩 73시간).
 | 3 Dense Embedding | BGE-M3(실무) / e5-instruct(정확도상한) | bge-m3 R@10=0.840(591.7ms) vs e5 R@10=0.867(3710.0ms) |
 | 4 Fusion | Normalized Weighted Fusion | R@10=0.903 R@20=0.940 MRR=0.713 NDCG@10=0.735 |
 | 5 Reranker | No-Reranker(CPU 배포용) / bge-reranker-v2-m3(GPU면 재검토) | no_reranker Hit@1=0.633 MRR=0.712(42.7ms) vs bge_reranker Hit@1=0.667 MRR=0.773(11,053.8ms, **258배 느림**) |
+| 8 Entity Extraction | Rule only | rule company_EM=1.0 correction_EM=1.0 metric_F1=0.971 period_F1=1.0(12μs) vs hcx_only metric_F1=~0.40 period_F1=0.556(7s+) — 압승, trade-off 자체 없음 |
+| 9 Router | hcx_structured_router | hcx accuracy=0.800 macro_F1=0.813(4.502s) vs semantic_router accuracy=0.600 macro_F1=0.495(38.7ms) vs agent_only(NoRouter) accuracy=0.0 fallback_rate=1.0(설계상 정상) |
 
 **현재까지 baseline 누적**: Section-aware+Parent-Child chunking + char_2gram(잠정,
 Kiwi 대안 검토중) tokenizer + BGE-M3 dense + Normalized Weighted Fusion +
-No-Reranker(CPU 배포 기준).
+No-Reranker(CPU 배포 기준) + Rule-only Entity Extraction + HCX structured Router.
 
 **Stage 5 에서 발견한 프로덕션 버그(수정 완료)**: `CrossEncoderReranker` 가
 `max_length` 미지정이라 매우 긴 outlier chunk(최대 26,027자) 만나면 처리
@@ -244,14 +248,11 @@ No-Reranker(CPU 배포 기준).
 
 ## 11. 남은 TODO (Stage 순서대로)
 
-- [ ] **Stage 5 — Reranker**: bge-reranker-v2-m3 결과 확인 후 마무리(실행 중).
-      완료되면 `results/reranker/failure_analysis.md` 작성 + git commit/push.
-- [ ] **Stage 8 — Entity Extraction**: Rule only / Rule+HCX fallback / HCX only 비교.
-      Rule extractor 는 이미 구현됨(`entity/entity_extractor.py`) — HCX fallback/
-      only 버전을 새로 짜야 함. 지표: Entity Exact Match, Metric F1, Latency.
-- [ ] **Stage 9 — Router**: Semantic Router(이미 구현, `router/`) / HCX structured
-      router(신규 구현 필요) / Agent-only(NoRouter, 이미 구현). Encoder 후보
-      BGE-M3/Qwen3-Embedding(제외됨, e5로 대체 검토)/e5 비교도 포함.
+- [x] **Stage 5 — Reranker**: 완료. `results/reranker/` 전체 커밋됨.
+- [x] **Stage 8 — Entity Extraction**: 완료. Rule only 압승.
+      `results/entity/` 전체(failure_analysis.md 포함) 커밋됨.
+- [x] **Stage 9 — Router**: 완료. hcx_structured_router 채택.
+      `results/router/` 전체(failure_analysis.md 포함) 커밋됨.
 - [ ] **Stage 10 — Agent HCX 모델**: HCX-DASH-002/HCX-005/HCX-007 중 실제
       사용 가능한 모델을 **먼저 API로 확인**(현재 `.env` 는 HCX-005 로 설정
       돼 있고 이것만 검증됨). Tool Accuracy/Argument Accuracy/Task
@@ -274,13 +275,20 @@ No-Reranker(CPU 배포 기준).
 
 ## 12. 다음에 바로 해야 할 작업
 
-1. **Stage 8 — Entity Extraction 비교** 시작 (Task #20, 이미 in_progress).
-   Rule only(구현됨, `entity/entity_extractor.py`) / Rule+HCX fallback(신규
-   구현 필요) / HCX only(신규 구현 필요) 3종 비교. 지표: Entity Exact Match,
-   Metric F1, Latency. Gold entity label 이 아직 없으므로 `eval/gold_queries.json`
-   질의들에서 회사명/기간/지표를 직접 읽고 gold 로 라벨링 필요(Stage 1 gold
-   query 만들 때처럼 직접 읽고 검증).
-2. `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
+1. **Stage 10 — Agent HCX 모델 비교** 시작 (Task #22, pending → in_progress로
+   전환). 순서: (a) `.env` 의 HCX_MODEL 을 바꿔가며 HCX-DASH-002/HCX-005/
+   HCX-007 각각 실제 tool-calling 가능 여부를 먼저 짧게 API 호출로 검증
+   (사용자 지침: "실험 전에 다시 확인한다") — 현재는 HCX-005 만 검증된 상태.
+   (b) 가용 모델들로 `agent/agent_loop.py` 의 전체 tool-calling agent 루프를
+   동일 evaluation set(gold_queries.json validation 30개)에 대해 실행,
+   Tool Accuracy/Argument Accuracy/Task Success/Latency 비교.
+   (c) `results/agent/{model_name}/` 에 config.json/metrics.json/results.csv/
+   failure_cases.jsonl/summary.md 저장 + `results/agent/comparison.json`.
+   (d) `results/agent/failure_analysis.md` 작성(stage8/9 패턴과 동일하게 —
+   ≥20 실패 케이스 목표, 부족하면 있는 만큼 근본원인 분류).
+2. Stage 10 완료 후: PROJECT_STATE.md §5/§8/§11/§12 갱신, git commit/push,
+   Task #22 completed → Task #23(Stage 11 — E2E RAG 비교) in_progress 전환.
+3. `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
    `/tmp` 임시 파일들이 세션 재시작으로 사라졌다면, 아래 코드로 재생성:
    ```python
    # doc_ids 재생성 (삼성전자 33개 문서: periodic 최신 2 + major 전체 19 +
@@ -295,4 +303,4 @@ No-Reranker(CPU 배포 기준).
    doc_ids = [r.doc_id for r in periodic+major+exchange+holding]
    ```
    `eval/gold_queries.json` (git에 커밋되어 있음, 40개 gold query)은 그대로 사용.
-5. TaskList 로 진행상황 재확인 (Task #14~25, id 20부터가 다음 미완료 작업).
+4. TaskList 로 진행상황 재확인 (Task #14~25, id 22부터가 다음 미완료 작업).

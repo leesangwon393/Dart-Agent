@@ -1,0 +1,23 @@
+{
+  "semantic_router": {
+    "accuracy": 0.6,
+    "macro_f1": 0.4947089947089947,
+    "fallback_rate": 0.0,
+    "n": 30,
+    "mean_latency_sec": 0.03866263230641683
+  },
+  "hcx_structured_router": {
+    "accuracy": 0.8,
+    "macro_f1": 0.8133385133385134,
+    "fallback_rate": 0.0,
+    "n": 30,
+    "mean_latency_sec": 4.5020671606063845
+  },
+  "agent_only_no_router": {
+    "accuracy": 0.0,
+    "macro_f1": 0.0,
+    "fallback_rate": 1.0,
+    "n": 30,
+    "mean_latency_sec": 6.67572021484375e-07
+  }
+}
