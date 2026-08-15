@@ -1,0 +1,6 @@
+{
+  "fusion": "rrf",
+  "chunking": "section_aware_parent_child",
+  "bm25_tokenizer": "kiwi",
+  "dense_model": "bge-m3"
+}
