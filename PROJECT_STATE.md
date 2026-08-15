@@ -296,31 +296,27 @@ Extraction + HCX structured Router(HCX-005 고정) + **Agent=HCX-007**(Stage
 - [x] 각 Stage 리포트 형식 `[Experiment]/[Candidates]/[Metrics]/[Best]/
       [Trade-off]/[Failure Cases]/[Recommendation]`: 매 Stage 완료 시
       사용자에게 이 형식으로 보고 완료(대화 로그 참고, 별도 저장 파일 없음).
-- [ ] **모든 실험 완료 후 `results/` 전체를 하나의 최종 요약 문서로 정리**
+- [x] **모든 실험 완료 후 `results/` 전체를 하나의 최종 요약 문서로 정리**
       (사용자가 "이거 다 돌리고 폴더 하나 파서 잘 정리해줘" 라고 요청함) —
-      **이것만 아직 안 함, 마지막 남은 작업.**
+      완료. `results/FINAL_SUMMARY.md`(git 커밋됨) + Artifact 대시보드
+      게시(claude.ai 링크, git 미포함 — 세션에서 사용자에게 전달됨).
+      **모든 실험 arc 종료.**
 
 ---
 
 ## 12. 다음에 바로 해야 할 작업
 
-**Stage 1~14 실험 전부 완료.** 유일하게 남은 작업:
+**전체 실험 arc(Stage 1~14 + 최종 요약) 완전히 종료됨.** 사용자가 새로운
+요청을 하기 전까지는 이 프로젝트에 대해 자발적으로 더 할 작업 없음. 다음
+세션에서 이어갈 만한 후보(사용자가 명시적으로 요청할 경우에만):
+- Stage 11/14 에서 식별된 `search_disclosures` 필터 완화 로직 개선
+  (ownership/보유비율 질의 실패의 근본 원인)
+- `ask.py`에 answer 전용 모델(HCX-005) 분리 적용(현재는 agent client 를
+  answer 생성에도 재사용 — Stage 12 결론이 프로덕션에 아직 반영 안 됨)
+- char_2gram BM25 토크나이저 재검토(Stage 2 에서 수치상 1위였으나 보류)
+- test set 표본 확대(Stage 14 의 n=10 한계 보완용 confirmatory set)
 
-1. **최종 요약 문서 작성** (Task #25 완료 처리는 이미 됨 — 이건 별도
-   마무리 작업). `results/` 밑 11개 스테이지(chunking/bm25/embedding/
-   fusion/reranker/entity/router/agent/answer/e2e_rag/e2e_final) 전체를
-   종합해 하나의 최종 리포트로 정리(사용자 요청: "이거 다 돌리고 폴더
-   하나 파서 잘 정리해줘"). 구성 제안:
-   - 각 Stage 의 `[Experiment]/[Candidates]/[Metrics]/[Best]/[Trade-off]/
-     [Failure Cases]/[Recommendation]` 요약(대화 중 이미 이 형식으로
-     보고했던 내용 재사용 가능)
-   - 최종 확정 baseline configuration 한눈에 보기 표(§8 "최종 확정
-     baseline" 문단 재사용)
-   - 스테이지 간 관통하는 공통 발견(예: ownership/보유비율 질의의 corpus
-     난이도가 4개 스테이지·2개 split 에서 반복 관찰됨, HCX-007 의 두 가지
-     파라미터 특이사항 등 §10 발견된 문제 재사용)
-   - 마크다운 파일로 저장 후 Artifact 로도 게시(사용자가 보기 편하게)
-2. `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
+참고로 `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
    `/tmp` 임시 파일들이 세션 재시작으로 사라졌다면, 아래 코드로 재생성:
    ```python
    # doc_ids 재생성 (삼성전자 33개 문서: periodic 최신 2 + major 전체 19 +
