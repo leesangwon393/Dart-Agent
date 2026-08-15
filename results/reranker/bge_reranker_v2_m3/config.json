@@ -1,0 +1,5 @@
+{
+  "reranker": "bge_reranker_v2_m3",
+  "candidate_pool": "hybrid_top50(normalized_weighted_fusion)",
+  "load_time_sec": 4.703906774520874
+}

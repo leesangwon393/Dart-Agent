@@ -1,0 +1,5 @@
+{
+  "reranker": "no_reranker",
+  "candidate_pool": "hybrid_top50(normalized_weighted_fusion)",
+  "load_time_sec": 0.0
+}

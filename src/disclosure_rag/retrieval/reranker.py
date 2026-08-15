@@ -20,10 +20,15 @@ class Reranker(Protocol):
 class CrossEncoderReranker:
     name = "bge-reranker-v2-m3"
 
-    def __init__(self, model_name: str = "BAAI/bge-reranker-v2-m3", device: str | None = None):
+    def __init__(self, model_name: str = "BAAI/bge-reranker-v2-m3", device: str | None = None, max_length: int = 512):
         from sentence_transformers import CrossEncoder
 
-        self._model = CrossEncoder(model_name, device=device)
+        # 회귀 발견: max_length 를 안 주면 CrossEncoder 가 truncation 없이 그대로
+        # 토크나이즈한다. corpus 에 드물게 존재하는 매우 긴 chunk(malformed XML
+        # 표 잔여 케이스, 최대 26,027자 확인됨)를 만나면 quadratic attention
+        # 비용 때문에 reranking 1건이 수십 분씩 걸려 실측으로 확인됨. 512 토큰
+        # 이면 chunk 의 핵심 내용은 대부분 포함되므로 정확도 손실은 미미하다.
+        self._model = CrossEncoder(model_name, device=device, max_length=max_length)
 
     def rerank(self, query: str, candidates: Candidates, *, top_k: int = 5) -> Candidates:
         if not candidates:
