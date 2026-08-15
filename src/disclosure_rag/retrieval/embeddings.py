@@ -61,6 +61,27 @@ class E5InstructEmbeddingProvider:
         return self.embed([self._QUERY_PREFIX + text])[0]
 
 
+class Qwen3EmbeddingProvider:
+    """비교 대상 (Stage 3 실험). Qwen3-Embedding-0.6B — e5 처럼 query 에 instruction
+    prefix 를 붙여야 한다 (document 쪽은 prefix 없음)."""
+
+    name = "qwen3-embedding-0.6b"
+    dim = 1024
+    _QUERY_PREFIX = "Instruct: Given a financial disclosure question, retrieve relevant passages\nQuery: "
+
+    def __init__(self, device: str | None = None):
+        from sentence_transformers import SentenceTransformer
+
+        self._model = SentenceTransformer("Qwen/Qwen3-Embedding-0.6B", device=device)
+
+    def embed(self, texts: list[str], *, batch_size: int = 32) -> list[list[float]]:
+        vecs = self._model.encode(texts, batch_size=batch_size, normalize_embeddings=True, show_progress_bar=False)
+        return vecs.tolist()
+
+    def embed_query(self, text: str) -> list[float]:
+        return self.embed([self._QUERY_PREFIX + text])[0]
+
+
 class HCXEmbeddingProvider:
     """비교 대상 #2 (사용자 결정 #2). HCX API 연결이 별도 dependency 로 확정되기
     전까지는 placeholder — 호출 시 명시적으로 NotImplementedError 를 낸다
@@ -87,6 +108,8 @@ def build_embedding_provider(name: str, **kwargs) -> EmbeddingProvider:
         return BgeM3EmbeddingProvider(**kwargs)
     if name == "e5-instruct":
         return E5InstructEmbeddingProvider(**kwargs)
+    if name == "qwen3-embedding-0.6b":
+        return Qwen3EmbeddingProvider(**kwargs)
     if name == "hcx-embedding":
         return HCXEmbeddingProvider(**kwargs)
     raise ValueError(f"알 수 없는 embedding provider: {name}")

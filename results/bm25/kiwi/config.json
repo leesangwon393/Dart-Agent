@@ -1,0 +1,5 @@
+{
+  "tokenizer": "kiwi",
+  "chunking": "section_aware_parent_child",
+  "n_chunks": 1411
+}

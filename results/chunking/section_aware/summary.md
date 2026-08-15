@@ -1,0 +1,28 @@
+# Chunking variant: section_aware
+
+- n_chunks: 314
+- avg_chunk_chars: 5355
+- chunk_build_time_sec: 0.02
+- index_build_time_sec: 4.483
+- mem_delta_mb: 566.5
+
+## Metrics (validation set, n=30)
+
+- n_queries: 30
+- recall_at_5: 0.62
+- recall_at_10: 0.7977777777777778
+- recall_at_20: 0.8833333333333333
+- mrr: 0.6041088833194095
+- ndcg_at_10: 0.6252061089948275
+- hit_at_1: 0.5
+- hit_at_3: 0.6
+- ndcg_at_5: 0.556090969752253
+- mean_latency_sec: 0.0001922130584716797
+- p95_latency_sec: 0.00026702880859375
+- n_chunks: 314
+- avg_chunk_chars: 5354.598726114649
+- chunk_build_time_sec: 0.016655921936035156
+- index_build_time_sec: 4.482755184173584
+- mem_delta_mb: 566.525952
+
+## Failure cases (Recall@10=0): 4/30

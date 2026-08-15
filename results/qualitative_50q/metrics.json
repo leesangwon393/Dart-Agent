@@ -1,0 +1,9 @@
+{
+  "grade_counts": {
+    "PASS": 24,
+    "HONEST_NO_EVIDENCE": 3,
+    "FAIL_UNGROUNDED": 20,
+    "ERROR": 3
+  },
+  "n": 50
+}

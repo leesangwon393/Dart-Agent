@@ -1,0 +1,19 @@
+# BM25 tokenizer: char_3gram
+
+## Metrics (n=30)
+
+- n_queries: 30
+- recall_at_5: 0.6911111111111111
+- recall_at_10: 0.8316666666666667
+- recall_at_20: 0.9083333333333333
+- mrr: 0.6966666666666667
+- ndcg_at_10: 0.70980588773381
+- hit_at_1: 0.6
+- hit_at_3: 0.7333333333333333
+- ndcg_at_5: 0.6623546483118794
+- mean_latency_sec: 9.991327921549479e-05
+- p95_latency_sec: 0.00010514259338378906
+- index_build_time_sec: 0.2830331325531006
+- mem_delta_mb: 36.99507199999994
+
+## Failures (recall@10<1.0): 6/30

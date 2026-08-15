@@ -1,0 +1,7 @@
+{
+  "variant": "section_aware",
+  "n_docs": 33,
+  "n_chunk_units": 35,
+  "tokenizer": "kiwi",
+  "retriever": "bm25s"
+}
