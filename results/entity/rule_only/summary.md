@@ -1,0 +1,15 @@
+# Entity Extraction: rule_only
+
+## Metrics (n=30)
+
+- n: 30
+- company_exact_match: 1.0
+- correction_exact_match: 1.0
+- report_name_presence_accuracy: 1.0
+- metric_f1_macro: 0.9711111111111111
+- period_presence_f1: 1.0
+- period_presence_precision: 1.0
+- period_presence_recall: 1.0
+- mean_latency_sec: 1.2302398681640625e-05
+
+## Failures: 0/30
