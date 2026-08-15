@@ -1,0 +1,94 @@
+[
+  {
+    "label": "삼성SDI/single_lookup",
+    "query": "삼성SDI의 2025년 매출액은 얼마야?",
+    "route": "single_lookup",
+    "n_citations": 5,
+    "answer": "제공된 근거에 따르면 삼성SDI의 2025년 매출액은 **13,266,731백만 원**입니다.\n\n근거: report_id(periodic_20260310002954), chunk_id(periodic_20260310002954::main::P14::C7)",
+    "grounded": true,
+    "citation": true,
+    "warnings": [],
+    "elapsed": 23.864017009735107
+  },
+  {
+    "label": "삼성SDI/single_lookup",
+    "query": "삼성SDI의 2025년 부채비율은 얼마야?",
+    "route": "calculation",
+    "n_citations": 5,
+    "answer": "제공된 근거에 따르면, 삼성SDI의 2025년 부채비율은 **0.7928**입니다. 이는 'III. 재무에 관한 사항' 섹션의 '연결재무제표 주석' 부분에서 확인할 수 있습니다.\n\n근거: report_id(periodic_20260310002954), chunk_id(periodic_20260310002954::main::P16::C11)",
+    "grounded": true,
+    "citation": true,
+    "warnings": [],
+    "elapsed": 17.307037830352783
+  },
+  {
+    "label": "삼성SDI/correction",
+    "query": "삼성SDI가 2025년에 발표한 유상증자 결정이 몇 번 기재정정됐어?",
+    "route": "ownership_analysis",
+    "n_citations": 0,
+    "answer": "삼성SDI의 2025년 유상증자 결정은 총 **4번** 기재정정되었습니다.\n\n근거: report_id(major_20250519000120), correction history in get_correction_history result.",
+    "grounded": true,
+    "citation": false,
+    "warnings": [
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 15.400556087493896
+  },
+  {
+    "label": "LG에너지솔루션/single_lookup",
+    "query": "LG에너지솔루션의 2025년 영업이익은 얼마야?",
+    "route": "single_lookup",
+    "n_citations": 5,
+    "answer": "제공된 근거에 따르면, LG에너지솔루션의 2025년 영업이익은 **1,346,120**입니다. \n\n근거: report_id(chunk_id): periodic_20260312000217::main::P15::C4, periodic_20260312000217::main::P16::C93, periodic_20260312000217::main::P16::C117",
+    "grounded": true,
+    "citation": true,
+    "warnings": [],
+    "elapsed": 19.89690589904785
+  },
+  {
+    "label": "LG에너지솔루션/open",
+    "query": "LG에너지솔루션의 주요 제품이나 매출처를 알려줘",
+    "route": "single_lookup",
+    "n_citations": 5,
+    "answer": "LG에너지솔루션의 주요 제품과 매출처에 대해 다음과 같은 정보를 제공할 수 있습니다:\n\n**주요 제품**\n- **EV용 배터리**: 전기차 배터리로, 전기차의 핵심 부품이며 높은 에너지 밀도와 긴 수명이 특징입니다.\n- **ESS용 배터리**: 에너지 저장 시스템 배터리로, 재생 가능 에너지 발전소와 연계되어 에너지를 저장하고 필요할 때 공급하는 역할을 합니다.\n- **소형 Application용 배터리**: 스마트폰, 노트북, 태블릿 PC 등 다양한 전자기기에 사용되는 배터리입니다.\n\n**주요 매출처**\n- **자동차 OEM 업체**: 주요 5대 매출처에 대한 매출 비중은 약 63% 수준입니다.\n\n또한, LG에너지솔루션은 국내외 여러 시장에 진출해 있으며, 특히 미국과 유럽, 아시아 지역에서 활발하게 사업을 펼치고 있습니다. 이를 통해 글로벌 배터리 시장에서 선도적인 위치를 차지하고 있으며, 지속적인 연구개발과 품질 개선을 통해 고객 만족도를 높이고 있습니다.\n\n근거: \n- 주요 매출처 정보: [EVIDENCE 1]\n- 주요 제품 목록: [EVIDENCE 3]\n- 사업 개요 및 글로벌 네트워크: [EVIDENCE 5]",
+    "grounded": true,
+    "citation": true,
+    "warnings": [],
+    "elapsed": 23.03374481201172
+  },
+  {
+    "label": "한미반도체/event_count",
+    "query": "한미반도체가 2024년에 체결한 자기주식취득신탁계약은 총 몇 건이야?",
+    "route": "calculation",
+    "n_citations": 5,
+    "answer": "제공된 근거로는 확인할 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "citation": true,
+    "warnings": [],
+    "elapsed": 16.303388118743896
+  },
+  {
+    "label": "한미반도체/open",
+    "query": "한미반도체의 자기주식취득신탁계약 해지 이력을 시간순으로 정리해줘",
+    "route": "single_lookup",
+    "n_citations": 10,
+    "answer": "한미반도체의 자기주식취득 신탁계약 해지 이력을 시간 순서대로 정리하면 다음과 같습니다:\n\n1. **2023년 4월 24일**\n   - 계약기간: 2022년 10월 24일부터 2023년 4월 24일까지\n   - 해지 기관: 기업은행\n   - 해지 목적: 신탁계약 기간 만료에 의한 해지\n   - 해지 전 자기주식 보유 현황: 973,300주 (비율: 1.0%)\n\n2. **2024년 4월 17일**\n   - 계약기간: 2023년 10월 17일부터 2024년 4월 17일까지\n   - 해지 기관: 현대차증권\n   - 해지 목적: 신탁계약 기간 만료에 의한 해지\n   - 해지 전 자기주식 보유 현황: 859,600주 (비율: 0.88%)\n\n3. **2024년 7월 16일**\n   - 계약기간: 2024년 1월 16일부터 2024년 7월 16일까지\n   - 해지 기관: 현대차증권\n   - 해지 목적: 신탁계약 기간 만료에 의한 해지\n   - 해지 전 자기주식 보유 현황: 847,732주 (비율: 0.87%)\n\n4. **2024년 10월 23일**\n   - 계약기간: 2024년 4월 23일부터 2024년 10월 23일까지\n   - 해지 기관: 삼성증권\n   - 해지 목적: 신탁계약 기간 만료에 의한 해지\n   - 해지 전 자기주식 보유 현황: 1,446,032주 (비율: 1.49%)\n\n5. **2025년 1월 22일**\n   - 계약기간: 2024년 7월 22일부터 2025년 1월 22일까지\n   - 해지 기관: 현대차증권\n   - 해지 목적: 신탁계약 기간 만료에 의한 해지\n   - 해지 전 자기주식 보유 현황: 1,755,657주 (비율: 1.82%)\n\n6. **2025년 5월 12일**\n   - 계약기간: 2024년 11월 12일부터 2025년 5월 12일까지\n   - 해지 기관: 삼성증권\n   - 해지 목적: 신탁계약 기간 만료에 의한 해지\n   - 해지 전 자기주식 보유 현황: 1,761,257주 (비율: 1.8%)\n\n이 정보는 제공된 공시 자료를 기반으로 하며, 각 공시에서 확인된 내용을 바탕으로 정리되었습니다.\n\n근거: report_id(chunk_id): major_20250122000503::main::C1, major_20241023000340::main::C1, major_20240716000265::main::C1, major_20230424000440::main::C1, major_20240417000353::main::C1, major_20250512000550::main::C1, major_20240716000265::main::C1",
+    "grounded": true,
+    "citation": true,
+    "warnings": [],
+    "elapsed": 48.920087814331055
+  },
+  {
+    "label": "cross-company/multi_compare",
+    "query": "삼성SDI와 LG에너지솔루션 중 2025년 매출액이 더 큰 곳은 어디야?",
+    "route": "multi_compare",
+    "n_citations": 10,
+    "answer": "제공된 근거에 따르면, 2025년 매출액은 다음과 같습니다:\n\n- **삼성SDI**: 13,266,731백만원 (약 13조 2,667억원)\n- **LG에너지솔루션**: 7,661,584백만원 (약 7조 6,615억원)\n\n따라서 2025년 매출액이 더 큰 곳은 **삼성SDI**입니다.\n\n근거:\n- 삼성SDI 2025년 매출액 정보: [EVIDENCE 1], [EVIDENCE 2]\n- LG에너지솔루션 2025년 매출액 정보: [EVIDENCE 6]",
+    "grounded": false,
+    "citation": true,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 에서 찾을 수 없는 숫자: ['6615']"
+    ],
+    "elapsed": 17.97459888458252
+  }
+]

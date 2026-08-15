@@ -29,8 +29,9 @@ logger = logging.getLogger(__name__)
 # 라운드트립(2턴 이상)까지 통과하는지 확인 후 반영할 것.
 AGENT_SYSTEM_PROMPT = (
     "당신은 금융공시(DART) 분석 Agent입니다. 추측하지 말고 tool 로 확인하세요. "
-    "정정/최신본 확인은 get_correction_history/get_latest_report, 계산은 calculate_* "
-    "를 쓰세요. 근거가 충분하면 tool 호출을 멈추세요."
+    "정정/최신본 확인은 get_correction_history/get_latest_report, 계산(비율/증가율/CAGR)은 "
+    "calculate_*, 개수를 세는 질문은 검색 결과 개수로 직접 답하세요. 근거가 충분하면 tool "
+    "호출을 멈추세요."
 )
 
 
@@ -93,6 +94,13 @@ def run_agent_loop(
     ]
     hcx_tools = [t.to_hcx_schema() for t in tools]
 
+    # 실측(2026-08-16, 회사 일반화 스모크테스트): "몇 건이야?" 같은 카운팅 질문이
+    # calculation route 로 잘못 분류되면, agent 가 calculate_cagr 을 동일한(무의미한)
+    # 인자로 여러 번 연속 호출하다 포기하는 경우가 재현됨(n_years=0 등 이미 실패가
+    # 확정된 입력을 계속 재시도). 이름+인자가 완전히 같은 tool 호출은 재실행하지
+    # 않고 캐시된 결과 + 명시적 안내를 돌려줘서 이 무한반복을 구조적으로 막는다.
+    seen_calls: dict[str, dict] = {}
+
     for i in range(max_iterations):
         trace.iterations = i + 1
         msg = client.chat(messages, tools=hcx_tools)
@@ -106,7 +114,12 @@ def run_agent_loop(
 
         for tc in tool_calls:
             fn = tc["function"]
-            result = dispatch_tool_call(tools, fn["name"], fn["arguments"])
+            call_key = f"{fn['name']}::{json.dumps(fn['arguments'], sort_keys=True, ensure_ascii=False)}"
+            if call_key in seen_calls:
+                result = {**seen_calls[call_key], "note": "이 tool 을 동일한 인자로 이미 호출했습니다 — 결과가 바뀌지 않으니 다른 tool 이나 다른 인자를 시도하세요."}
+            else:
+                result = dispatch_tool_call(tools, fn["name"], fn["arguments"])
+                seen_calls[call_key] = result
             trace.tool_calls.append(ToolCallRecord(name=fn["name"], arguments=fn["arguments"], result=result))
             messages.append({
                 "role": "tool", "tool_call_id": tc["id"],

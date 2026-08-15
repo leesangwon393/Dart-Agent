@@ -93,14 +93,27 @@ User Query → Entity Extraction + Query Normalize → Semantic Router(hint)
 
 ## 5. 현재 진행 중인 작업
 
-**전체 Ablation 실험(Stage 1~14) 완료.** Stage 14 에서 test set(n=10, 처음이자
-유일 사용)으로 efficiency(reranker off, 현재 production) vs best_quality
-(reranker on) 비교 — efficiency 가 task_success/pass_rate/latency 모두에서
-근소 우위(다만 n=10 이라 통계적으로 약함, MRR/NDCG 같은 순수 랭킹 지표는
-best_quality 가 나음). **reranker OFF 유지가 최종 결론**. 최종 확정
-configuration 은 §11 failure_analysis 참고. 다음(마지막) 작업은 `results/`
-전체를 종합한 최종 요약 문서 작성(사용자가 "이거 다 돌리고 폴더 하나 파서
-잘 정리해줘"라고 요청함) — 아직 미완료.
+**전체 Ablation 실험(Stage 1~14) + 최종 요약 완료.** 이후 사용자가 대회 참고
+질의를 보여줘서 시작된 **"회사 일반화 검증"** 트랙이 진행 중이다(Stage 체계와
+별개, `results/generalization_check/` 참고):
+- 대회 예시 6개 질의를 실제 회사명(삼성전자/삼성SDI/LG에너지솔루션/한미반도체)
+  으로 치환해 production `ask()`에 직접 태워보는 방식으로 검증 — Stage 1~14
+  의 report-level Recall/NDCG 지표로는 못 잡았을 실제 버그 3개(TOC chunk
+  오염/카운팅 오분류/validator 오탐 2건)를 발견하고 전부 수정+회귀테스트
+  완료함(§10 참고).
+- **전체 70개사 코퍼스를 GPU 서버에서 임베딩 진행 중**(로컬 CPU는 76.8시간
+  추정이라 불가능 — `scripts/embed_full_corpus_gpu.py`, `~/Desktop/embedding/`
+  번들로 전달함). 서버 쪽에서 macOS AppleDouble(`._*`) 메타데이터 파일이
+  섞여 XML로 오인되는 문제가 발생했으나 서버 측(Codex)에서 원인 규명 및
+  격리 완료, 재개 진행 중 — **아직 로컬로 결과 안 받아옴**.
+- 방법론: 대회가 제시한 "검색추출/비교연산/복합추론 × Closed/Open" 6개
+  카테고리를 좌표축으로 회사×카테고리 매트릭스(`matrix.csv`)를 채워나가는
+  방식으로 진행하기로 사용자와 합의함 — 무작위 질문 던지기가 아니라 커버리지
+  추적 가능하게. GPU 임베딩 도착하면 이 매트릭스를 다른 업종(금융지주/바이오/
+  조선 등)으로 확장할 예정.
+- 미해결로 남은 것: "복합추론_Open"(다년도/장문 비교, 예: "2023 vs 2025
+  사업보고서 비교") 유형이 top_k=5 retrieval breadth 부족으로 반복 실패 —
+  다음 우선순위.
 
 ---
 
@@ -292,6 +305,29 @@ Extraction + HCX structured Router(HCX-005 고정) + **Agent=HCX-007**(Stage
   (안전 방향은 아님 — 재실행하면 오히려 소폭 하락할 수 있음). 전체
   Stage 1~14 재실행은 하지 않았다(범위 밖) — 재검증이 필요하면 이 caveat
   부터 확인할 것.
+- **[수정됨]** "몇 건이야?" 같은 카운팅 질문이 route=calculation 으로
+  오분류되면, agent 가 `calculate_cagr`을 완전히 동일한 무의미한 인자
+  (n_years=0 등 이미 실패가 확정된 입력)로 여러 번 연속 호출하다 포기하는
+  버그 발견(2026-08-16, 회사 일반화 스모크테스트 — 한미반도체 "2024년
+  체결 계약 몇 건" 질문에서 재현, 정답 5건인데 "확인 불가"로 오답).
+  `agent_loop.py`에 두 가지 수정: (a) AGENT_SYSTEM_PROMPT 에 "개수를 세는
+  질문은 검색 결과 개수로 직접 답하세요" 추가(186자, 300자 안전마진 유지),
+  (b) 이름+인자가 완전히 동일한 tool 호출은 실제로 재실행하지 않고 캐시된
+  결과+안내 메시지를 돌려주는 dedup guard 추가(모든 route 공통 적용,
+  calculate_cagr 특정 문제가 아니라 구조적 방지책). 재검증: 동일 질의
+  재실행 시 5건 정답, 반복 호출 없음 확인. 회귀 테스트:
+  `tests/test_agent.py::test_agent_loop_skips_redundant_identical_tool_calls`.
+- **[수정됨]** Validator 오탐 2건 발견(2026-08-16, 같은 스모크테스트).
+  (a) `get_correction_history`만 호출돼 `evidence_pack.citations`가
+  비어있으면 답변이 근거를 정확히 인용해도 무조건 `has_citation=False`로
+  잡힘 — `validator.py`가 `tool_results_summary`에서 report_id 패턴
+  (`_DOC_ID_PAT`)을 스캔하도록 수정. (b) "7조 6,615억원"처럼 같은 숫자를
+  조/억 단위로 재표기한 괄호 `(약 ...)` 안 숫자가 evidence 원문과 글자
+  그대로 안 겹친다는 이유로 "근거 없는 숫자"로 오탐 — `_extract_numbers`
+  가 `(약 ...)` 괄호를 grounding 검사 전에 제거하도록 수정. 재검증: 둘 다
+  재실행 후 정상(citation=True, ungrounded=set()) 확인. 회귀 테스트:
+  `test_validator_has_citation_from_correction_history_tool_result`,
+  `test_validator_ignores_approx_paren_restatement`.
 
 ---
 
@@ -326,30 +362,36 @@ Extraction + HCX structured Router(HCX-005 고정) + **Agent=HCX-007**(Stage
 
 ## 12. 다음에 바로 해야 할 작업
 
-**전체 실험 arc(Stage 1~14 + 최종 요약) 완전히 종료됨.** 이후 사용자가
-대회 참고 질의(§3 평가 및 제출방법, 6개 유형 예시)를 보여줘서 실제 회사명
-(삼성전자/삼성SDI/LG에너지솔루션/한미반도체)으로 치환해 production
-파이프라인(`ask()`)에 직접 태워보는 스모크테스트를 진행했고, 그 과정에서
-목차(TOC) chunk 버그를 발견·수정했다(§10 참고). 관련 산출물(git 미커밋,
-필요시 재생성 가능):
-- `/tmp/extra_companies_vectors.pkl`: 삼성SDI/LG에너지솔루션/한미반도체/
-  삼성전자FY2023 총 21개 문서, 2,110개 청크(TOC 수정 반영됨) 임베딩 캐시.
-  재생성 코드는 세션 스크립트 `embed_extra_companies.py` 참고(scratchpad,
-  세션 종료 시 사라짐 — doc_id 목록은 대화 로그에 남아있음).
-- `/tmp/competition_check_results.json`: 6개 질의 원본 실행 결과(TOC 버그
-  수정 전).
-- **미해결로 남은 것**: Q6("2023 vs 2025 사업보고서 비교")는 TOC 버그
-  수정 후에도 여전히 실패한다 — 이제는 목차 오염이 아니라, "핵심 사업"처럼
-  넓은 주제어 질의에서 top_k=5 검색이 실제 "II. 사업의 내용" 섹션을 못
-  찾고 감사보고서/상세표 같은 다른 넓은 섹션에 밀리는 **별개의 retrieval
-  breadth 문제**다. 복합문서추론/Open(다년도 전체 리포트 비교) 유형은
-  현재 아키텍처의 진짜 약점으로 남아있음 — 개선하려면 (a) 이런 broad
-  narrative 질의에 top_k 를 늘리거나, (b) agent 가 "사업의 개요/주요
-  제품" 같은 하위 키워드로 여러 번 나눠 검색하도록 유도하거나, (c) 섹션
-  전체(parent chunk)를 통째로 가져오는 전용 tool 을 고려.
+**Stage 1~14 실험 arc는 완전히 종료됨.** 현재는 그 뒤에 시작된 **"회사
+일반화 검증"** 트랙이 진행 중이다(§5 참고).
 
-다음 세션에서 이어갈 만한 후보(사용자가 명시적으로 요청할 경우에만):
-- 위에서 확인된 "복합문서추론/Open" retrieval breadth 문제 개선
+### 지금 막혀있는 것 (외부 의존)
+- **전체 70개사 코퍼스 GPU 임베딩이 서버에서 진행 중** — 로컬로 아직
+  안 받아옴. 서버에서 macOS AppleDouble 파일 오염 문제가 있었으나 해결됨
+  (서버측 Codex 가 처리). 결과 도착하면:
+  1. `gpu_embeddings/shard_*.pkl` 을 로컬 `~/Desktop/공시 agent/gpu_embeddings/`
+     로 받아오기(각 파일이 `{"chunks":[...], "vectors":[...], "dim":1024}`
+     형태 — 합칠 필요 없이 순회하며 `QdrantVectorStore.upsert_chunks()`에
+     이어붙이면 전체 인덱스 완성).
+  2. `results/generalization_check/matrix.csv`에 다른 업종(금융지주/바이오/
+     조선/자동차 등) 회사를 추가해 커버리지 확장 — 대회 6개 카테고리
+     프레임 그대로 유지.
+
+### 지금 바로(임베딩 없이) 할 수 있는 것 — 이미 진행/완료한 것
+- [x] 카운팅 오분류 + tool 중복호출 버그 수정 (§10)
+- [x] Validator 오탐 2건 수정 (§10)
+- [x] 회귀 테스트 3건 추가(`tests/test_agent.py`)
+- [x] `results/generalization_check/` 폴더 생성(matrix.csv + summary.md +
+      raw 실행 결과 2건)
+- [ ] **아직 미해결**: "복합문서추론_Open"(다년도/장문 비교, 예: "2023 vs
+      2025 사업보고서 비교", "해지 이력 시간순 정리") 유형이 top_k=5
+      retrieval breadth 부족으로 반복 실패 — 삼성전자·한미반도체 두 회사
+      모두에서 같은 계열 문제로 재현됨. 다음 우선순위 후보로 유력.
+      개선 방향: (a) broad narrative 질의에 top_k 확대, (b) agent 가 하위
+      키워드로 여러 번 나눠 검색하도록 유도, (c) 섹션 전체(parent chunk)를
+      통째로 가져오는 전용 tool.
+
+### 다음 세션에서 이어갈 만한 다른 후보 (사용자가 명시적으로 요청할 경우에만)
 - Stage 11/14 에서 식별된 `search_disclosures` 필터 완화 로직 개선
   (ownership/보유비율 질의 실패의 근본 원인)
 - `ask.py`에 answer 전용 모델(HCX-005) 분리 적용(현재는 agent client 를
@@ -358,6 +400,21 @@ Extraction + HCX structured Router(HCX-005 고정) + **Agent=HCX-007**(Stage
 - test set 표본 확대(Stage 14 의 n=10 한계 보완용 confirmatory set)
 - TOC 버그 수정이 Stage 1~14 지표에 준 영향 재검증(§10 caveat 참고 —
   선택적, 비용이 크므로 사용자가 명시적으로 요청할 때만)
+
+### 로컬 임시 캐시 (git 미포함, 세션 재시작 시 사라짐)
+- `/tmp/bgem3_chunks_vectors.pkl`: 삼성전자 33개 문서/1,411개 청크(TOC
+  수정 반영 안 됨 — 삼성전자는 원래 TOC 문제 없었던 문서들이라 무관).
+- `/tmp/extra_companies_vectors.pkl`: 삼성SDI/LG에너지솔루션/한미반도체/
+  삼성전자FY2023 총 21개 문서, 2,110개 청크(TOC 수정 반영됨). 재생성 코드는
+  세션 스크립트 `embed_extra_companies.py` 참고(scratchpad, 세션 종료 시
+  사라짐 — doc_id 목록은 대화 로그 및 `results/generalization_check/`
+  raw json 파일에 남아있음).
+- `/private/tmp/.../scratchpad/`(세션별 경로) 안의 `competition_check.py`,
+  `other_companies_check.py`, `verify_fixes.py`: 4개사 스모크테스트/재검증
+  스크립트 원본 — 세션 종료 시 사라지지만 결과는 `results/generalization_check/`
+  에 이미 저장됨.
+- `~/Desktop/embedding/`, `~/Desktop/embedding.tar.gz`: GPU 서버 전달용
+  번들(코드+corpus). GPU 결과 받아온 뒤에는 삭제해도 무방.
 
 참고로 `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
    `/tmp` 임시 파일들이 세션 재시작으로 사라졌다면, 아래 코드로 재생성:

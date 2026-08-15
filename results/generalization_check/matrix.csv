@@ -1,0 +1,18 @@
+company,category,query,verdict,note
+삼성전자,검색추출_Closed,2025년 연결기준 매출액은 얼마인가?,PASS,"334조원, 근거 정확"
+삼성전자,검색추출_Open,2026년 1분기 분기보고서 기준 주요 투자 계획 정리,PASS,부문별 투자액까지 구체적으로 정리
+삼성SDI+LG에너지솔루션,비교연산_Closed,2025년 설비투자 규모 비교,PASS,교차기업 비교 성공(LG엔솔 10.5조 > SDI 3.27조)
+삼성SDI,비교연산_Open,2025년 자금조달 내역 유형별 정리,PASS,유상증자+지급보증 둘 다 찾아 정리
+한미반도체,복합추론_Closed,계약 체결→해지 여부,PASS,3건 체결→해지 페어를 날짜까지 정확히 매칭
+삼성전자,복합추론_Open,"2023 vs 2025 사업보고서 비교, 핵심사업 변화",FAIL,TOC버그(수정완료) 이후에도 top_k=5 retrieval breadth 부족으로 여전히 실패 — 별개 미해결 이슈
+삼성SDI,검색추출_Closed,2025년 매출액,PASS,"13,266,731백만원, grounded"
+삼성SDI,검색추출_Closed,2025년 부채비율,PASS,"0.7928 — 원문이 raw ratio로 표기(단위 확인함), 정확한 인용"
+삼성SDI,복합추론_Closed,2025년 유상증자 결정 기재정정 횟수,PASS,4번 — manifest 대조 검증함(원본1+정정4)
+LG에너지솔루션,검색추출_Closed,2025년 영업이익,PASS,"1,346,120백만원"
+LG에너지솔루션,검색추출_Open,주요 제품/매출처,PASS,"EV/ESS/소형배터리, 5대매출처 63% — 근거 잘 인용"
+한미반도체,비교연산_Closed,2024년 체결 계약 건수(카운팅),FAIL(수정전),"route가 calculation으로 오분류, calculate_cagr 4회 무의미 반복호출 후 포기 — 정답은 5건"
+한미반도체,비교연산_Closed,2024년 체결 계약 건수(카운팅) [재검증],PASS,"수정 후 재실행: 5건 정답, calculate_cagr 재호출 없이 search_disclosures 1회로 정확히 답함 — agent_loop.py dedup guard + system prompt 문구 수정 확인됨"
+한미반도체,복합추론_Open,해지 이력 시간순 정리,PARTIAL,"6건만 나열, 실제 7건 중 major_20250324000703(2025-03-24 해지) 누락 확인 — 할루시네이션은 아니고 조용한 불완전 (미해결, retrieval breadth 문제로 Q6와 동일 계열)"
+삼성SDI+LG에너지솔루션,비교연산_Closed,2025년 매출액 비교,PASS(검증오탐),"정답(삼성SDI가 큼) 맞지만 validator가 '7조 6,615억원' 재표기를 ungrounded로 오탐"
+삼성SDI+LG에너지솔루션,비교연산_Closed,2025년 매출액 비교 [재검증],PASS,"수정 후 재실행: ungrounded=set() 확인됨, citation=True — validator.py _APPROX_PAREN_PAT 수정 확인됨. 단 SDI 매출액 수치가 top_k=1 재실행에서 11,455,691백만원(예상치로 추정)으로 이전 실행(13,266,731백만원, 실적치)과 달라짐 — top_k 낮을 때 다른 chunk(예상 vs 실적)가 뽑히는 변동성 별도 관찰, 버그는 아니나 참고"
+삼성SDI,복합추론_Closed,2025년 유상증자 결정 기재정정 횟수 [재검증],PASS,"수정 후 재실행: citation=True 확인됨(이전엔 citation=False 오탐) — validator.py has_citation 수정 확인됨"

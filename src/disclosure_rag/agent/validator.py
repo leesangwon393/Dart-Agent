@@ -13,11 +13,21 @@ from disclosure_rag.agent.evidence import EvidencePack
 from disclosure_rag.entity.entity_extractor import ExtractedEntities
 
 _NUMBER_PAT = re.compile(r"\d[\d,]*\.?\d*")
+_APPROX_PAREN_PAT = re.compile(r"\(약[^)]*\)")
+_DOC_ID_PAT = re.compile(r"\b(?:periodic|major|exchange|holding)_\d{10,}\b")
 
 
 def _extract_numbers(text: str, *, min_digits: int = 3) -> set[str]:
     """콤마/소수점을 제거한 뒤, 우연한 오검출(1~2자리 숫자, 연도 등)을 줄이기 위해
-    min_digits 자리 이상만 취급한다."""
+    min_digits 자리 이상만 취급한다.
+
+    회귀 발견(2026-08-16, 회사 일반화 스모크테스트): "7,661,584백만원 (약 7조
+    6,615억원)"처럼 답변이 같은 숫자를 조/억 단위로 다시 풀어 쓰면, 괄호 안의
+    "6615"가 evidence 원문 문자열과 글자 그대로 일치하지 않아 "근거 없는 숫자"로
+    오탐됐다(실제로는 같은 숫자의 재표기일 뿐 새로운 주장이 아님). "(약 ...)"
+    괄호는 근사 재표기라는 걸 답변 스스로 명시한 것이므로 grounding 검사에서
+    제외한다."""
+    text = _APPROX_PAREN_PAT.sub(" ", text)
     out = set()
     for m in _NUMBER_PAT.finditer(text):
         norm = m.group(0).replace(",", "")
@@ -53,10 +63,22 @@ def validate_answer(answer: str, evidence_pack: EvidencePack, entities: Extracte
     if ungrounded:
         warnings.append(f"[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 에서 찾을 수 없는 숫자: {sorted(ungrounded)}")
 
-    has_citation = bool(evidence_pack.citations) and (
-        "근거" in answer or any(c.report_id in answer or c.chunk_id in answer for c in evidence_pack.citations)
+    # 회귀 발견(2026-08-16): get_correction_history/get_latest_report 만 호출된
+    # 답변(search_disclosures 를 안 써서 evidence_pack.citations 가 비어있는
+    # 경우)은, 답변이 근거를 정확히 인용했어도 evidence_pack.citations 가
+    # 비어있다는 이유만으로 무조건 has_citation=False 로 잡혔다. tool_results_
+    # summary(예: get_correction_history 결과)에 등장한 report_id 를 답변이
+    # 그대로 인용했는지도 함께 확인한다.
+    tool_result_doc_ids = {
+        m.group(0) for tr in evidence_pack.tool_results_summary for m in _DOC_ID_PAT.finditer(str(tr))
+    }
+    has_any_evidence = bool(evidence_pack.citations) or bool(tool_result_doc_ids)
+    has_citation = has_any_evidence and (
+        any(c.report_id in answer or c.chunk_id in answer for c in evidence_pack.citations)
+        or any(doc_id in answer for doc_id in tool_result_doc_ids)
+        or "근거" in answer
     )
-    if evidence_pack.citations and not has_citation:
+    if has_any_evidence and not has_citation:
         warnings.append("답변에 근거(report_id/chunk_id) 인용이 없음")
 
     correction_evidence_complete: bool | None = None

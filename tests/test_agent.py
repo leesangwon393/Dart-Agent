@@ -133,3 +133,86 @@ def test_validator_flags_ungrounded_number():
     result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
     assert not result.numbers_grounded
     assert "999999999" in result.ungrounded_numbers
+
+
+def test_validator_ignores_approx_paren_restatement():
+    """회귀(2026-08-16, 회사 일반화 스모크테스트): "7,661,584백만원 (약 7조
+    6,615억원)"처럼 같은 숫자를 조/억 단위로 다시 풀어 쓴 괄호 안 숫자가
+    evidence 원문과 문자 그대로 안 겹친다는 이유로 "근거 없는 숫자"로 오탐됐다.
+    "(약 ...)" 괄호는 근사 재표기이므로 grounding 검사에서 제외해야 한다."""
+    from disclosure_rag.agent.evidence import EvidencePack
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    pack = EvidencePack(
+        question="q", prompt_text="[EVIDENCE 1]\n내용: 매출액 7,661,584백만원\nreport_id: r1\nchunk_id: c1\n",
+        citations=[],
+    )
+    answer = "매출액은 7,661,584백만원(약 7조 6,615억원)입니다. 근거: r1"
+    result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
+    assert result.numbers_grounded, f"괄호 안 재표기가 오탐됨: {result.ungrounded_numbers}"
+
+
+def test_validator_has_citation_from_correction_history_tool_result():
+    """회귀(2026-08-16): get_correction_history 만 호출돼 evidence_pack.citations
+    가 비어있는 경우(search_disclosures 를 안 씀), 답변이 tool 결과의 report_id
+    를 정확히 인용했는데도 무조건 has_citation=False 로 잡혔다."""
+    from disclosure_rag.agent.evidence import EvidencePack
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    pack = EvidencePack(
+        question="q", prompt_text="[TOOL RESULT]\nget_correction_history: ...\n",
+        citations=[],
+        tool_results_summary=[{
+            "tool": "get_correction_history", "arguments": {},
+            "result": {"correction_groups": [{"chain": [{"doc_id": "major_20250519000120"}]}]},
+        }],
+    )
+    answer = "정정이 4번 있었습니다.\n근거: report_id(major_20250519000120)"
+    result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
+    assert result.has_citation is True
+
+
+class _StubHCXClient:
+    """agent_loop 의 duplicate-tool-call 방지 로직을 실제 API 없이 검증하기
+    위한 스텁 — 스크립트된 응답을 순서대로 반환한다."""
+
+    def __init__(self, responses: list[dict]):
+        self._responses = list(responses)
+
+    def chat(self, messages, *, tools=None, **kwargs):
+        return self._responses.pop(0)
+
+
+def test_agent_loop_skips_redundant_identical_tool_calls():
+    """회귀(2026-08-16, 회사 일반화 스모크테스트): "몇 건이야?" 같은 카운팅
+    질문이 calculation route 로 오분류되면, agent 가 calculate_cagr 을 완전히
+    동일한(무의미한) 인자로 여러 번 연속 호출하다 포기하는 경우가 실측 재현됐다
+    (n_years=0 처럼 이미 실패가 확정된 입력을 계속 재시도). 이름+인자가 완전히
+    같은 tool 호출은 실제로 재실행하지 않아야 한다."""
+    from disclosure_rag.agent.agent_loop import run_agent_loop
+    from disclosure_rag.agent.tools import ToolDef
+
+    call_count = {"n": 0}
+
+    def handler(x: int) -> dict:
+        call_count["n"] += 1
+        return {"value": x}
+
+    dummy_tool = ToolDef(
+        name="dummy_tool", description="테스트용",
+        parameters={"type": "object", "properties": {"x": {"type": "integer"}}, "required": ["x"]},
+        handler=handler,
+    )
+    repeated_call_msg = {
+        "role": "assistant", "content": "",
+        "toolCalls": [{"id": "id", "type": "function", "function": {"name": "dummy_tool", "arguments": {"x": 5}}}],
+    }
+    responses = [dict(repeated_call_msg) for _ in range(3)] + [{"role": "assistant", "content": "완료.", "toolCalls": None}]
+    client = _StubHCXClient(responses)
+    extractor = EntityExtractor(corpus_root=CORPUS_ROOT, metric_terms_path=CONFIG_ROOT / "metric_terms.txt")
+
+    trace = run_agent_loop(client, [dummy_tool], "테스트 질문", entity_extractor=extractor, max_iterations=6)
+
+    assert len(trace.tool_calls) == 3, "호출 기록 자체는 투명하게 3번 다 남아야 함"
+    assert call_count["n"] == 1, f"handler 가 {call_count['n']}번 실제 실행됨 — 중복 방지가 동작 안 함"
+    assert "이미" in trace.tool_calls[1].result.get("note", ""), "2번째부터는 중복 안내가 붙어야 함"
