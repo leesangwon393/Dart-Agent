@@ -1,0 +1,6 @@
+{
+  "embedding_model": "e5-instruct",
+  "chunking": "section_aware_parent_child",
+  "n_chunks": 1411,
+  "device": "cpu"
+}
