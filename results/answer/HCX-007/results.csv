@@ -1,0 +1,30 @@
+id,query,route,answer_len,numbers_grounded,has_citation,correction_evidence_complete,passed,latency_sec
+1,삼성전자 2025년 사업보고서에서 매출액 알려줘,single_lookup,175,True,True,,True,1.84
+2,삼성전자 2026년 1분기 영업이익 얼마야?,single_lookup,138,True,True,,True,1.6
+3,삼성전자 연구개발비 얼마야?,single_lookup,488,True,True,,True,5.05
+5,삼성전자 반도체 위탁생산 계약금액 얼마야?,single_lookup,139,True,True,,True,1.45
+6,삼성전자 2026년 1월 자기주식 취득예정금액 얼마야?,single_lookup,146,True,True,,True,1.88
+7,삼성전자 해외증권시장 상장 결정 내용 알려줘,single_lookup,576,True,True,,True,5.24
+9,삼성전자 2024년 11월 자기주식취득 공시 정정 전후로 뭐가 바뀌었어?,correction_analysis,994,True,True,True,True,7.62
+10,삼성전자 2025년 2월 자기주식취득 정정공시 내용 알려줘,correction_analysis,20,True,False,False,False,0.51
+11,삼성전자 단일판매공급계약체결 정정 전후 비교해줘,correction_analysis,747,False,True,True,False,6.82
+13,삼성전자 최근 정정공시 이력 알려줘,correction_analysis,469,False,False,False,False,5.57
+14,삼성전자 공급계약 계약상대방이 정정으로 어떻게 바뀌었어?,correction_analysis,296,True,True,True,True,2.36
+17,삼성전자 2025년과 2026년 자기주식취득 규모 비교해줘,multi_compare,498,True,True,,True,6.16
+18,삼성전자 사업보고서와 분기보고서 실적 비교해줘,multi_compare,814,False,True,,False,9.21
+19,삼성전자 삼성물산 보유주식 변동 추이 알려줘,multi_compare,1104,True,True,,True,8.77
+21,삼성전자 반도체 위탁생산 계약금액이 최근매출액 대비 몇 %야?,calculation,84,False,True,,False,1.21
+22,삼성전자 영업이익률 계산해줘,calculation,234,False,True,,False,2.95
+23,삼성전자 부채비율 계산해줘,calculation,569,False,True,,False,5.28
+25,삼성전자 최대주주가 누구야?,ownership_analysis,312,True,True,,True,25.08
+26,삼성전자 삼성물산 보유지분율 알려줘,ownership_analysis,452,True,True,,True,3.41
+27,삼성전자 최근 대량보유상황보고서 내용 알려줘,ownership_analysis,1081,True,True,,True,8.38
+29,삼성전자 지분 보고자 특별관계자 현황 알려줘,ownership_analysis,1491,True,False,,False,13.41
+30,삼성전자 2025년 9월 지분보고 내용 알려줘,ownership_analysis,20,True,True,,True,1.0
+31,삼성전자 2026년 1월 지분 변동 내역 알려줘,ownership_analysis,105,True,True,,True,3.18
+33,삼성전자 최근 자기주식 취득 결정했어?,event_analysis,465,True,True,,True,4.44
+34,삼성전자 최근 자기주식 처분 결정했어?,event_analysis,1002,True,True,,True,7.37
+35,삼성전자 해외 상장 관련 이벤트 있었어?,event_analysis,638,True,True,,True,5.45
+37,삼성전자 최근 대규모 계약 체결 있었어?,event_analysis,641,False,True,,False,27.5
+38,삼성전자 2026년 3월 자기주식 관련 결정 내용 알려줘,event_analysis,630,True,True,,True,5.04
+39,삼성전자 2025년 5월 자기주식처분 결정 내용 알려줘,event_analysis,299,True,True,,True,2.74

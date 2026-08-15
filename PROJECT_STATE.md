@@ -93,14 +93,13 @@ User Query → Entity Extraction + Query Normalize → Semantic Router(hint)
 
 ## 5. 현재 진행 중인 작업
 
-**Stage 11 완료.** 5개 후보(BM25/Dense/Hybrid/Hybrid+Reranker/Full Agentic)를
-동일 report-level Recall/MRR/NDCG 공식으로 비교. `hybrid_reranker`가 랭킹
-품질 최고(R@5=0.820, NDCG@10=0.783, 5.4s), `full_agentic`은 랭킹 품질은
-raw retrieval 보다 낮지만(필터 과도 축소로 인한 0건 실패가 원인)
-task_success_rate=0.759 로 "결국 찾는다"에는 강함 — 단일 winner 대신
-두 시나리오(정확도 최우선 vs 실시간성+도구조합)로 나눠 권고함(§8/§11 참고).
-현재 baseline(hybrid_fusion 기반 tools + HCX-007 agent)이 이미 합리적
-절충이라는 점이 재확인됨. 다음은 **Stage 12 — Answer HCX 모델 비교**를
+**Stage 12 완료.** Tool-calling(agent loop)은 HCX-007 로 질의당 1번만 실행해
+동일 Evidence Pack 을 만들고, 그 Pack 을 3개 모델(DASH-002/005/007)에 그대로
+줘서 답변 생성만 비교. **HCX-005 가 answer 역할에서는 1위**(overall_pass_
+rate=0.750, HCX-007 0.690, DASH-002 0.321) — Agent 역할(Stage 10, HCX-007)과
+다른 모델이 승리하는 역할별 분리 결론이 나왔다. 도중 HCX-007 전용
+프로덕션 버그(`maxTokens` 대신 `maxCompletionTokens` 필요) 발견/수정함.
+다음은 **Stage 14 — Final E2E**(test set 10개, 처음이자 마지막 사용)를
 시작할 차례.
 
 ---
@@ -183,6 +182,7 @@ BGE-M3 591.7ms/chunk 기준 전체 코퍼스 임베딩 73시간).
 | 9 Router | hcx_structured_router | hcx accuracy=0.800 macro_F1=0.813(4.502s) vs semantic_router accuracy=0.600 macro_F1=0.495(38.7ms) vs agent_only(NoRouter) accuracy=0.0 fallback_rate=1.0(설계상 정상) |
 | 10 Agent HCX 모델 | HCX-007 | tool_acc=0.966 arg_acc=0.980 task_success=0.793(13.9s) vs HCX-005 tool_acc=0.897 arg_acc=0.883 task_success=0.552(20.3s) vs HCX-DASH-002 tool_acc=0.567 arg_acc=1.000 task_success=0.233(9.1s) — HCX-007 이 정확도·지연·API호출비용 전부 우위 |
 | 11 E2E RAG | 시나리오별 분리(§5 참고) | hybrid_reranker R@5=0.820 NDCG@10=0.783(5.4s) > hybrid_fusion R@5=0.661 NDCG@10=0.731(43ms) > full_agentic R@5=0.622 NDCG@10=0.545(15.7s) task_success=0.759 > bm25_only/dense_only |
+| 12 Answer HCX 모델 | HCX-005(answer 역할, Agent 역할과 다름) | pass_rate: HCX-005=0.750 > HCX-007=0.690 > DASH-002=0.321(citation 누락이 주원인) |
 
 **현재까지 baseline 누적**: Section-aware+Parent-Child chunking + char_2gram(잠정,
 Kiwi 대안 검토중) tokenizer + BGE-M3 dense + Normalized Weighted Fusion +
@@ -257,6 +257,12 @@ hybrid_reranker 를 별도 옵션으로 문서화(§11 failure_analysis 참고).
   남 → `thinking={"effort":"none"}`을 명시하면 해결. `hcx_client.py` 의
   `HCXClient`가 모델명에 "007"이 포함되면 자동으로 이 파라미터를 붙이도록
   수정(호출부 무수정으로 HCX-007 사용 가능, Stage 10 에서 발견/수정).
+- **[수정됨]** HCX-007 은 max token 제한 파라미터 이름도 다르다 —
+  "maxTokens"를 주면 400("Invalid parameter: maxTokens"), 대신
+  "maxCompletionTokens"를 써야 정상 동작(Stage 12 답변생성 경로에서 발견
+  — agent loop 는 tool-calling 모드라 애초에 max_tokens 를 안 보내서
+  Stage 10 에서는 드러나지 않았던 버그). `hcx_client.py`의
+  `self._max_tokens_param`이 모델명으로 자동 분기하도록 수정.
 
 ---
 
@@ -273,8 +279,8 @@ hybrid_reranker 를 별도 옵션으로 문서화(§11 failure_analysis 참고).
       최우선)와 full_agentic(현재 baseline, task_success 강함이나 필터 과도
       축소로 랭킹 품질은 raw retrieval 보다 낮음)으로 시나리오 분리 권고.
       `results/e2e_rag/`(failure_analysis.md 포함) 커밋됨.
-- [ ] **Stage 12 — Answer HCX 모델**: 동일 Evidence Pack 을 HCX-DASH-002/005/007
-      에 주고 Accuracy/Numerical Accuracy/Faithfulness/Citation Accuracy 비교.
+- [x] **Stage 12 — Answer HCX 모델**: 완료. HCX-005 채택(answer 역할).
+      `results/answer/`(failure_analysis.md 포함) 커밋됨.
 - [ ] **Stage 14 — Final E2E**: Best-quality config vs efficiency config,
       **test set(10개, 지금까지 한 번도 안 씀)으로만** 최종 평가.
 - [ ] 각 Stage 리포트 형식: `[Experiment]/[Candidates]/[Metrics]/[Best]/
@@ -286,25 +292,31 @@ hybrid_reranker 를 별도 옵션으로 문서화(§11 failure_analysis 참고).
 
 ## 12. 다음에 바로 해야 할 작업
 
-1. **Stage 12 — Answer HCX 모델 비교** 시작 (Task #24, pending → in_progress
-   전환). 방법: Stage 11 의 `full_agentic` 실행에서 나온 각 질의의
-   `AgentTrace`(tool_calls 포함)를 재사용해 `build_evidence_pack()`으로
-   동일 Evidence Pack 을 만들고(agent tool-calling 자체는 이미 Stage 10/11
-   에서 HCX-007 로 확정 — 여기서 또 돌리면 변수가 섞이므로, tool 호출은
-   1번만 하고 그 결과를 3개 모델에 동일하게 재사용할 것), `generate_answer()`
-   만 HCX-DASH-002/HCX-005/HCX-007 각각으로 실행. 지표: Numerical Accuracy
-   (evidence 안의 숫자와 답변 숫자 일치, `validator.py`의 `_extract_numbers`
-   재사용), Faithfulness(`validate_answer().numbers_grounded`), Citation
-   Accuracy(`has_citation`), 정성 Accuracy(직접 20+ 건 읽고 판단).
-   `results/answer/{model_name}/` 저장 + `comparison.json` + `failure_analysis.md`.
-2. Stage 12 완료 후: PROJECT_STATE.md §5/§8/§11/§12 갱신, git commit/push,
-   Task #24 completed → Task #25(Stage 14 — Final E2E, test set) in_progress 전환.
-   Stage 14 는 **test set(10개, 여태 한 번도 안 씀)으로 단 한 번만** 평가 —
-   Best-quality config(hybrid_reranker 기반) vs efficiency config(현재
-   baseline=hybrid_fusion 기반 full_agentic) 두 configuration 비교.
-3. Stage 14 이후: 모든 `results/`를 하나의 최종 요약 문서로 정리(사용자
-   요청 "이거 다 돌리고 폴더 하나 파서 잘 정리해줘") — 전체 11개 스테이지
-   결과를 종합한 최종 리포트(마크다운 또는 Artifact)를 만들 것.
+1. **Stage 14 — Final E2E** 시작 (Task #25, pending → in_progress 전환).
+   **Test set(10개, id=4,8,...,40 — 지금까지 model/parameter 선택에 전혀
+   안 씀)으로 단 한 번만** 평가. 두 configuration 비교:
+   - **Best-quality**: chunking=section_aware_parent_child + bm25=kiwi +
+     dense=bge-m3 + fusion=normalized_weighted + **reranker=bge-reranker-
+     v2-m3 ON** + entity=rule_only + router=hcx_structured(HCX-005 고정) +
+     agent=HCX-007 + answer=HCX-005.
+   - **Efficiency**(현재 production baseline): 위와 동일하되 **reranker
+     OFF**. (answer 모델은 두 config 모두 HCX-005 로 통일 — DASH-002 는
+     Stage 12 에서 정확도 격차가 "미미한 수준"이 아니었으므로 지연
+     우선이라도 배제하는 게 사용자 지침의 "정확도 차이가 미미할 때만
+     latency 로 결정" 원칙과 일관됨. 즉 Stage 14 는 사실상 **reranker
+     on/off 가 test set 최종 답변 품질에 실질적으로 영향을 주는지**를
+     검증하는 실험이 된다.)
+   지표: retrieval(Recall/MRR/NDCG, Stage 11과 동일 공식) + answer
+   validation(faithfulness/citation/pass_rate, Stage 12와 동일) + latency.
+   `results/e2e_final/{config}/` 저장 + `comparison.json` + `failure_analysis.md`.
+   **주의**: test set 크기가 10개뿐이라 통계적으로 약함 — 결과 해석 시
+   반드시 이 표본 크기 한계를 명시할 것.
+2. Stage 14 완료 후: PROJECT_STATE.md §5/§8/§11/§12 갱신, git commit/push,
+   Task #25 completed.
+3. 모든 Stage 완료 후: `results/` 전체를 하나의 최종 요약 문서로 정리(사용자
+   요청 "이거 다 돌리고 폴더 하나 파서 잘 정리해줘") — 11개 스테이지 결과를
+   종합한 최종 리포트(마크다운 + Artifact 게시 고려)를 만들 것. 이게 이번
+   실험 arc 의 마지막 산출물.
 4. `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
    `/tmp` 임시 파일들이 세션 재시작으로 사라졌다면, 아래 코드로 재생성:
    ```python
@@ -320,4 +332,4 @@ hybrid_reranker 를 별도 옵션으로 문서화(§11 failure_analysis 참고).
    doc_ids = [r.doc_id for r in periodic+major+exchange+holding]
    ```
    `eval/gold_queries.json` (git에 커밋되어 있음, 40개 gold query)은 그대로 사용.
-5. TaskList 로 진행상황 재확인 (Task #14~25, id 24부터가 다음 미완료 작업).
+5. TaskList 로 진행상황 재확인 (Task #14~25, id 25가 마지막 미완료 작업).

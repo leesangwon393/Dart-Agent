@@ -1,0 +1,8 @@
+{
+  "answer_model": "HCX-005",
+  "evidence_source": "HCX-007 agent (Stage 10/11 fixed)",
+  "chunking": "section_aware_parent_child",
+  "bm25": "kiwi",
+  "dense": "bge-m3",
+  "fusion": "normalized_weighted"
+}

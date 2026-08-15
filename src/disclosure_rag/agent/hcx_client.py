@@ -63,6 +63,12 @@ class HCXClient:
         # 호출부(agent_loop.py 등)를 모델별로 분기시키지 않기 위해 클라이언트
         # 레벨에서 흡수한다.
         self._default_thinking = {"effort": "none"} if "007" in self.model else None
+        # HCX-007 은 max token 제한 파라미터 이름이 다른 모델과 다르다(실측,
+        # Stage 12): "maxTokens"를 주면 400("Invalid parameter: maxTokens")이
+        # 나고, 대신 "maxCompletionTokens"를 써야 정상 동작한다. 원인 불명
+        # (reasoning 모델이라 내부적으로 토큰 예산을 다르게 다루는 것으로 추정)
+        # — 호출부 무수정으로 흡수하기 위해 여기서 모델별로 파라미터 이름을 정한다.
+        self._max_tokens_param = "maxCompletionTokens" if "007" in self.model else "maxTokens"
 
     def _load_env(self, env_path: str | Path) -> None:
         from dotenv import load_dotenv
@@ -91,7 +97,11 @@ class HCXClient:
         있는데, 이 상태에서 `tools`를 같이 주면 400("Invalid parameter: tools,
         thinking")이 난다(실측, Stage 10). `thinking={"effort": "none"}`을
         명시하면 해결된다. HCX-DASH-002/HCX-005는 이 파라미터가 필요 없다
-        (안 줘도 tool-calling 정상 동작) — 모델별로 호출부에서 필요할 때만 전달."""
+        (안 줘도 tool-calling 정상 동작) — 모델별로 호출부에서 필요할 때만 전달.
+
+        `max_tokens`: HCX-007 은 파라미터 이름 자체가 다르다("maxTokens"를
+        주면 400, "maxCompletionTokens"라고 줘야 함 — 실측, Stage 12).
+        `self._max_tokens_param`(모델별 자동 결정)을 키로 써서 흡수한다."""
         payload: dict[str, Any] = {"messages": messages, "topP": top_p, "temperature": temperature}
         if thinking is None:
             thinking = self._default_thinking
@@ -103,7 +113,7 @@ class HCXClient:
                 payload["toolChoice"] = tool_choice
             # 실측: tools + maxTokens 동시 사용 시 400 (§ 위 docstring)
         elif max_tokens is not None:
-            payload["maxTokens"] = max_tokens
+            payload[self._max_tokens_param] = max_tokens
 
         headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
 

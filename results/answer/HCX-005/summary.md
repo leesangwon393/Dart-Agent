@@ -1,0 +1,17 @@
+# Answer HCX Model: HCX-005
+
+## Metrics (n=28)
+
+- n: 28
+- n_client_exceptions: 2
+- faithfulness_rate: 0.8214285714285714
+- citation_accuracy_rate: 0.8928571428571429
+- overall_pass_rate: 0.75
+- correction_evidence_complete_rate: 0.6
+- n_correction_applicable: 5
+- numerical_accuracy: 1.0
+- n_numerical_checks: 2
+- mean_latency_sec: 6.857543621744428
+- mean_answer_len_chars: 466.57142857142856
+
+## Failures: 9/30
