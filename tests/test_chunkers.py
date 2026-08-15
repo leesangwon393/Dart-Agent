@@ -96,6 +96,29 @@ def test_search_text_has_context_header(manifest):
     assert c.raw_text not in c.text or "[내용]" in c.text  # text 는 raw_text 를 감싼 형태
 
 
+def test_toc_table_excluded_from_chunks(manifest):
+    """회귀(2026-08-15, 대회 참고 질의 스모크테스트에서 발견): periodic 문서의
+    목차(TOC) 페이지가 표로 파싱되어 그대로 인덱싱되면 [제목 | 대시 필러 |
+    페이지번호] 텍스트가 실제 section 제목과 키워드가 겹쳐 검색을 오염시킨다
+    (진짜 본문 대신 목차 chunk 가 top-k 를 차지해 "핵심 사업" 질의가 실패로
+    이어짐 — 실제 재현됨). 목차 표는 chunk 후보에서 제외돼야 하고, 원문의
+    모든 섹션 제목은 실제 section 으로도 존재하므로 정보 손실은 없다."""
+    chunks = _chunks_for(manifest, {"periodic_20240312000736"})
+    toc_like = [c for c in chunks if c.section_path == ["사업보고서"]]
+    assert not toc_like, f"목차 표가 여전히 chunk 로 남아있음: {[c.chunk_id for c in toc_like]}"
+    # 진짜 본문(예: 사업의 내용)은 그대로 살아있어야 한다 — 과도하게 걸러내지 않았는지 확인.
+    assert any("사업의 내용" in "".join(c.section_path) for c in chunks)
+
+
+def test_toc_detector_does_not_flag_real_data_table(manifest):
+    """회귀: 초기 구현은 셀 텍스트가 "-" 하나만 있어도(재무표의 결측/0 표기 관행)
+    목차로 오탐했다(실측: 내부통제담당인력 현황표, periodic_20250319000665).
+    대시 필러는 목차 특유의 긴 리더 점선(예: 35자)이어야만 걸러야 한다."""
+    chunks = _chunks_for(manifest, {"periodic_20250319000665"})
+    control_chunks = [c for c in chunks if "내부통제에 관한 사항" in "".join(c.section_path)]
+    assert control_chunks, "내부통제 관련 chunk 가 통째로 사라짐(오탐으로 필터링됐을 가능성)"
+
+
 def test_all_chunks_are_valid_schema(manifest):
     """무작위 표본에 대해 스키마 필수 필드가 채워지는지 확인."""
     import random

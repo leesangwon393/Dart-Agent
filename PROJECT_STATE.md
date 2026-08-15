@@ -272,6 +272,26 @@ Extraction + HCX structured Router(HCX-005 고정) + **Agent=HCX-007**(Stage
   — agent loop 는 tool-calling 모드라 애초에 max_tokens 를 안 보내서
   Stage 10 에서는 드러나지 않았던 버그). `hcx_client.py`의
   `self._max_tokens_param`이 모델명으로 자동 분기하도록 수정.
+- **[수정됨]** periodic 문서의 목차(TOC) 페이지가 표로 파싱돼 그대로
+  인덱싱되는 버그 발견(2026-08-15, 대회 참고 질의를 실제 파이프라인에 태워본
+  스모크테스트에서 재현 — 정식 Stage 실험 범위 밖). "SECTION 밖 loose
+  content 보존" 수정(§10 위 항목) 덕에 유실은 안 되지만, [제목 | 긴 대시
+  필러 | 페이지번호] 텍스트가 실제 section 제목과 키워드가 겹쳐 BM25에서
+  허위로 높은 점수를 받아 진짜 본문을 top-k 밖으로 밀어냄(실제 질의
+  "삼성전자 2023 vs 2025 사업보고서 비교 → 핵심 사업 변화"에서 재현:
+  2023년 근거로 목차만 잡혀 "확인할 수 없음"으로 오답). `chunkers.py`에
+  `_is_toc_table()` 추가해 목차 표를 chunk 후보에서 제외(파싱 트리 자체는
+  보존). 1차 구현은 "-" 한 글자만 봐서 재무표 결측치 표기와 헷갈려
+  오탐(내부통제 인력 현황표)이 났고, 대시 필러 최소 길이(10자) 조건을
+  추가해 해결 — `tests/test_chunkers.py`에 회귀 테스트 2건 추가.
+  **중요 caveat**: 삼성전자 100개 문서 중 6건, 300개 periodic 샘플 중 6건
+  꼴로 존재하는 것으로 확인(약 2%) — Stage 1~14 ablation 은 이 버그가
+  있는 상태로 진행됐다. Report-level Recall/MRR/NDCG 지표는 "정답 리포트의
+  아무 chunk나 top-k에 있으면 성공"으로 채점하므로 목차 chunk가 걸려도
+  성공으로 잡혀 **지표가 실제보다 살짝 유리하게 나왔을 가능성**이 있다
+  (안전 방향은 아님 — 재실행하면 오히려 소폭 하락할 수 있음). 전체
+  Stage 1~14 재실행은 하지 않았다(범위 밖) — 재검증이 필요하면 이 caveat
+  부터 확인할 것.
 
 ---
 
@@ -306,15 +326,38 @@ Extraction + HCX structured Router(HCX-005 고정) + **Agent=HCX-007**(Stage
 
 ## 12. 다음에 바로 해야 할 작업
 
-**전체 실험 arc(Stage 1~14 + 최종 요약) 완전히 종료됨.** 사용자가 새로운
-요청을 하기 전까지는 이 프로젝트에 대해 자발적으로 더 할 작업 없음. 다음
-세션에서 이어갈 만한 후보(사용자가 명시적으로 요청할 경우에만):
+**전체 실험 arc(Stage 1~14 + 최종 요약) 완전히 종료됨.** 이후 사용자가
+대회 참고 질의(§3 평가 및 제출방법, 6개 유형 예시)를 보여줘서 실제 회사명
+(삼성전자/삼성SDI/LG에너지솔루션/한미반도체)으로 치환해 production
+파이프라인(`ask()`)에 직접 태워보는 스모크테스트를 진행했고, 그 과정에서
+목차(TOC) chunk 버그를 발견·수정했다(§10 참고). 관련 산출물(git 미커밋,
+필요시 재생성 가능):
+- `/tmp/extra_companies_vectors.pkl`: 삼성SDI/LG에너지솔루션/한미반도체/
+  삼성전자FY2023 총 21개 문서, 2,110개 청크(TOC 수정 반영됨) 임베딩 캐시.
+  재생성 코드는 세션 스크립트 `embed_extra_companies.py` 참고(scratchpad,
+  세션 종료 시 사라짐 — doc_id 목록은 대화 로그에 남아있음).
+- `/tmp/competition_check_results.json`: 6개 질의 원본 실행 결과(TOC 버그
+  수정 전).
+- **미해결로 남은 것**: Q6("2023 vs 2025 사업보고서 비교")는 TOC 버그
+  수정 후에도 여전히 실패한다 — 이제는 목차 오염이 아니라, "핵심 사업"처럼
+  넓은 주제어 질의에서 top_k=5 검색이 실제 "II. 사업의 내용" 섹션을 못
+  찾고 감사보고서/상세표 같은 다른 넓은 섹션에 밀리는 **별개의 retrieval
+  breadth 문제**다. 복합문서추론/Open(다년도 전체 리포트 비교) 유형은
+  현재 아키텍처의 진짜 약점으로 남아있음 — 개선하려면 (a) 이런 broad
+  narrative 질의에 top_k 를 늘리거나, (b) agent 가 "사업의 개요/주요
+  제품" 같은 하위 키워드로 여러 번 나눠 검색하도록 유도하거나, (c) 섹션
+  전체(parent chunk)를 통째로 가져오는 전용 tool 을 고려.
+
+다음 세션에서 이어갈 만한 후보(사용자가 명시적으로 요청할 경우에만):
+- 위에서 확인된 "복합문서추론/Open" retrieval breadth 문제 개선
 - Stage 11/14 에서 식별된 `search_disclosures` 필터 완화 로직 개선
   (ownership/보유비율 질의 실패의 근본 원인)
 - `ask.py`에 answer 전용 모델(HCX-005) 분리 적용(현재는 agent client 를
   answer 생성에도 재사용 — Stage 12 결론이 프로덕션에 아직 반영 안 됨)
 - char_2gram BM25 토크나이저 재검토(Stage 2 에서 수치상 1위였으나 보류)
 - test set 표본 확대(Stage 14 의 n=10 한계 보완용 confirmatory set)
+- TOC 버그 수정이 Stage 1~14 지표에 준 영향 재검증(§10 caveat 참고 —
+  선택적, 비용이 크므로 사용자가 명시적으로 요청할 때만)
 
 참고로 `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
    `/tmp` 임시 파일들이 세션 재시작으로 사라졌다면, 아래 코드로 재생성:

@@ -14,13 +14,50 @@ from __future__ import annotations
 
 from disclosure_rag.chunking.chunk_schema import ChunkSchema, estimate_tokens, render_search_text
 from disclosure_rag.chunking.packer import pack_nodes
-from disclosure_rag.common.doc_tree import ParsedDocument, SectionNode
+from disclosure_rag.common.doc_tree import ContentNode, ParsedDocument, SectionNode, TableNode
 from disclosure_rag.common.manifest_loader import ManifestRow
 from disclosure_rag.correction.correction_graph_builder import CorrectionRecord
 
 CHILD_TARGET_TOKENS = 600
 CHILD_MAX_TOKENS = 1000
 WHOLE_DOC_MAX_TOKENS = 1000  # 이보다 작으면 major/exchange 는 "공시 1건 = chunk 1개"
+
+_TOC_DASH_RATIO_MIN = 0.6
+_TOC_PAGENUM_RATIO_MIN = 0.6
+_TOC_MIN_ROWS = 3
+_TOC_DASH_LEADER_MIN_LEN = 10  # "리더 점선"(예: 35자 대시)과 재무표의 "-"(결측/0 표기) 를 구분
+
+
+def _is_toc_table(node: ContentNode) -> bool:
+    """목차(TOC) 페이지가 표(TableNode)로 파싱된 경우를 감지한다.
+
+    실측(2026-08-15, 대회 참고 질의 스모크테스트): periodic 문서에서 SECTION
+    밖 loose content 로 존재하는 목차 표가 "SECTION 밖 loose content 보존"
+    수정(§10) 덕에 더 이상 유실되지는 않지만, 그대로 인덱싱하면 [제목 | 빈칸 |
+    '---------------------------------' | 페이지번호] 행이 반복되는 텍스트가
+    실제 section 제목과 키워드가 그대로 겹쳐 BM25에서 허위로 높은 점수를 받고,
+    진짜 본문 chunk 를 top-k 밖으로 밀어낸다(실제 질의 "핵심 사업"에서 재현
+    확인됨). 목차는 원문에 있는 모든 제목이 실제 section 으로도 그대로
+    존재하므로 검색 인덱스에서 빼도 정보 손실이 없다 — 파싱 트리 자체에서는
+    빼지 않고(§9-2 원문 보존 원칙 유지), chunk 로 만들 content 후보에서만 제외.
+
+    주의(회귀 발견): 처음엔 셀 텍스트가 "-"로만 이루어졌는지만 봤는데, 재무표에서
+    결측/0 을 "-" 한 글자로 표기하는 관행과 구분이 안 돼 내부통제 인력 현황 같은
+    진짜 데이터 표를 오탐했다(실측: `periodic_20250319000665` "2. 내부통제에
+    관한 사항"). 목차의 "리더 점선"은 길게 이어진 대시(예: 35자)라는 게 실측으로
+    확인된 차이라 최소 길이 조건(`_TOC_DASH_LEADER_MIN_LEN`)을 추가해 구분한다."""
+    if not isinstance(node, TableNode) or len(node.rows) < _TOC_MIN_ROWS:
+        return False
+    n = len(node.rows)
+    dash_hits = 0
+    pagenum_hits = 0
+    for row in node.rows:
+        texts = [c.text.strip() for c in row]
+        if any(len(t) >= _TOC_DASH_LEADER_MIN_LEN and set(t) == {"-"} for t in texts):
+            dash_hits += 1
+        if texts and texts[-1].isdigit():
+            pagenum_hits += 1
+    return (dash_hits / n) >= _TOC_DASH_RATIO_MIN and (pagenum_hits / n) >= _TOC_PAGENUM_RATIO_MIN
 
 
 def _period_str(row: ManifestRow) -> str | None:
@@ -48,9 +85,10 @@ def _base_fields(row: ManifestRow, correction: CorrectionRecord, report_name: st
 
 
 def _content_bearing_sections(sections: list[SectionNode]):
-    """direct content(ContentNode) 를 가진 SectionNode 를 전부 순회한다 (Parent 후보)."""
+    """direct content(ContentNode) 를 가진 SectionNode 를 전부 순회한다 (Parent 후보).
+    목차 표(_is_toc_table)는 검색 인덱스 후보에서 제외한다(원문 트리 자체는 그대로 유지)."""
     for s in sections:
-        direct_content = [c for c in s.children if not isinstance(c, SectionNode)]
+        direct_content = [c for c in s.children if not isinstance(c, SectionNode) and not _is_toc_table(c)]
         if direct_content:
             yield s, direct_content
         sub_sections = [c for c in s.children if isinstance(c, SectionNode)]
@@ -120,7 +158,7 @@ def _flatten_with_section(sections: list[SectionNode]) -> list[tuple[list[str], 
         for c in s.children:
             if isinstance(c, SectionNode):
                 out.extend(_flatten_with_section([c]))
-            else:
+            elif not _is_toc_table(c):
                 out.append((s.path, c))
     return out
 
