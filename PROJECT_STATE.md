@@ -93,17 +93,9 @@ User Query → Entity Extraction + Query Normalize → Semantic Router(hint)
 
 ## 5. 현재 진행 중인 작업
 
-**Stage 5 — Reranker 비교** (bge-reranker-v2-m3 vs No-Reranker baseline,
-Qwen3-Reranker-0.6B 는 로딩 정체로 제외 예정).
-- `no_reranker` 완료: Hit@1=0.633 Hit@3=0.733 MRR=0.712 NDCG@5=0.672,
-  latency 42.9ms
-- `bge_reranker_v2_m3` 는 백그라운드에서 실행 중, **예상보다 훨씬 오래 걸리는
-  중**(1시간+, 정상 예상은 5~10분). 원인 추정: Hybrid Top-50 candidate 중
-  일부가 여전히 매우 긴 chunk(§9 표 캡 미해결 잔여 케이스, 최대 26,027자
-  확인됨)라 cross-encoder 처리가 느려짐. 스크립트:
-  `/private/tmp/claude-501/.../scratchpad/stage5_reranker.py` (경로는 세션마다
-  바뀌는 scratchpad 라 재실행 필요 시 §11 "다음 작업" 참고해 재작성).
-  결과가 나오면 `results/reranker/` 에 저장하고 Stage 5 마무리.
+**Stage 5 완료.** No-Reranker(Hybrid only) 를 baseline 으로 채택(CPU 환경
+쿼리당 11초는 대화형 서비스에 치명적 — §8 참고). 다음은 **Stage 8 — Entity
+Extraction 비교**(Rule only / Rule+HCX fallback / HCX only)를 시작할 차례.
 
 ---
 
@@ -180,10 +172,16 @@ BGE-M3 591.7ms/chunk 기준 전체 코퍼스 임베딩 73시간).
 | 2 BM25 Tokenizer | char_2gram (잠정) | R@10=0.912 MRR=0.757 (Kiwi: R@10=0.802 MRR=0.682) |
 | 3 Dense Embedding | BGE-M3(실무) / e5-instruct(정확도상한) | bge-m3 R@10=0.840(591.7ms) vs e5 R@10=0.867(3710.0ms) |
 | 4 Fusion | Normalized Weighted Fusion | R@10=0.903 R@20=0.940 MRR=0.713 NDCG@10=0.735 |
-| 5 Reranker | 진행 중 | no_reranker: Hit@1=0.633 MRR=0.712 (baseline) |
+| 5 Reranker | No-Reranker(CPU 배포용) / bge-reranker-v2-m3(GPU면 재검토) | no_reranker Hit@1=0.633 MRR=0.712(42.7ms) vs bge_reranker Hit@1=0.667 MRR=0.773(11,053.8ms, **258배 느림**) |
 
 **현재까지 baseline 누적**: Section-aware+Parent-Child chunking + char_2gram(잠정,
-Kiwi 대안 검토중) tokenizer + BGE-M3 dense + Normalized Weighted Fusion.
+Kiwi 대안 검토중) tokenizer + BGE-M3 dense + Normalized Weighted Fusion +
+No-Reranker(CPU 배포 기준).
+
+**Stage 5 에서 발견한 프로덕션 버그(수정 완료)**: `CrossEncoderReranker` 가
+`max_length` 미지정이라 매우 긴 outlier chunk(최대 26,027자) 만나면 처리
+시간이 폭증(1500쌍 reranking 이 58분+ 걸림) → `retrieval/reranker.py` 에
+`max_length=512` 기본값 추가로 수정, 프로덕션 코드에 반영됨.
 
 ---
 
@@ -276,13 +274,13 @@ Kiwi 대안 검토중) tokenizer + BGE-M3 dense + Normalized Weighted Fusion.
 
 ## 12. 다음에 바로 해야 할 작업
 
-1. Stage 5(`bge_reranker_v2_m3`) 백그라운드 프로세스 결과 확인
-   (`ps aux | grep stage5_reranker`, `tail /tmp/stage5_reranker.log`).
-   완료 안 됐으면 계속 대기(ScheduleWakeup 사용 중이었음).
-2. 결과 나오면 `results/reranker/failure_analysis.md` 작성, git commit+push,
-   Task #19 completed 처리.
-3. Task #20(Stage 8 Entity Extraction) in_progress 로 변경 후 진행.
-4. `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
+1. **Stage 8 — Entity Extraction 비교** 시작 (Task #20, 이미 in_progress).
+   Rule only(구현됨, `entity/entity_extractor.py`) / Rule+HCX fallback(신규
+   구현 필요) / HCX only(신규 구현 필요) 3종 비교. 지표: Entity Exact Match,
+   Metric F1, Latency. Gold entity label 이 아직 없으므로 `eval/gold_queries.json`
+   질의들에서 회사명/기간/지표를 직접 읽고 gold 로 라벨링 필요(Stage 1 gold
+   query 만들 때처럼 직접 읽고 검증).
+2. `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
    `/tmp` 임시 파일들이 세션 재시작으로 사라졌다면, 아래 코드로 재생성:
    ```python
    # doc_ids 재생성 (삼성전자 33개 문서: periodic 최신 2 + major 전체 19 +
