@@ -93,11 +93,12 @@ User Query → Entity Extraction + Query Normalize → Semantic Router(hint)
 
 ## 5. 현재 진행 중인 작업
 
-**Stage 9 완료.** Entity Extraction(Stage 8)은 Rule only 압승으로 종료,
-Router(Stage 9)는 hcx_structured_router 를 baseline 으로 채택(정확도 격차가
-커서 latency trade-off 원칙 적용 안 함 — §8/§9 결과 참고). 다음은
-**Stage 10 — Agent HCX 모델 비교**(HCX-DASH-002/HCX-005/HCX-007, 먼저 실제
-API 가용성부터 확인)를 시작할 차례.
+**Stage 10 완료.** HCX-DASH-002/HCX-005/HCX-007 모두 tool-calling 가능함을
+확인(HCX-007 은 `thinking={"effort":"none"}` 필요 — `hcx_client.py` 에 자동
+적용 로직 추가됨). HCX-007 이 정확도(tool/argument/task 3개 지표)·지연·API
+호출 비용 전부에서 우위라 baseline 으로 채택, `.env` 의 `HCX_MODEL` 을
+HCX-007 로 변경함. 다음은 **Stage 11 — E2E RAG 비교**(BM25/Dense/Hybrid/
+Hybrid+Reranker/Full Agentic)를 시작할 차례.
 
 ---
 
@@ -177,10 +178,12 @@ BGE-M3 591.7ms/chunk 기준 전체 코퍼스 임베딩 73시간).
 | 5 Reranker | No-Reranker(CPU 배포용) / bge-reranker-v2-m3(GPU면 재검토) | no_reranker Hit@1=0.633 MRR=0.712(42.7ms) vs bge_reranker Hit@1=0.667 MRR=0.773(11,053.8ms, **258배 느림**) |
 | 8 Entity Extraction | Rule only | rule company_EM=1.0 correction_EM=1.0 metric_F1=0.971 period_F1=1.0(12μs) vs hcx_only metric_F1=~0.40 period_F1=0.556(7s+) — 압승, trade-off 자체 없음 |
 | 9 Router | hcx_structured_router | hcx accuracy=0.800 macro_F1=0.813(4.502s) vs semantic_router accuracy=0.600 macro_F1=0.495(38.7ms) vs agent_only(NoRouter) accuracy=0.0 fallback_rate=1.0(설계상 정상) |
+| 10 Agent HCX 모델 | HCX-007 | tool_acc=0.966 arg_acc=0.980 task_success=0.793(13.9s) vs HCX-005 tool_acc=0.897 arg_acc=0.883 task_success=0.552(20.3s) vs HCX-DASH-002 tool_acc=0.567 arg_acc=1.000 task_success=0.233(9.1s) — HCX-007 이 정확도·지연·API호출비용 전부 우위 |
 
 **현재까지 baseline 누적**: Section-aware+Parent-Child chunking + char_2gram(잠정,
 Kiwi 대안 검토중) tokenizer + BGE-M3 dense + Normalized Weighted Fusion +
-No-Reranker(CPU 배포 기준) + Rule-only Entity Extraction + HCX structured Router.
+No-Reranker(CPU 배포 기준) + Rule-only Entity Extraction + HCX structured Router
++ HCX-007 Agent 모델(`.env` HCX_MODEL 도 HCX-007 로 변경 완료).
 
 **Stage 5 에서 발견한 프로덕션 버그(수정 완료)**: `CrossEncoderReranker` 가
 `max_length` 미지정이라 매우 긴 outlier chunk(최대 26,027자) 만나면 처리
@@ -243,6 +246,11 @@ No-Reranker(CPU 배포 기준) + Rule-only Entity Extraction + HCX structured Ro
 - **[관찰됨]** HCX API 가 짧은 시간 연속 호출 시 간헐적으로 400
   ("Unsupported function")을 내는 rate-limit 성 패턴 — exponential backoff
   재시도(3s/6s/12s/24s)로 대부분 우회됨(`hcx_client.py`).
+- **[수정됨]** HCX-007(reasoning 모델)은 thinking 모드가 기본 on 상태라
+  `tools` 파라미터와 같이 쓰면 400("Invalid parameter: tools, thinking")이
+  남 → `thinking={"effort":"none"}`을 명시하면 해결. `hcx_client.py` 의
+  `HCXClient`가 모델명에 "007"이 포함되면 자동으로 이 파라미터를 붙이도록
+  수정(호출부 무수정으로 HCX-007 사용 가능, Stage 10 에서 발견/수정).
 
 ---
 
@@ -253,10 +261,8 @@ No-Reranker(CPU 배포 기준) + Rule-only Entity Extraction + HCX structured Ro
       `results/entity/` 전체(failure_analysis.md 포함) 커밋됨.
 - [x] **Stage 9 — Router**: 완료. hcx_structured_router 채택.
       `results/router/` 전체(failure_analysis.md 포함) 커밋됨.
-- [ ] **Stage 10 — Agent HCX 모델**: HCX-DASH-002/HCX-005/HCX-007 중 실제
-      사용 가능한 모델을 **먼저 API로 확인**(현재 `.env` 는 HCX-005 로 설정
-      돼 있고 이것만 검증됨). Tool Accuracy/Argument Accuracy/Task
-      Success/Latency 비교.
+- [x] **Stage 10 — Agent HCX 모델**: 완료. HCX-007 채택, `.env` 갱신됨.
+      `results/agent/`(failure_analysis.md 포함) 커밋됨.
 - [ ] **Stage 11 — E2E RAG**: BM25/Dense/Hybrid/Hybrid+Reranker/Full Agentic
       비교. 여기서 Stage 1 failure_analysis 에 적힌 "corpus 불균형으로 인한
       periodic 과다매칭" 문제가 metadata filter/agent 개입으로 해소되는지
@@ -275,19 +281,25 @@ No-Reranker(CPU 배포 기준) + Rule-only Entity Extraction + HCX structured Ro
 
 ## 12. 다음에 바로 해야 할 작업
 
-1. **Stage 10 — Agent HCX 모델 비교** 시작 (Task #22, pending → in_progress로
-   전환). 순서: (a) `.env` 의 HCX_MODEL 을 바꿔가며 HCX-DASH-002/HCX-005/
-   HCX-007 각각 실제 tool-calling 가능 여부를 먼저 짧게 API 호출로 검증
-   (사용자 지침: "실험 전에 다시 확인한다") — 현재는 HCX-005 만 검증된 상태.
-   (b) 가용 모델들로 `agent/agent_loop.py` 의 전체 tool-calling agent 루프를
-   동일 evaluation set(gold_queries.json validation 30개)에 대해 실행,
-   Tool Accuracy/Argument Accuracy/Task Success/Latency 비교.
-   (c) `results/agent/{model_name}/` 에 config.json/metrics.json/results.csv/
-   failure_cases.jsonl/summary.md 저장 + `results/agent/comparison.json`.
-   (d) `results/agent/failure_analysis.md` 작성(stage8/9 패턴과 동일하게 —
-   ≥20 실패 케이스 목표, 부족하면 있는 만큼 근본원인 분류).
-2. Stage 10 완료 후: PROJECT_STATE.md §5/§8/§11/§12 갱신, git commit/push,
-   Task #22 completed → Task #23(Stage 11 — E2E RAG 비교) in_progress 전환.
+1. **Stage 11 — E2E RAG 비교** 시작 (Task #23, pending → in_progress 전환).
+   후보: BM25 only / Dense only / Hybrid(Fusion만) / Hybrid+Reranker /
+   Full Agentic(현재 baseline 전체: HCX-007 agent + hcx_structured_router +
+   rule entity + normalized_weighted fusion + no reranker). 동일 validation
+   30개 질의로 report-level Recall/MRR/NDCG(비-agentic 후보는 retrieval
+   지표) + Full Agentic 은 Stage 10 과 동일한 task_success_rate 로 비교.
+   **중요**: 여기서 Stage 1/4 failure_analysis 에 적힌 "지분/보유
+   관련(ownership_analysis) retrieval 난이도가 유독 높다"는 관찰과 Stage
+   10 failure_analysis 의 id=26/27 교차실패가 agent 개입(query rewriting/
+   metadata filter 재시도)으로 완화되는지 재확인할 것 — 열린 질문으로
+   문서화되어 있음.
+   `results/e2e_rag/{variant}/` 저장 + `comparison.json` + `failure_analysis.md`.
+2. Stage 11 완료 후: PROJECT_STATE.md §5/§8/§11/§12 갱신, git commit/push,
+   Task #23 completed → Task #24(Stage 12 — Answer HCX 모델 비교) in_progress 전환.
+   Stage 12 는 동일 Evidence Pack(Stage 11 의 Full Agentic 결과에서 추출)을
+   HCX-DASH-002/HCX-005/HCX-007 각각에 주고 `answer_generator.py`(HCX-007 은
+   `thinking` 파라미터 필요 없음 — `hcx_client.py` 가 이미 자동 처리)로
+   답변만 생성해 Accuracy/Numerical Accuracy/Faithfulness/Citation Accuracy
+   비교.
 3. `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
    `/tmp` 임시 파일들이 세션 재시작으로 사라졌다면, 아래 코드로 재생성:
    ```python
@@ -303,4 +315,4 @@ No-Reranker(CPU 배포 기준) + Rule-only Entity Extraction + HCX structured Ro
    doc_ids = [r.doc_id for r in periodic+major+exchange+holding]
    ```
    `eval/gold_queries.json` (git에 커밋되어 있음, 40개 gold query)은 그대로 사용.
-4. TaskList 로 진행상황 재확인 (Task #14~25, id 22부터가 다음 미완료 작업).
+4. TaskList 로 진행상황 재확인 (Task #14~25, id 23부터가 다음 미완료 작업).

@@ -58,6 +58,11 @@ class HCXClient:
             raise HCXError("HCX_MODEL 이 없습니다 (.env 확인)")
         self.timeout = timeout
         self._url = _ENDPOINT_TMPL.format(model=self.model)
+        # HCX-007(reasoning 모델)은 thinking 모드 기본 on 상태에서 tools 와 같이
+        # 쓰면 400 이 난다(실측, Stage 10) — 모델명으로 감지해 자동으로 꺼준다.
+        # 호출부(agent_loop.py 등)를 모델별로 분기시키지 않기 위해 클라이언트
+        # 레벨에서 흡수한다.
+        self._default_thinking = {"effort": "none"} if "007" in self.model else None
 
     def _load_env(self, env_path: str | Path) -> None:
         from dotenv import load_dotenv
@@ -74,13 +79,24 @@ class HCXClient:
         top_p: float = 0.8,
         max_tokens: int | None = None,
         max_retries: int = 3,
+        thinking: dict | None = None,
     ) -> dict:
         """단일 chat completion 호출. 원본 응답의 result.message 를 그대로 반환한다.
 
         실측: 드물게 동일 요청이 일시적으로 400("Unsupported function")을 내다가
         재시도하면 바로 성공하는 케이스가 관측됨(원인 불명, API 측 일시 오류로 추정)
-        — 짧게 재시도한다."""
+        — 짧게 재시도한다.
+
+        `thinking`: HCX-007(reasoning 모델)은 기본적으로 thinking 모드가 켜져
+        있는데, 이 상태에서 `tools`를 같이 주면 400("Invalid parameter: tools,
+        thinking")이 난다(실측, Stage 10). `thinking={"effort": "none"}`을
+        명시하면 해결된다. HCX-DASH-002/HCX-005는 이 파라미터가 필요 없다
+        (안 줘도 tool-calling 정상 동작) — 모델별로 호출부에서 필요할 때만 전달."""
         payload: dict[str, Any] = {"messages": messages, "topP": top_p, "temperature": temperature}
+        if thinking is None:
+            thinking = self._default_thinking
+        if thinking is not None:
+            payload["thinking"] = thinking
         if tools:
             payload["tools"] = tools
             if tool_choice is not None:

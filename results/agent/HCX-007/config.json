@@ -1,0 +1,9 @@
+{
+  "agent_model": "HCX-007",
+  "router_model": "HCX-005(fixed)",
+  "entity": "rule_only",
+  "chunking": "section_aware_parent_child",
+  "bm25": "kiwi",
+  "dense": "bge-m3",
+  "fusion": "normalized_weighted"
+}

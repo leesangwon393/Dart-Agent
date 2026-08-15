@@ -1,0 +1,14 @@
+{
+  "n": 29,
+  "n_client_exceptions": 1,
+  "tool_accuracy": 0.896551724137931,
+  "argument_accuracy": 0.8831168831168831,
+  "task_success_rate": 0.5517241379310345,
+  "max_iterations_hit_rate": 0.034482758620689655,
+  "mean_latency_sec": 20.3420323914495,
+  "mean_iterations": 2.7241379310344827,
+  "mean_tool_calls": 2.6551724137931036,
+  "total_tool_calls": 77,
+  "error_tool_calls": 9,
+  "mem_rss_delta_mb": -1671.4
+}

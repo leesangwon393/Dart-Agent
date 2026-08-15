@@ -1,0 +1,31 @@
+id,query,route,called_tools,tool_ok,n_tool_calls,n_errors,task_success,stopped_reason,iterations,latency_sec
+1,삼성전자 2025년 사업보고서에서 매출액 알려줘,single_lookup,['search_disclosures'],True,1,0,True,no_more_tool_calls,2,7.6
+2,삼성전자 2026년 1분기 영업이익 얼마야?,single_lookup,[],False,0,0,False,no_more_tool_calls,1,5.02
+3,삼성전자 연구개발비 얼마야?,single_lookup,['search_disclosures'],True,1,0,True,no_more_tool_calls,2,8.4
+5,삼성전자 반도체 위탁생산 계약금액 얼마야?,single_lookup,['search_disclosures'],True,1,0,False,no_more_tool_calls,2,9.53
+6,삼성전자 2026년 1월 자기주식 취득예정금액 얼마야?,single_lookup,['search_disclosures'],True,1,0,False,no_more_tool_calls,2,9.26
+7,삼성전자 해외증권시장 상장 결정 내용 알려줘,single_lookup,[],False,0,0,False,no_more_tool_calls,1,5.3
+9,삼성전자 2024년 11월 자기주식취득 공시 정정 전후로 뭐가 바뀌었어?,correction_analysis,[],False,0,0,False,no_more_tool_calls,1,5.93
+10,삼성전자 2025년 2월 자기주식취득 정정공시 내용 알려줘,correction_analysis,['get_correction_history'],True,1,0,False,no_more_tool_calls,2,6.94
+11,삼성전자 단일판매공급계약체결 정정 전후 비교해줘,correction_analysis,['get_correction_history'],True,1,0,False,no_more_tool_calls,2,9.42
+13,삼성전자 최근 정정공시 이력 알려줘,correction_analysis,['get_correction_history'],True,1,0,False,no_more_tool_calls,2,20.74
+14,삼성전자 공급계약 계약상대방이 정정으로 어떻게 바뀌었어?,correction_analysis,['get_correction_history'],True,1,0,False,no_more_tool_calls,2,8.48
+15,삼성전자 최근 지분 변동 추이 알려줘,multi_compare,['get_latest_report'],False,1,0,False,no_more_tool_calls,2,9.32
+17,삼성전자 2025년과 2026년 자기주식취득 규모 비교해줘,multi_compare,['get_latest_report'],False,2,0,False,no_more_tool_calls,2,8.87
+18,삼성전자 사업보고서와 분기보고서 실적 비교해줘,multi_compare,"['search_disclosures', 'get_latest_report']",True,6,0,True,no_more_tool_calls,4,25.32
+19,삼성전자 삼성물산 보유주식 변동 추이 알려줘,multi_compare,['search_disclosures'],True,1,0,True,no_more_tool_calls,2,13.7
+21,삼성전자 반도체 위탁생산 계약금액이 최근매출액 대비 몇 %야?,calculation,[],False,0,0,False,no_more_tool_calls,1,5.95
+22,삼성전자 영업이익률 계산해줘,calculation,[],False,0,0,False,no_more_tool_calls,1,6.09
+23,삼성전자 부채비율 계산해줘,calculation,[],False,0,0,False,no_more_tool_calls,1,5.9
+25,삼성전자 최대주주가 누구야?,ownership_analysis,['search_disclosures'],True,1,0,True,no_more_tool_calls,2,7.16
+26,삼성전자 삼성물산 보유지분율 알려줘,ownership_analysis,['get_latest_report'],False,1,0,False,no_more_tool_calls,2,7.66
+27,삼성전자 최근 대량보유상황보고서 내용 알려줘,ownership_analysis,['get_latest_report'],False,1,0,False,no_more_tool_calls,2,9.63
+29,삼성전자 지분 보고자 특별관계자 현황 알려줘,ownership_analysis,[],False,0,0,False,no_more_tool_calls,1,6.29
+30,삼성전자 2025년 9월 지분보고 내용 알려줘,ownership_analysis,[],False,0,0,False,no_more_tool_calls,1,5.92
+31,삼성전자 2026년 1월 지분 변동 내역 알려줘,ownership_analysis,['search_disclosures'],True,1,0,False,no_more_tool_calls,2,8.84
+33,삼성전자 최근 자기주식 취득 결정했어?,event_analysis,['get_latest_report'],False,1,0,False,no_more_tool_calls,2,7.83
+34,삼성전자 최근 자기주식 처분 결정했어?,event_analysis,['search_disclosures'],True,1,0,True,no_more_tool_calls,2,9.53
+35,삼성전자 해외 상장 관련 이벤트 있었어?,event_analysis,['search_disclosures'],True,1,0,False,no_more_tool_calls,2,8.11
+37,삼성전자 최근 대규모 계약 체결 있었어?,event_analysis,['search_disclosures'],True,1,0,True,no_more_tool_calls,2,9.71
+38,삼성전자 2026년 3월 자기주식 관련 결정 내용 알려줘,event_analysis,['search_disclosures'],True,1,0,False,no_more_tool_calls,2,10.7
+39,삼성전자 2025년 5월 자기주식처분 결정 내용 알려줘,event_analysis,['search_disclosures'],True,1,0,False,no_more_tool_calls,2,10.49

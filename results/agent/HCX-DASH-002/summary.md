@@ -1,0 +1,18 @@
+# Agent HCX Model: HCX-DASH-002
+
+## Metrics (n=30)
+
+- n: 30
+- n_client_exceptions: 0
+- tool_accuracy: 0.5666666666666667
+- argument_accuracy: 1.0
+- task_success_rate: 0.23333333333333334
+- max_iterations_hit_rate: 0.0
+- mean_latency_sec: 9.120791657765706
+- mean_iterations: 1.8
+- mean_tool_calls: 0.9333333333333333
+- total_tool_calls: 28
+- error_tool_calls: 0
+- mem_rss_delta_mb: 1220.1
+
+## Failures: 23/30
