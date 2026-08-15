@@ -115,6 +115,28 @@ User Query → Entity Extraction + Query Normalize → Semantic Router(hint)
   사업보고서 비교") 유형이 top_k=5 retrieval breadth 부족으로 반복 실패 —
   다음 우선순위.
 
+**부가 트랙: Router 파인튜닝 데이터 준비** (GPU 임베딩과 별개로 진행 가능,
+`results/router_tuning/` 참고):
+- 대회 측이 CLOVA Studio 튜닝을 방법론으로 제공 → 어디를 튜닝할지 검토한 결과
+  **Router(route 분류)가 1순위**로 결론남(이유: 닫힌 분류 문제라 튜닝이 잘
+  먹히는 유형, 학습데이터 있음, 오늘 찾은 카운팅 오분류 버그가 정확히 이
+  지점). Agent(tool 선택)는 2순위(잠재력 크지만 리스크 큼), Answer 생성은
+  3순위(지금 문제들이 대부분 답변 품질이 아니라 retrieval/라우팅 문제라
+  우선순위 낮음)로 정리함.
+- CLOVA Studio 분류 튜닝 요구사항 웹 조사 완료: **카테고리당 최소 200행**
+  (6개 route × 200 = 최소 1,200건 필요), 라벨은 한 단어·띄어쓰기/특수문자
+  금지(언더스코어 포함 route 이름이 통과되는지 미확인, 콘솔에서 재확인
+  필요), CSV/JSONL 형식(C_ID/T_ID/Text/Completion/System_Prompt 필드),
+  행당 8,000자 이내. 분류 태스크엔 HCX-DASH-001 권장이라는 출처도 있었으나
+  불확실 — 재확인 필요.
+- **HCX로 학습데이터 생성하는 파일럿(150개) 완료 및 사용자와 함께 검토**:
+  `scripts/generate_route_pilot.py` 로 6개 route × 25개 생성 → 실제로
+  칼럼간 오분류 3~5건(전체의 ~3%) 발견 → 사용자와 함께 경계 규칙 2가지 확정
+  (①기간별 비율/지표 비교→multi_compare, ②두 회사 정정이력 비교→
+  correction_analysis, `results/router_tuning/rubric.md` 참고) → 오분류
+  수정 반영한 최종 파일럿 149건(`results/router_tuning/pilot_v1_reviewed.json`)
+  확보. **아직 1,200건까지 확대는 안 함** — 사용자 승인 대기 중.
+
 ---
 
 ## 6. 주요 파일과 역할
