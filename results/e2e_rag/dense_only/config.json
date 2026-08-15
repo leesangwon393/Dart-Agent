@@ -1,0 +1,7 @@
+{
+  "variant": "dense_only",
+  "chunking": "section_aware_parent_child",
+  "bm25": "kiwi",
+  "dense": "bge-m3",
+  "fusion": null
+}

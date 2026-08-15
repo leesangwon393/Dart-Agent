@@ -1,0 +1,8 @@
+{
+  "variant": "full_agentic",
+  "agent_model": "HCX-007",
+  "router": "hcx_structured(HCX-005 fixed)",
+  "entity": "rule_only",
+  "fusion": "normalized_weighted",
+  "reranker": null
+}

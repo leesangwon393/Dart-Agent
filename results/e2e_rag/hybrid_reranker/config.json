@@ -1,0 +1,8 @@
+{
+  "variant": "hybrid_reranker",
+  "chunking": "section_aware_parent_child",
+  "bm25": "kiwi",
+  "dense": "bge-m3",
+  "fusion": "normalized_weighted",
+  "reranker": "bge-reranker-v2-m3"
+}

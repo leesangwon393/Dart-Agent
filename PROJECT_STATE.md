@@ -93,12 +93,15 @@ User Query → Entity Extraction + Query Normalize → Semantic Router(hint)
 
 ## 5. 현재 진행 중인 작업
 
-**Stage 10 완료.** HCX-DASH-002/HCX-005/HCX-007 모두 tool-calling 가능함을
-확인(HCX-007 은 `thinking={"effort":"none"}` 필요 — `hcx_client.py` 에 자동
-적용 로직 추가됨). HCX-007 이 정확도(tool/argument/task 3개 지표)·지연·API
-호출 비용 전부에서 우위라 baseline 으로 채택, `.env` 의 `HCX_MODEL` 을
-HCX-007 로 변경함. 다음은 **Stage 11 — E2E RAG 비교**(BM25/Dense/Hybrid/
-Hybrid+Reranker/Full Agentic)를 시작할 차례.
+**Stage 11 완료.** 5개 후보(BM25/Dense/Hybrid/Hybrid+Reranker/Full Agentic)를
+동일 report-level Recall/MRR/NDCG 공식으로 비교. `hybrid_reranker`가 랭킹
+품질 최고(R@5=0.820, NDCG@10=0.783, 5.4s), `full_agentic`은 랭킹 품질은
+raw retrieval 보다 낮지만(필터 과도 축소로 인한 0건 실패가 원인)
+task_success_rate=0.759 로 "결국 찾는다"에는 강함 — 단일 winner 대신
+두 시나리오(정확도 최우선 vs 실시간성+도구조합)로 나눠 권고함(§8/§11 참고).
+현재 baseline(hybrid_fusion 기반 tools + HCX-007 agent)이 이미 합리적
+절충이라는 점이 재확인됨. 다음은 **Stage 12 — Answer HCX 모델 비교**를
+시작할 차례.
 
 ---
 
@@ -179,11 +182,14 @@ BGE-M3 591.7ms/chunk 기준 전체 코퍼스 임베딩 73시간).
 | 8 Entity Extraction | Rule only | rule company_EM=1.0 correction_EM=1.0 metric_F1=0.971 period_F1=1.0(12μs) vs hcx_only metric_F1=~0.40 period_F1=0.556(7s+) — 압승, trade-off 자체 없음 |
 | 9 Router | hcx_structured_router | hcx accuracy=0.800 macro_F1=0.813(4.502s) vs semantic_router accuracy=0.600 macro_F1=0.495(38.7ms) vs agent_only(NoRouter) accuracy=0.0 fallback_rate=1.0(설계상 정상) |
 | 10 Agent HCX 모델 | HCX-007 | tool_acc=0.966 arg_acc=0.980 task_success=0.793(13.9s) vs HCX-005 tool_acc=0.897 arg_acc=0.883 task_success=0.552(20.3s) vs HCX-DASH-002 tool_acc=0.567 arg_acc=1.000 task_success=0.233(9.1s) — HCX-007 이 정확도·지연·API호출비용 전부 우위 |
+| 11 E2E RAG | 시나리오별 분리(§5 참고) | hybrid_reranker R@5=0.820 NDCG@10=0.783(5.4s) > hybrid_fusion R@5=0.661 NDCG@10=0.731(43ms) > full_agentic R@5=0.622 NDCG@10=0.545(15.7s) task_success=0.759 > bm25_only/dense_only |
 
 **현재까지 baseline 누적**: Section-aware+Parent-Child chunking + char_2gram(잠정,
 Kiwi 대안 검토중) tokenizer + BGE-M3 dense + Normalized Weighted Fusion +
 No-Reranker(CPU 배포 기준) + Rule-only Entity Extraction + HCX structured Router
-+ HCX-007 Agent 모델(`.env` HCX_MODEL 도 HCX-007 로 변경 완료).
++ HCX-007 Agent 모델(`.env` HCX_MODEL 도 HCX-007 로 변경 완료). Stage 11 은
+이 baseline 조합(=full_agentic)을 유지하되, "정확도 최우선" 대안으로
+hybrid_reranker 를 별도 옵션으로 문서화(§11 failure_analysis 참고).
 
 **Stage 5 에서 발견한 프로덕션 버그(수정 완료)**: `CrossEncoderReranker` 가
 `max_length` 미지정이라 매우 긴 outlier chunk(최대 26,027자) 만나면 처리
@@ -263,11 +269,10 @@ No-Reranker(CPU 배포 기준) + Rule-only Entity Extraction + HCX structured Ro
       `results/router/` 전체(failure_analysis.md 포함) 커밋됨.
 - [x] **Stage 10 — Agent HCX 모델**: 완료. HCX-007 채택, `.env` 갱신됨.
       `results/agent/`(failure_analysis.md 포함) 커밋됨.
-- [ ] **Stage 11 — E2E RAG**: BM25/Dense/Hybrid/Hybrid+Reranker/Full Agentic
-      비교. 여기서 Stage 1 failure_analysis 에 적힌 "corpus 불균형으로 인한
-      periodic 과다매칭" 문제가 metadata filter/agent 개입으로 해소되는지
-      재확인 필요(§results/chunking, bm25, fusion 의 failure_analysis.md 에
-      명시된 open question).
+- [x] **Stage 11 — E2E RAG**: 완료. 단일 winner 없음 — hybrid_reranker(정확도
+      최우선)와 full_agentic(현재 baseline, task_success 강함이나 필터 과도
+      축소로 랭킹 품질은 raw retrieval 보다 낮음)으로 시나리오 분리 권고.
+      `results/e2e_rag/`(failure_analysis.md 포함) 커밋됨.
 - [ ] **Stage 12 — Answer HCX 모델**: 동일 Evidence Pack 을 HCX-DASH-002/005/007
       에 주고 Accuracy/Numerical Accuracy/Faithfulness/Citation Accuracy 비교.
 - [ ] **Stage 14 — Final E2E**: Best-quality config vs efficiency config,
@@ -281,26 +286,26 @@ No-Reranker(CPU 배포 기준) + Rule-only Entity Extraction + HCX structured Ro
 
 ## 12. 다음에 바로 해야 할 작업
 
-1. **Stage 11 — E2E RAG 비교** 시작 (Task #23, pending → in_progress 전환).
-   후보: BM25 only / Dense only / Hybrid(Fusion만) / Hybrid+Reranker /
-   Full Agentic(현재 baseline 전체: HCX-007 agent + hcx_structured_router +
-   rule entity + normalized_weighted fusion + no reranker). 동일 validation
-   30개 질의로 report-level Recall/MRR/NDCG(비-agentic 후보는 retrieval
-   지표) + Full Agentic 은 Stage 10 과 동일한 task_success_rate 로 비교.
-   **중요**: 여기서 Stage 1/4 failure_analysis 에 적힌 "지분/보유
-   관련(ownership_analysis) retrieval 난이도가 유독 높다"는 관찰과 Stage
-   10 failure_analysis 의 id=26/27 교차실패가 agent 개입(query rewriting/
-   metadata filter 재시도)으로 완화되는지 재확인할 것 — 열린 질문으로
-   문서화되어 있음.
-   `results/e2e_rag/{variant}/` 저장 + `comparison.json` + `failure_analysis.md`.
-2. Stage 11 완료 후: PROJECT_STATE.md §5/§8/§11/§12 갱신, git commit/push,
-   Task #23 completed → Task #24(Stage 12 — Answer HCX 모델 비교) in_progress 전환.
-   Stage 12 는 동일 Evidence Pack(Stage 11 의 Full Agentic 결과에서 추출)을
-   HCX-DASH-002/HCX-005/HCX-007 각각에 주고 `answer_generator.py`(HCX-007 은
-   `thinking` 파라미터 필요 없음 — `hcx_client.py` 가 이미 자동 처리)로
-   답변만 생성해 Accuracy/Numerical Accuracy/Faithfulness/Citation Accuracy
-   비교.
-3. `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
+1. **Stage 12 — Answer HCX 모델 비교** 시작 (Task #24, pending → in_progress
+   전환). 방법: Stage 11 의 `full_agentic` 실행에서 나온 각 질의의
+   `AgentTrace`(tool_calls 포함)를 재사용해 `build_evidence_pack()`으로
+   동일 Evidence Pack 을 만들고(agent tool-calling 자체는 이미 Stage 10/11
+   에서 HCX-007 로 확정 — 여기서 또 돌리면 변수가 섞이므로, tool 호출은
+   1번만 하고 그 결과를 3개 모델에 동일하게 재사용할 것), `generate_answer()`
+   만 HCX-DASH-002/HCX-005/HCX-007 각각으로 실행. 지표: Numerical Accuracy
+   (evidence 안의 숫자와 답변 숫자 일치, `validator.py`의 `_extract_numbers`
+   재사용), Faithfulness(`validate_answer().numbers_grounded`), Citation
+   Accuracy(`has_citation`), 정성 Accuracy(직접 20+ 건 읽고 판단).
+   `results/answer/{model_name}/` 저장 + `comparison.json` + `failure_analysis.md`.
+2. Stage 12 완료 후: PROJECT_STATE.md §5/§8/§11/§12 갱신, git commit/push,
+   Task #24 completed → Task #25(Stage 14 — Final E2E, test set) in_progress 전환.
+   Stage 14 는 **test set(10개, 여태 한 번도 안 씀)으로 단 한 번만** 평가 —
+   Best-quality config(hybrid_reranker 기반) vs efficiency config(현재
+   baseline=hybrid_fusion 기반 full_agentic) 두 configuration 비교.
+3. Stage 14 이후: 모든 `results/`를 하나의 최종 요약 문서로 정리(사용자
+   요청 "이거 다 돌리고 폴더 하나 파서 잘 정리해줘") — 전체 11개 스테이지
+   결과를 종합한 최종 리포트(마크다운 또는 Artifact)를 만들 것.
+4. `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
    `/tmp` 임시 파일들이 세션 재시작으로 사라졌다면, 아래 코드로 재생성:
    ```python
    # doc_ids 재생성 (삼성전자 33개 문서: periodic 최신 2 + major 전체 19 +
@@ -315,4 +320,4 @@ No-Reranker(CPU 배포 기준) + Rule-only Entity Extraction + HCX structured Ro
    doc_ids = [r.doc_id for r in periodic+major+exchange+holding]
    ```
    `eval/gold_queries.json` (git에 커밋되어 있음, 40개 gold query)은 그대로 사용.
-4. TaskList 로 진행상황 재확인 (Task #14~25, id 23부터가 다음 미완료 작업).
+5. TaskList 로 진행상황 재확인 (Task #14~25, id 24부터가 다음 미완료 작업).
