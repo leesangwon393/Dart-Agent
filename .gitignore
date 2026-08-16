@@ -14,3 +14,7 @@ corpus/universe.xlsx
 
 # .claude 세션/스케줄 상태 파일 — 저장소 코드가 아님
 .claude/
+
+# 전체 70개사 GPU 임베딩 결과(2.8GB, 로컬 전용) — 코드 저장소에는 넣지 않는다.
+gpu_embeddings/
+gpu_embeddings.tar.gz
