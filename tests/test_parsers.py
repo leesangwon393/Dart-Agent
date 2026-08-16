@@ -13,6 +13,7 @@ import pytest
 from disclosure_rag.common.doc_tree import KeyValueNode, SectionNode, TableNode
 from disclosure_rag.common.manifest_loader import load_manifest
 from disclosure_rag.common.unicode_utils import PathResolver
+from disclosure_rag.parsing.dart_xml_parser import parse_dart_xml
 from disclosure_rag.parsing.document_detector import parse_documents_for_row
 
 CORPUS_ROOT = Path(__file__).resolve().parents[1] / "corpus"
@@ -122,3 +123,76 @@ def test_no_silent_empty_content_across_random_sample(manifest, resolver):
             if not has_content:
                 empty.append((row.doc_id, d.report_subtype))
     assert empty == [], f"내용이 완전히 비어있는 파싱 결과: {empty}"
+
+
+# 회귀 발견(2026-08-16, 회사 일반화 검증 2라운드): 콘텐츠 안의 escape 안 된
+# bare "&"/"<" 가 lxml recover 모드를 오정렬시켜 SECTION 구조 대부분을 표
+# 안으로 잘못 밀어넣고, 문서 대부분이 유실되던 버그. dart_xml_parser.py 의
+# _escape_bare_special_chars() 로 고쳤다 — 아래는 그 고정 테스트.
+_MALFORMED_XML_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
+<DOCUMENT ACLASS="OU"><DOCUMENT-NAME ACODE="1">사업보고서</DOCUMENT-NAME>
+<BODY>
+<SECTION-1 ACLASS="1-1"><TITLE ATOC="Y">I. 회사의 개요</TITLE>
+<P>국내 신용평가사(S&P 등)로부터 등급을 받았다.</P>
+</SECTION-1>
+<SECTION-1 ACLASS="1-2"><TITLE ATOC="Y">II. 사업의 내용</TITLE>
+<TABLE><TBODY><TR><TD>목적사업 변경 <신  설></TD></TR></TBODY></TABLE>
+</SECTION-1>
+<SECTION-1 ACLASS="1-3"><TITLE ATOC="Y">III. 재무에 관한 사항</TITLE>
+<P>재무제표 요약.</P>
+</SECTION-1>
+</BODY></DOCUMENT>"""
+
+
+def test_escape_bare_special_chars_preserves_valid_xml_syntax():
+    """실제 태그/entity 는 안 건드리고 콘텐츠 안 bare "&"/"<" 만 escape 해야 한다."""
+    from disclosure_rag.parsing.dart_xml_parser import _escape_bare_special_chars
+
+    raw = b'<TITLE ATOC="Y">I. \xea\xb0\x9c\xec\x9a\x94</TITLE><P>S&P &amp; &lt;Manufacturing Excellence&gt; \xec\x99\x84\xeb\xa3\x8c</P>'
+    fixed = _escape_bare_special_chars(raw)
+    assert b"<TITLE ATOC=" in fixed, "유효한 여는 태그가 훼손됨"
+    assert b"</TITLE>" in fixed, "유효한 닫는 태그가 훼손됨"
+    assert b"S&amp;P" in fixed, "bare & 가 escape 안 됨"
+    assert b"&amp;amp;" not in fixed, "이미 escape 된 &amp; 가 이중 escape 됨"
+    assert b"&amp;lt;Manufacturing" not in fixed, "이미 escape 된 &lt; 가 이중 escape 됨"
+
+
+def test_parse_dart_xml_recovers_sections_despite_malformed_ampersand_and_bracket():
+    """회귀 테스트: bare "&"("S&P")와 bare "<"("<신  설>") 가 섞인 문서도
+    SECTION-1 3개가 전부 살아남아야 한다 (수정 전에는 lxml recover 모드가
+    구조를 오정렬시켜 첫 SECTION 이후가 통째로 표 안에 잘못 중첩됐다)."""
+    doc = parse_dart_xml(
+        _MALFORMED_XML_TEMPLATE.encode("utf-8"),
+        doc_id="test_malformed", doc_group="periodic", doc_subtype=None,
+        report_subtype="main", source_path="<synthetic>",
+    )
+    top_titles = [s.title for s in doc.sections]
+    assert any(t.startswith("I. 회사의 개요") for t in top_titles)
+    assert any(t.startswith("II. 사업의 내용") for t in top_titles)
+    assert any(t.startswith("III. 재무에 관한 사항") for t in top_titles)
+
+
+def test_hyundai_motor_periodic_report_recovers_financial_section(manifest, resolver):
+    """실제 영향받은 문서(현대자동차 2025 사업보고서) 회귀 테스트: 수정 전에는
+    malformed "&"/"<" 때문에 목차 154개 TITLE 중 2개만 살아남았다."""
+    row = _row(manifest, "periodic_20260318001394")
+    docs = parse_documents_for_row(row, resolver)
+    main = next(d for d in docs if d.report_subtype == "main")
+    top_titles = [s.title for s in main.sections]
+    assert any(t.startswith("II. 사업의 내용") for t in top_titles), (
+        f"'II. 사업의 내용' 유실 (회귀) — 현재 top_titles={top_titles}"
+    )
+    assert any(t.startswith("III. 재무에 관한 사항") for t in top_titles), (
+        f"'III. 재무에 관한 사항' 유실 (회귀) — 현재 top_titles={top_titles}"
+    )
+
+
+def test_kb_financial_periodic_report_recovers_financial_section(manifest, resolver):
+    """실제 영향받은 문서(KB금융 사업보고서) 회귀 테스트."""
+    row = _row(manifest, "periodic_20260313001191")
+    docs = parse_documents_for_row(row, resolver)
+    main = next(d for d in docs if d.report_subtype == "main")
+    top_titles = [s.title for s in main.sections]
+    assert any(t.startswith("III. 재무에 관한 사항") for t in top_titles), (
+        f"'III. 재무에 관한 사항' 유실 (회귀) — 현재 top_titles={top_titles}"
+    )

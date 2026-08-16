@@ -1,7 +1,7 @@
 # PROJECT_STATE.md — 금융공시 Agentic RAG 시스템
 
 > 새 Claude 세션은 이 파일만 읽고 바로 이어서 작업할 수 있어야 한다.
-> 최종 갱신: 2026-08-15 (Stage 5 진행 중)
+> 최종 갱신: 2026-08-16 (파싱 버그 수정 + 재검증 완료, 커밋 직전)
 
 ---
 
@@ -13,10 +13,11 @@ retrieval(BM25+Dense+Fusion+Reranker) → 정정공시 버전 해석 → tool
 calling(계산 등) → evidence pack 구성 → **HyperCLOVA X(HCX)** 로 근거 기반
 최종 답변 생성 → 검증(validation). 단순 "질문→벡터검색→LLM" 구조가 아니다.
 
-파이프라인 전체(§34, 원본 스펙 82절 문서 기준)는 이미 구현·검증 완료
-(Phase 1~19). 현재는 **각 component 후보를 동일 eval set 으로 비교하는
-rigorous ablation 실험(Stage 1~14)**을 진행 중이다. Fine-tuning 은 이번
-단계에서 전부 제외.
+**진행 단계**: (1) 핵심 파이프라인 구현(Phase 1~19, 완료) → (2) 각 component
+후보를 동일 eval set 으로 비교하는 rigorous ablation(Stage 1~14, 완료,
+fine-tuning 제외) → (3) **회사 일반화 검증**(현재 단계 — 삼성전자 1개사로만
+검증했던 스코프를 벗어나 실제 다양한 회사/업종에서 라이브로 질의해보며 버그
+발견/수정) → (4, 검토 중) Router 파인튜닝.
 
 ---
 
@@ -26,7 +27,7 @@ rigorous ablation 실험(Stage 1~14)**을 진행 중이다. Fine-tuning 은 이�
 공시 Corpus → Unicode Path Resolve → 유형별 Parsing → 유형별 Chunking
   → Correction Graph → 공통 Chunk Schema → [BM25 인덱스 + Dense 인덱스]
 ─────────────────────────────────────────────────────────────────
-User Query → Entity Extraction + Query Normalize → Semantic Router(hint)
+User Query → Entity Extraction + Query Normalize → HCX Router(hint)
   → HCX Agent(Tool Calling loop) → search_disclosures/get_correction_history/
     get_latest_report/calculate_* → Evidence Pack 구성
   → HCX Answer Generator(evidence-only) → Validator → 최종 답변+근거
@@ -43,123 +44,111 @@ User Query → Entity Extraction + Query Normalize → Semantic Router(hint)
 | 결정 | 이유 |
 |---|---|
 | periodic/major/holding = parser 1개 공용 | 셋 다 동일 DART `DOCUMENT/SECTION-N` XML 스키마 (실측 확인) |
-| exchange = 별도 HTML parser | `.xml` 확장자지만 실제 내용은 위장 HTML (실측 확인) |
+| exchange = 별도 HTML parser | `.xml` 확장자지만 실제 내용은 위장 HTML — lxml.html 이라 bare `&`/`<` 에 관대해서 아래 파싱버그 영향 없음 |
 | Unicode: 세그먼트 단위 NFC 리졸버 | `raw/` 폴더명 NFD, manifest/universe NFC — 직접 비교하면 100% 실패 |
-| periodic 정정 매칭 = `(corp_name,doc_subtype,base_year,base_month)` manifest key | collision 0건, 텍스트 파싱 불필요, pdf+html 대체수집도 자동 처리 |
-| major/exchange/holding 정정 매칭 = 본문 정규식 + transitive chain | "정정대상 공시서류의 최초제출일" 텍스트 99.9% 추출 성공. **단, 이 3종은 직전 정정본을 가리키는 다단 체인**이라 root 까지 chasing 필요(periodic 과 다름, §correction_graph_builder.py 주석 참고) |
-| 표 파싱: rowspan/colspan 그리드 확장 + RLE dedup | colspan 중복 텍스트 버그 방지, KeyValue vs Table 그리드 정확히 분류 |
-| 표 1개 TR 500행 cap | malformed XML 로 인한 lxml recover 오동작으로 TR 11,786개짜리 표가 실측 발견됨(§5 참고). 캡 없으면 chunk 하나가 수만 자로 폭주 |
-| 검색 인덱스 = leaf chunk 만 | Parent(섹션 전체, 무제한 길이)를 그대로 임베딩하면 비정상적으로 느려짐(실측: CPU 30분+). `filter_leaf_chunks()` 필수 |
-| HCX Agent system prompt = 짧게 유지 | **실측으로 결정적으로 재현된 버그**: system prompt 가 길면(~400자, 6줄 bullet) tool-calling 2번째 턴부터 HCX API 가 매번 400("Unsupported function") 반환. 3줄로 줄이니 해결. `agent_loop.py` 상단 주석 참고 — 새 지침 추가 시 반드시 다중 턴 테스트 확인 |
-| Stage 1 winner: Section-aware+Parent-Child | 4개 지표(R@5/R@10/MRR/NDCG@10) 전부 1위, trade-off 없음 |
-| Stage 2 winner: char_2gram (**잠정**, Kiwi 아님) | 실측 R@10=0.912 > Kiwi 0.802. 단, 단일회사 corpus 라 회사명 substring 매칭에 유리했을 caveat 있음 — 다회사 재검증 전까지 잠정 |
-| Stage 3 winner: BGE-M3 (실무), e5-instruct(정확도 상한 참고) | e5-instruct 가 모든 정확도 지표 우위지만 6.3배 느림(591.7ms vs 3710.0ms/chunk) → 전체 코퍼스(45만 chunk) 환산 시 73시간 vs 463시간(19일). CPU-only 환경에서 e5 전체 인덱싱 불가능 |
-| Stage 4 winner: Normalized Weighted Fusion(alpha=0.5) | 4개 지표 전부 1위, RRF보다 뚜렷이 우위, 구현 복잡도 거의 안 늘어남 |
-| Qwen3-Embedding-0.6B, Qwen3-Reranker-0.6B 제외 | 이 환경에서 반복적으로 다운로드/로딩 실패(아래 §9 참고) — 재현 가능한 코드 버그 아니라 환경 이슈로 판단, 4회 이상 시도 후 확정 |
+| periodic 정정 매칭 = manifest key 기반 | collision 0건, pdf+html 대체수집도 자동 처리 |
+| major/exchange/holding 정정 매칭 = 본문 정규식 + transitive chain | "정정대상 공시서류의 최초제출일" 텍스트 99.9% 추출 성공. 이 3종은 직전 정정본을 가리키는 다단 체인이라 root 까지 chasing 필요 |
+| 표 파싱: rowspan/colspan 그리드 확장 + RLE dedup | colspan 중복 텍스트 버그 방지 |
+| 표 1개 TR 500행 cap | malformed XML 로 표가 폭주하는 걸 방어(근본 원인은 §10 파싱버그와 동일 계열이나 별도 방어선으로 유지) |
+| 검색 인덱스 = leaf chunk 만 | Parent(섹션 전체)를 그대로 임베딩하면 비정상적으로 느려짐. `filter_leaf_chunks()` 필수 |
+| **XML 파싱 전 bare `&`/`<` 사전 이스케이프** (2026-08-16 추가) | malformed XML(`S&P`, `<신 설>` 같은 미이스케이프 특수문자)이 lxml recover 모드를 오동작시켜 문서 대부분이 표 안에 파묻혀 유실되는 버그를 근본적으로 방지. §10 참고 |
+| HCX Agent/Router system prompt = 짧게 유지(~300자 이내) | **3회 독립 재현된 버그**: system prompt 가 길면 tool-calling 이 결정적으로 400 에러. `agent_loop.py`/router 코드 상단 주석 참고 |
+| HCX-007 은 `thinking`/`maxCompletionTokens` 파라미터 필요 | `hcx_client.py` 가 모델명으로 자동 분기(호출부 무수정) |
+| 최종 확정 baseline | §8 참고 |
 
 ---
 
 ## 4. 완료된 작업
 
-### 4-A. 핵심 시스템 (Phase 1~19, 전부 구현+테스트 완료, 실제 HCX API 검증됨)
-- Phase 1: Unicode/Path Resolver — 4,204건 100% resolve
-- Phase 4: Parser 4종 (periodic/major/holding 공용 + exchange 전용)
-- Phase 5+6: Chunker + 공통 Chunk Schema (Parent-Child / flat)
-- Phase 7: Correction Graph Builder (transitive chain resolution)
-- Phase 8: BM25S + Kiwi baseline
-- Phase 9: BGE-M3 + Qdrant dense retrieval
-- Phase 10+11: RRF Fusion + bge-reranker-v2-m3
-- Phase 12: Entity Extraction (universe.csv 기반 alias 자동 해결)
-- Phase 13+14: Semantic Router 6종 + 평가 하네스
-- Phase 15~19: HCX Agent(Tool Calling) + Evidence Pack + Answer Generator +
-  Validator — **실제 HyperCLOVA X API 로 end-to-end 검증됨** (예: "삼성전자
-  단일판매공급계약체결 정정 전후" 질문에 3턴 tool-calling 으로 정확히
-  "계약상대 글로벌 대형기업→테슬라(Tesla, Inc.)" 답변, 원문 XML 대조 100% 일치)
+### 4-A. 핵심 시스템 (Phase 1~19)
+파싱(Unicode resolve 100%) → 청킹(Parent-Child/flat) → 정정 그래프
+(transitive chain) → BM25S+Kiwi/BGE-M3+Qdrant/Fusion/Reranker → Entity
+Extraction → Router → HCX Agent(Tool Calling) + Evidence Pack + Answer
+Generator + Validator. 실제 HyperCLOVA X API 로 end-to-end 검증됨(예:
+정정 전후 계약상대 "글로벌 대형기업→테슬라" 를 3턴 tool-calling 으로 정확히
+답변, 원문 XML 대조 100% 일치).
 
-테스트: `tests/` 70개 중 62개 fast 통과 + 8개 slow(HCX API/모델 필요) 통과.
+### 4-B. Rigorous Ablation (Stage 1~14, 전부 완료)
+Stage 1(Chunking)/2(BM25)/3(Embedding)/4(Fusion)/5(Reranker)/8(Entity)/
+9(Router)/10(Agent 모델)/11(E2E)/12(Answer 모델)/14(Final E2E, test set)
+— 6/7/13은 요청 범위 밖. 각 `results/{stage}/`에 config/metrics/results.csv/
+failure_cases/summary/failure_analysis 전부 저장. 최종 요약:
+`results/FINAL_SUMMARY.md` + Artifact 대시보드. 상세 수치는 §8.
 
-### 4-B. Rigorous 실험 (Stage 1~4 완료, Stage 5 진행 중)
-`results/{chunking,bm25,embedding,fusion}/` 에 각각 `config.json`,
-`metrics.json`, `results.csv`, `failure_cases.jsonl`, `summary.md`,
-`failure_analysis.md`, `comparison.json` 저장 완료. 상세 수치는 §8 참고.
+### 4-C. 회사 일반화 검증 (진행 중, Stage 체계와 별개 트랙)
+`results/generalization_check/` — 대회가 제시한 "검색추출/비교연산/복합추론
+× Closed/Open" 6개 카테고리를 좌표축으로 회사×카테고리 매트릭스(`matrix.csv`)
+를 채워가며 실제 production 파이프라인으로 라이브 검증. 12개사 조합, 72칸 중
+36칸(50%) 커버. 발견/수정한 버그는 §10 참고 — **이 트랙에서 Stage 1~14의
+정량 지표로는 못 잡았던 진짜 버그 여러 건을 발견**(TOC chunk 오염, 카운팅
+오분류, validator 오탐 2건, **파싱 단계 대량 문서유실**).
 
-### 4-C. 부가 산출물
-- `results/qualitative_50q/`: 정식 Stage 체계 이전에 돌린 BM25-only Agent
-  50문항 정성평가 (PASS 24, FAIL_UNGROUNDED 20, HONEST_NO_EVIDENCE 3, ERROR 3)
-- GitHub 연동 완료: https://github.com/leesangwon393/Dart-Agent.git
-  (origin/main, Stage 완료마다 커밋+push 하는 흐름으로 진행 중)
+### 4-D. 부가 산출물
+- `results/qualitative_50q/`: Stage 체계 이전 BM25-only Agent 50문항 정성평가
+- `results/router_tuning/`: Router 파인튜닝 검토 — CLOVA Studio 요구사항 조사,
+  HCX 생성 파일럿 데이터 149건(review 완료, `rubric.md`에 경계규칙 문서화)
+- **전체 70개사 GPU 임베딩**: `gpu_embeddings/`(로컬 전용, git 제외, 2.8GB,
+  467,043 leaf chunk) — §7 참고
+- GitHub: https://github.com/leesangwon393/Dart-Agent.git (origin/main,
+  단계 완료마다 커밋+push)
 
 ---
 
 ## 5. 현재 진행 중인 작업
 
-**전체 Ablation 실험(Stage 1~14) + 최종 요약 완료.** 이후 사용자가 대회 참고
-질의를 보여줘서 시작된 **"회사 일반화 검증"** 트랙이 진행 중이다(Stage 체계와
-별개, `results/generalization_check/` 참고):
-- 대회 예시 6개 질의를 실제 회사명(삼성전자/삼성SDI/LG에너지솔루션/한미반도체)
-  으로 치환해 production `ask()`에 직접 태워보는 방식으로 검증 — Stage 1~14
-  의 report-level Recall/NDCG 지표로는 못 잡았을 실제 버그 3개(TOC chunk
-  오염/카운팅 오분류/validator 오탐 2건)를 발견하고 전부 수정+회귀테스트
-  완료함(§10 참고).
-- **전체 70개사 코퍼스 GPU 임베딩 완료 및 로컬 회수 완료** (`scripts/
-  embed_full_corpus_gpu.py`로 서버(`mileb-v100`, 203.246.112.74:10427)에서
-  실행 → `gpu_embeddings.tar.gz`(2.8GB)를 scp로 로컬에 받아옴 →
-  `gpu_embeddings/shard_0000~0023.pkl`, 총 **467,043개 leaf chunk 정확히
-  일치 확인**). 서버 쪽 macOS AppleDouble 오염 이슈는 해결됐었고, 이번
-  임베딩엔 TOC chunk 필터 수정이 이미 반영되어 있음(bundle 생성 시점이
-  그 수정 커밋 이후). `gpu_embeddings/`는 2.8GB라 `.gitignore` 처리(로컬
-  전용). **주의**: 467,043개 전체를 한 번에 메모리에 올리면 벡터만
-  ~15GB+ 로 이 머신(16GB RAM)에서 OOM 위험 — 필요한 회사만 shard 를
-  한 번(순차) 스캔해서 report_id 로 필터링하는 방식으로 재사용할 것
-  (재임베딩 불필요, 필터링만 몇 초~수십 초).
-- 방법론: 대회가 제시한 "검색추출/비교연산/복합추론 × Closed/Open" 6개
-  카테고리를 좌표축으로 회사×카테고리 매트릭스(`matrix.csv`)를 채워나가는
-  방식 — 무작위 질문 던지기가 아니라 커버리지 추적 가능하게. GPU 임베딩
-  도착 후 **8개 업종(금융보험/바이오제약/조선/자동차/건설/통신 6개 신규 +
-  기존 IT/2차전지/반도체) 10개사로 1차 확장 완료**.
-- **2라운드 매트릭스 확장(빈 칸 채우기, 12개 질의) 중 최우선순위 버그 발견**
-  — **파싱 단계에서 문서 대부분이 유실되는 심각한 버그**(§10 맨 위 참고).
-  KB금융/현대자동차 검색 실패를 원문 대조하다 발견: malformed XML(주로
-  `S&P`처럼 escape 안 된 `&`)이 lxml recover 모드 구조를 오정렬시켜
-  최상위 SECTION 대부분이 TABLE 안에 잘못 중첩되고 파서가 이를 "표 안
-  내용"으로 취급해 통째로 유실. **400개 periodic 문서 샘플 중 116건
-  (29%) 영향받음**(현대차/현대모비스/현대오토에버/POSCO홀딩스/현대제철/
-  고려아연/KB금융/신한지주/하나금융지주/메리츠금융지주 등 반복). 삼성전자/
-  삼성SDI/LG에너지솔루션/한미반도체는 이번 스캔에서 안 걸림 — 지금까지
-  이 문제가 안 보였던 이유. **미수정, 다음 세션 최우선 후보.**
-- 그 외 새로 발견한 문제(미수정): (a) 다중행 표 요약 시 답변 모델이
-  숫자를 잘못 읽음(알테오젠 라이선스 계약금액 80억원→800억원, validator
-  가 정확히 잡아낸 진짜 오류), (b) 업종별 회계 용어 차이에 agent 적응
-  실패(금융지주 "매출액"↔"영업수익"), (c) "정정"이라는 단어에 과민반응해
-  엉뚱한 tool(get_correction_history) 선택(HD현대중공업 계약해지 질문),
-  (d) 비교 질문에서 검색 대신 메타데이터 tool(get_latest_report) 오선택
-  (알테오젠 당기/전기 비교 질문).
-- 매트릭스 커버리지: 12개사 조합, 72칸 중 36칸(50%) 채움. 상세는
-  `results/generalization_check/matrix.csv`, `summary.md`.
-- 미해결로 남은 것(변동 없음): "복합추론_Open"(다년도/장문 비교) 유형이
-  top_k=5 retrieval breadth 부족으로 반복 실패.
+**파싱 버그 수정 + 재검증이 완료됐다.** 아래는 그 전체 경위와 최종 수치
+(다음 세션은 여기부터 §12 "다음 후보"로 넘어가면 됨).
 
-**부가 트랙: Router 파인튜닝 데이터 준비** (GPU 임베딩과 별개로 진행 가능,
-`results/router_tuning/` 참고):
-- 대회 측이 CLOVA Studio 튜닝을 방법론으로 제공 → 어디를 튜닝할지 검토한 결과
-  **Router(route 분류)가 1순위**로 결론남(이유: 닫힌 분류 문제라 튜닝이 잘
-  먹히는 유형, 학습데이터 있음, 오늘 찾은 카운팅 오분류 버그가 정확히 이
-  지점). Agent(tool 선택)는 2순위(잠재력 크지만 리스크 큼), Answer 생성은
-  3순위(지금 문제들이 대부분 답변 품질이 아니라 retrieval/라우팅 문제라
-  우선순위 낮음)로 정리함.
-- CLOVA Studio 분류 튜닝 요구사항 웹 조사 완료: **카테고리당 최소 200행**
-  (6개 route × 200 = 최소 1,200건 필요), 라벨은 한 단어·띄어쓰기/특수문자
-  금지(언더스코어 포함 route 이름이 통과되는지 미확인, 콘솔에서 재확인
-  필요), CSV/JSONL 형식(C_ID/T_ID/Text/Completion/System_Prompt 필드),
-  행당 8,000자 이내. 분류 태스크엔 HCX-DASH-001 권장이라는 출처도 있었으나
-  불확실 — 재확인 필요.
-- **HCX로 학습데이터 생성하는 파일럿(150개) 완료 및 사용자와 함께 검토**:
-  `scripts/generate_route_pilot.py` 로 6개 route × 25개 생성 → 실제로
-  칼럼간 오분류 3~5건(전체의 ~3%) 발견 → 사용자와 함께 경계 규칙 2가지 확정
-  (①기간별 비율/지표 비교→multi_compare, ②두 회사 정정이력 비교→
-  correction_analysis, `results/router_tuning/rubric.md` 참고) → 오분류
-  수정 반영한 최종 파일럿 149건(`results/router_tuning/pilot_v1_reviewed.json`)
-  확보. **아직 1,200건까지 확대는 안 함** — 사용자 승인 대기 중.
+### 무슨 일이 있었는지 (순서대로)
+1. 회사 일반화 검증 2라운드(매트릭스 빈 칸 채우기, 12개 질의)에서 KB금융/
+   현대자동차가 아주 기본적인 질문("매출액 얼마야?", "사업 부문이 뭐야?")
+   에도 실패 → 원문 대조 → **`dart_xml_parser.py`가 malformed XML(escape
+   안 된 `&`, `<`)을 만나면 lxml recover 모드가 태그 구조를 오정렬시켜
+   최상위 SECTION 대부분이 TABLE 안에 잘못 중첩되고 통째로 유실되는 버그**
+   발견. 400개 periodic 문서 샘플 스캔 → **116건(29%) 영향**.
+2. **수정**: `dart_xml_parser.py`에 `_escape_bare_special_chars()` 추가 —
+   파싱 직전에 (a) 유효하지 않은 엔티티 참조 형태의 `&`를 `&amp;`로, (b)
+   진짜 DART 태그(전부 대문자/숫자/하이픈) 패턴이 아닌 `<`를 `&lt;`로 사전
+   치환. 현대자동차 문서: main report 파싱 section 2개 → 7개(매출 섹션
+   포함 "II.사업의내용", "III.재무에 관한 사항"까지 살아남음). KB금융:
+   3개 → 5개. Fast test suite(73개+신규 4개=77개) 전부 통과.
+3. **End-to-end 재검증 완료**: KB금융/현대자동차 재청킹+재임베딩 →
+   `/tmp/expand_sectors_vectors.pkl` 패치 → 원래 실패했던 두 질의 재실행.
+   - KB금융 "사업 부문 구성을 설명해줘" → **PASS**: 위탁/자산관리·기업금융·
+     자산운용·기타사업 4개 부문을 정확히 설명, `periodic_20260313001191`
+     등 5건 근거 인용(수정 전엔 근거를 아예 못 찾았음).
+   - 현대자동차 "2025년 매출액은 얼마야?" → **PASS(정직한 실패)**: III.재무
+     섹션이 복원돼 근거 5건은 인용되지만, 문서에 2025년 매출액 단일수치
+     자체가 없어("2024년 실적만 확인 가능") 할루시네이션 없이 정직하게
+     "확인할 수 없음"으로 답함 — grounded/citation 정상.
+   - `results/generalization_check/matrix.csv`에 "[재검증]" 행 2개 추가함.
+4. **전체 코퍼스 재스캔 완료**(2,732건 — TITLE 태그가 있는 XML 문서 전부,
+   ~160초): "원문 `<TITLE` 개수 대비 구조적으로 복원된 SectionNode 개수"
+   비율이 50% 미만인 문서를 "영향받음"으로 카운트. **결과: 627건(23.0%)
+   여전히 영향받음** — 전부 `doc_group=periodic`, KB금융/하나금융지주/
+   HD현대일렉트릭/한화에어로스페이스 등 금융지주·대기업 계열에 집중.
+   **직접 원문 대조로 원인 확정**: 위에서 말한 세 번째 malformation
+   패턴(속성값 안 이스케이프 안 된 따옴표) 그대로였다 — 예:
+   `ENG="" KB Insurance Co., Ltd ""` (KB금융 2026 사업보고서, 종속기업
+   현황 표). 이 패턴은 특수관계자/종속기업 현황처럼 표 안에 영문 회사명을
+   ENG 속성으로 넣는 표에 집중돼 있다. **즉 오늘 고친 bare `&`/`<` 버그는
+   진단 기준상 완전히 해소됐고(400건 재스캔 116→0), 남은 23%는 별개의,
+   이미 문서화된 채 의도적으로 미수정 상태로 남긴 3번째 패턴이 원인** —
+   새로 발견된 버그가 아니라 기존에 알려진 한계의 정밀한 정량화다.
+5. **`tests/test_dense_retriever.py::test_bge_m3_dense_retriever_finds_
+   relevant_chunk` 도 실패하지만 회귀 아님**: `git stash`로 파싱 수정을
+   빼고 동일 테스트를 재실행해도 **똑같이 실패**(관련성 있는 청크는
+   찾지만 assertion이 요구하는 정확한 리터럴 문자열 "연구개발"이 없는
+   변형 — 원래도 깨져 있던 brittle assertion). 파싱 수정과 무관함을
+   확인했으므로 커밋을 막지 않음(별도 이슈로 §10에 기록).
+
+### 아직 손 안 댄 이슈들 (§10 상세)
+복합추론_Open retrieval breadth 부족, 표 다중행 숫자 오독(알테오젠 10배
+오류), "정정" 단어 과민반응 tool 오선택, 비교질문에서 메타데이터 tool
+오선택, 업종별 회계용어 미적응, **3번째 malformation 패턴(속성값 안
+이스케이프 안 된 따옴표, 여전히 periodic 문서 23% 관련)**. 이 중 파싱버그와
+무관해 보이는 것들(카운팅 오분류 등은 이미 별도로 수정 확인됨)은 재확인
+결과 진짜 별개 이슈였던 것으로 보임 — 6번 항목 재확인 완료로 간주.
 
 ---
 
@@ -169,28 +158,36 @@ User Query → Entity Extraction + Query Normalize → Semantic Router(hint)
 src/disclosure_rag/
   common/unicode_utils.py       NFC 정규화 + 세그먼트 단위 path resolver
   common/doc_tree.py             Parser 공통 중간 표현
-  parsing/dart_xml_parser.py    periodic/major/holding 공용 (TR 500행 cap 포함)
-  parsing/exchange_parser.py    exchange 전용 (위장 HTML)
+  parsing/dart_xml_parser.py    periodic/major/holding 공용
+                                 (TR 500행 cap + bare &/< 사전 이스케이프)
+  parsing/exchange_parser.py    exchange 전용 (위장 HTML, lxml.html 사용)
   parsing/table_parser.py       rowspan/colspan grid 확장 + RLE dedup
   chunking/chunk_schema.py      공통 Chunk Schema + filter_leaf_chunks()
-  chunking/chunkers.py          Parent-Child(periodic/holding) / flat(major/exchange)
-  correction/correction_graph_builder.py   transitive chain resolution 핵심 로직
+  chunking/chunkers.py          Parent-Child / flat + _is_toc_table() 필터
+  correction/correction_graph_builder.py   transitive chain resolution
   retrieval/{tokenizers,bm25_retriever,embeddings,qdrant_store,dense_retriever,
              fusion,reranker,hybrid_retriever,metadata_filter}.py
   entity/{entity_extractor,query_normalizer}.py
   router/{routes,encoder_adapter,semantic_router_wrapper,eval,eval_dataset}.py
   agent/{hcx_client,tools,calculation,agent_loop,evidence,answer_generator,
-          validator,ask}.py      온라인 파이프라인 전체
-  experiments/
-    metrics.py                   Recall/MRR/NDCG(report-level dedup 버그 수정됨)
-    chunking_variants.py         Stage 1 전용 ablation 청커(Fixed-500/Section-aware)
+          validator,ask}.py      온라인 파이프라인 전체(dedup guard 포함)
+  experiments/                   Stage 1~14 실험용 metrics/variants
   pipeline.py                    오프라인 오케스트레이터
+
+scripts/
+  embed_full_corpus_gpu.py       GPU 서버용 전체코퍼스 임베딩(체크포인트/재개 지원)
+  generate_route_pilot.py        Router 튜닝용 질문 데이터 HCX 생성 스크립트
 
 config/financial_terms.txt      Kiwi 사용자 사전
 config/metric_terms.txt          Entity Extraction 지표 키워드
-eval/gold_queries.json           40개 gold query(validation 30/test 10, report_id 단위)
-results/{stage}/                 각 Stage 실험 결과 (§4-B 형식)
-.env                              HCX_API_KEY, HCX_MODEL (git 제외됨)
+eval/gold_queries.json           40개 gold query(validation 30/test 10)
+results/{stage}/                 Stage 1~14 실험 결과
+results/generalization_check/    회사 일반화 검증(matrix.csv, summary.md, raw json들)
+results/router_tuning/           Router 튜닝 검토(rubric.md, pilot 데이터)
+results/FINAL_SUMMARY.md         Stage 1~14 최종 요약
+tests/test_agent.py              agent_loop/validator 회귀 테스트(스텁 클라이언트, API 불필요)
+tests/test_chunkers.py           TOC 필터 회귀 테스트 포함
+.env                              HCX_API_KEY, HCX_MODEL=HCX-007 (git 제외)
 ```
 
 ---
@@ -204,321 +201,202 @@ uv venv --python 3.11 .venv && uv pip install -p .venv/bin/python -e .
 # corpus 검증
 .venv/bin/python -m disclosure_rag.common.corpus_validator corpus
 
-# 전체 코퍼스 파싱+청킹 (4,204건, ~9분, 표 cap 수정 후 더 빠를 수 있음)
+# 전체 코퍼스 파싱+청킹 (4,204건, ~9분)
 .venv/bin/python -m disclosure_rag.pipeline corpus
 
 # 테스트
-.venv/bin/python -m pytest tests/ -m "not slow"   # 빠른 것만(~20초)
-.venv/bin/python -m pytest tests/                  # 전체(HCX API+모델 필요, 수 분)
+.venv/bin/python -m pytest tests/ -m "not slow"   # 빠른 것만(~18초, 73개)
+.venv/bin/python -m pytest tests/                  # 전체(HCX API+모델 필요)
 
 # git
 cd "/Users/isang-won/Desktop/공시 agent"
 git add -A && git commit -m "..." && git push
 ```
 
-**실험용 eval 코퍼스**: 삼성전자 1개사, 33개 문서(periodic 2 + major 19 +
-exchange 2 + holding 10) 선정, doc_id 목록은 `/tmp/stage_eval_doc_ids.json`
-(세션 임시 경로 — 사라졌으면 아래 §11 재생성 코드 참고). 이유: 전체
-4,204건×3 embedding 모델 비교는 CPU-only 환경에서 물리적으로 불가능(실측
-BGE-M3 591.7ms/chunk 기준 전체 코퍼스 임베딩 73시간).
+**GPU 서버(전체 코퍼스 재임베딩용)**: `mileb-v100` (203.246.112.74:10427,
+user adminuser), SSH config 에 등록돼 있으나 이 세션 환경엔 인증키 없음
+(비밀번호 인증 필요 시 사용자에게 요청). `scripts/embed_full_corpus_gpu.py`
+를 그대로 서버에 올려서 실행 → `gpu_embeddings/shard_*.pkl` 로 결과 나옴 →
+scp/rsync 로 로컬 회수.
 
-**BGE-M3 임베딩 캐시**: `/tmp/bgem3_chunks_vectors.pkl` (1411 leaf chunks +
-벡터, pickle) — 재임베딩(14분) 없이 재사용 가능. 세션 재시작 시 사라졌으면
-`cache_bgem3_vectors.py` 류 스크립트로 재생성 필요(§11 참고).
+**전체 70개사 임베딩 재사용 방법** (재임베딩 불필요):
+```python
+import pickle, glob
+wanted_report_ids = {"periodic_xxx", ...}  # 필요한 문서만
+out_chunks, out_vectors = [], []
+for f in sorted(glob.glob("gpu_embeddings/shard_*.pkl")):
+    d = pickle.load(open(f, "rb"))
+    for c, v in zip(d["chunks"], d["vectors"]):
+        if c.report_id in wanted_report_ids:
+            out_chunks.append(c); out_vectors.append(v)
+```
+**주의**: 467,043개 전체를 한 번에 메모리에 올리면 벡터만 ~15GB+ 로 이
+머신(16GB RAM)에서 OOM 위험 — 항상 필요한 회사만 필터링해서 쓸 것.
+
+**실험용 eval 코퍼스(Stage 1~14 용)**: 삼성전자 1개사, 33개 문서, doc_id
+목록은 `/tmp/stage_eval_doc_ids.json`(세션 임시 — 사라지면 아래 재생성
+코드 사용). BGE-M3 임베딩 캐시: `/tmp/bgem3_chunks_vectors.pkl`(1,411
+chunks). 이유: 전체 코퍼스 임베딩 비교는 CPU-only 환경에서 불가능(BGE-M3
+기준 전체 76.8시간 실측).
+
+```python
+# doc_ids 재생성 (삼성전자 33개 문서: periodic 최신 2 + major 전체 19 +
+# exchange 전체 2 + holding 최신 10)
+from disclosure_rag.common.manifest_loader import load_manifest
+manifest = load_manifest("corpus")
+samsung = [r for r in manifest if r.corp_name == "삼성전자"]
+periodic = sorted([r for r in samsung if r.doc_group=="periodic" and not r.is_correction], key=lambda r: r.rcept_dt, reverse=True)[:2]
+major = [r for r in samsung if r.doc_group=="major"]
+exchange = [r for r in samsung if r.doc_group=="exchange"]
+holding = sorted([r for r in samsung if r.doc_group=="holding"], key=lambda r: r.rcept_dt, reverse=True)[:10]
+doc_ids = [r.doc_id for r in periodic+major+exchange+holding]
+```
 
 ---
 
-## 8. 실험 결과 요약 (validation set n=30, 상세는 각 results/{stage}/)
+## 8. 실험 결과 요약 (Stage 1~14, validation set n=30 기준)
 
 | Stage | Winner | 핵심 수치 |
 |---|---|---|
 | 1 Chunking | Section-aware+Parent-Child | R@5=0.706 R@10=0.802 MRR=0.682 NDCG@10=0.667 |
-| 2 BM25 Tokenizer | char_2gram (잠정) | R@10=0.912 MRR=0.757 (Kiwi: R@10=0.802 MRR=0.682) |
-| 3 Dense Embedding | BGE-M3(실무) / e5-instruct(정확도상한) | bge-m3 R@10=0.840(591.7ms) vs e5 R@10=0.867(3710.0ms) |
+| 2 BM25 Tokenizer | char_2gram(수치상 잠정) / **Kiwi(실질 baseline)** | char_2gram R@10=0.912 MRR=0.757 vs Kiwi R@10=0.802 MRR=0.682 — Kiwi가 도메인사전 확장 가능해 Stage4 이후 전부 Kiwi로 진행 |
+| 3 Dense Embedding | BGE-M3(실무) / e5-instruct(정확도상한) | bge-m3 R@10=0.840(591.7ms) vs e5 R@10=0.867(3710.0ms, 6.3배 느림) |
 | 4 Fusion | Normalized Weighted Fusion | R@10=0.903 R@20=0.940 MRR=0.713 NDCG@10=0.735 |
-| 5 Reranker | No-Reranker(CPU 배포용) / bge-reranker-v2-m3(GPU면 재검토) | no_reranker Hit@1=0.633 MRR=0.712(42.7ms) vs bge_reranker Hit@1=0.667 MRR=0.773(11,053.8ms, **258배 느림**) |
-| 8 Entity Extraction | Rule only | rule company_EM=1.0 correction_EM=1.0 metric_F1=0.971 period_F1=1.0(12μs) vs hcx_only metric_F1=~0.40 period_F1=0.556(7s+) — 압승, trade-off 자체 없음 |
-| 9 Router | hcx_structured_router | hcx accuracy=0.800 macro_F1=0.813(4.502s) vs semantic_router accuracy=0.600 macro_F1=0.495(38.7ms) vs agent_only(NoRouter) accuracy=0.0 fallback_rate=1.0(설계상 정상) |
-| 10 Agent HCX 모델 | HCX-007 | tool_acc=0.966 arg_acc=0.980 task_success=0.793(13.9s) vs HCX-005 tool_acc=0.897 arg_acc=0.883 task_success=0.552(20.3s) vs HCX-DASH-002 tool_acc=0.567 arg_acc=1.000 task_success=0.233(9.1s) — HCX-007 이 정확도·지연·API호출비용 전부 우위 |
-| 11 E2E RAG | 시나리오별 분리(§5 참고) | hybrid_reranker R@5=0.820 NDCG@10=0.783(5.4s) > hybrid_fusion R@5=0.661 NDCG@10=0.731(43ms) > full_agentic R@5=0.622 NDCG@10=0.545(15.7s) task_success=0.759 > bm25_only/dense_only |
-| 12 Answer HCX 모델 | HCX-005(answer 역할, Agent 역할과 다름) | pass_rate: HCX-005=0.750 > HCX-007=0.690 > DASH-002=0.321(citation 누락이 주원인) |
-| 14 Final E2E(TEST SET n=10, 최초/유일 사용) | efficiency(reranker off, 현재 baseline) | efficiency task_success=0.700 pass_rate=1.000(23.1s) vs best_quality(reranker on) task_success=0.667 pass_rate=0.889(31.1s) — 랭킹지표(MRR/NDCG)는 best_quality 우세하나 최종 답변 성공률/지연은 efficiency 우세, n=10 통계적으로 약함 |
+| 5 Reranker | No-Reranker(CPU 배포) | Hit@1=0.633 MRR=0.712(42.7ms) vs bge_reranker Hit@1=0.667 MRR=0.773(11,053.8ms, 258배 느림) |
+| 8 Entity Extraction | Rule only | company_EM=1.0 metric_F1=0.971 period_F1=1.0(12μs) — hcx 계열 압승, trade-off 없음 |
+| 9 Router | hcx_structured_router | accuracy=0.800 macro_F1=0.813(4.5s) vs semantic_router 0.600/0.495(38.7ms) |
+| 10 Agent HCX 모델 | **HCX-007** | tool_acc=0.966 arg_acc=0.980 task_success=0.793(13.9s) — 정확도·지연·비용 전부 우위 |
+| 11 E2E RAG | 시나리오 분리 | hybrid_reranker R@5=0.820(5.4s, 정확도 최우선) vs full_agentic R@5=0.622(15.7s, task_success=0.759, 실시간성+도구조합) |
+| 12 Answer HCX 모델 | **HCX-005**(Agent와 다른 모델) | pass_rate 0.750 vs HCX-007 0.690 vs DASH-002 0.321 |
+| 14 Final E2E(TEST SET n=10, 유일 사용) | efficiency(reranker off) | task_success=0.700 pass_rate=1.000(23.1s) — n=10이라 통계적으로 약함 |
 
-**최종 확정 baseline (Stage 14 결론, 전체 실험 종료)**:
-Section-aware+Parent-Child chunking + **Kiwi** tokenizer(Stage 2 는
-char_2gram 을 수치상 잠정 1위로 기록했지만, Stage 4 이후 모든 실험은
-실제로는 Kiwi 로 진행됐다 — Kiwi 가 형태소 기반이라 도메인 사전
-확장(`config/financial_terms.txt`)이 가능하고 char_2gram 은 실무 적용
-경로가 불명확해 실질적 baseline 은 계속 Kiwi 였다는 뜻. char_2gram 채택은
-보류된 상태로 남겨둔다) + BGE-M3 dense + Normalized Weighted Fusion +
-No-Reranker(Stage 5 최초 결론, Stage 14 test set 재확인) + Rule-only Entity
-Extraction + HCX structured Router(HCX-005 고정) + **Agent=HCX-007**(Stage
-10) + **Answer=HCX-005**(Stage 12, Agent 와 다른 모델). `.env` 의
-`HCX_MODEL`은 agent 기본값 HCX-007 로 설정돼 있고, answer 전용 모델
-분리는 아직 프로덕션 코드에 반영 안 됨(`ask.py`가 단일 client 재사용 —
-§12 향후 과제로 문서화됨). Stage 11 은 이 baseline(=full_agentic)을
-유지하되 "정확도 최우선" 대안으로 hybrid_reranker 를 별도 옵션으로 문서화.
-
-**Stage 5 에서 발견한 프로덕션 버그(수정 완료)**: `CrossEncoderReranker` 가
-`max_length` 미지정이라 매우 긴 outlier chunk(최대 26,027자) 만나면 처리
-시간이 폭증(1500쌍 reranking 이 58분+ 걸림) → `retrieval/reranker.py` 에
-`max_length=512` 기본값 추가로 수정, 프로덕션 코드에 반영됨.
+**최종 확정 baseline**: Section-aware+Parent-Child chunking + Kiwi BM25 +
+BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
++ HCX structured Router(HCX-005 고정) + **Agent=HCX-007** + **Answer=
+HCX-005**. `.env`의 `HCX_MODEL=HCX-007`(agent 기본값) — answer 전용 모델
+분리는 아직 `ask.py`에 미반영(단일 client 재사용 중, §12 후보).
 
 ---
 
 ## 9. 실패했던 접근 — 다시 하면 안 되는 것
 
-1. **HCX Agent system prompt 를 길게 쓰지 말 것.** 6줄 bullet(~400자) system
-   prompt 는 tool-calling 2턴째부터 결정적으로 400 에러. 3줄 이내로 유지.
-2. **HCX tool-calling 요청에 `tools`+`maxTokens` 동시 사용 금지.** 400 에러.
-3. **Qwen3-Embedding-0.6B / Qwen3-Reranker-0.6B 를 이 환경에서 그냥
-   재시도하지 말 것.** 4차례 이상 시도(CDN 403, HF_HUB_DISABLE_XET=1 재시도,
-   개별 파일 다운로드, 로드 테스트 10분+ 무응답) 후 전부 실패 확정. 재시도
-   전에 `HF_TOKEN` 설정 여부, 네트워크 상태, sentence-transformers 버전을
-   먼저 점검할 것 — 무작정 재실행은 시간 낭비.
-4. **전체 코퍼스(4,204건/45만 chunk)로 Dense 임베딩 비교 실험을 시도하지
-   말 것.** CPU-only 환경에서 비현실적(모델당 최소 70시간+). 반드시 축소
-   corpus(현재 33개 문서/1,411 chunk)로 진행.
-5. **Retrieval 인덱스에 parent chunk 를 포함시키지 말 것.** 반드시
-   `filter_leaf_chunks()` 통과. 안 그러면 임베딩이 30분+ 로 폭주(실측).
-6. **표 파싱에서 TR 개수 상한(500) 없이 그대로 처리하지 말 것.** malformed
-   XML 로 TR 11,786개짜리 표가 실제로 존재함 — 반드시 cap 적용.
-7. **NDCG 계산 시 report-level gold 인데 chunk 단위로 relevance 를 중복
-   카운트하지 말 것.** `experiments/metrics.py` 의 `ndcg_at_k` 가 이미
-   report-level dedup 으로 고쳐져 있음(회귀 테스트로 고정됨) — 이 로직을
-   되돌리면 NDCG>1 버그 재발.
+1. **HCX Agent/Router system prompt 를 300자 넘게 쓰지 말 것** — tool-calling
+   결정적 실패(3회 독립 재현).
+2. **HCX tool-calling 요청에 `tools`+`maxTokens` 동시 사용 금지.**
+3. **Qwen3-Embedding-0.6B / Qwen3-Reranker-0.6B 를 이 환경에서 재시도하지
+   말 것** — 4차례 이상 시도 후 전부 실패 확정(환경 이슈로 판단).
+4. **전체 코퍼스로 CPU Dense 임베딩 비교 실험을 시도하지 말 것** — 모델당
+   최소 70시간+. GPU 서버 활용(§7) 또는 축소 corpus로 진행.
+5. **Retrieval 인덱스에 parent chunk 를 포함시키지 말 것** — `filter_leaf_
+   chunks()` 필수(안 그러면 임베딩 30분+ 로 폭주).
+6. **표 파싱에서 TR 개수 상한 없이 처리하지 말 것.**
+7. **NDCG 계산 시 report-level gold 를 chunk 단위로 중복 카운트하지 말 것**
+   (`ndcg_at_k` 이미 report-level dedup, 회귀 테스트로 고정됨).
 8. **HuggingFace 모델 다운로드 시 xet 가속 다운로더를 기본값으로 두지
-   말 것.** 이 환경에서 xet CDN 이 403 을 반환하는 경우가 잦았다.
-   `HF_HUB_DISABLE_XET=1` 을 기본으로 설정 권장.
+   말 것** — `HF_HUB_DISABLE_XET=1` 권장.
+9. **malformed XML 대응을 증상별 캡(TR 500행 등)으로만 때우고 넘어가지
+   말 것** — 근본 원인(bare `&`/`<`)을 찾으면 훨씬 광범위한 문제(문서 전체
+   유실)였음이 §10에서 드러남. 이번처럼 "이상한 결과가 나오면 반드시 원문
+   대조부터" 하는 습관이 중요.
 
 ---
 
-## 10. 발견된 문제 (버그 픽스 완료된 것 포함, 이력 참고용)
+## 10. 발견된 문제 (버그 픽스 이력)
 
-- **[미수정, 최우선순위]** malformed XML(escape 안 된 `&`, 예: "S&P")이
-  lxml `recover=True` 파서의 태그 구조를 오정렬시켜 최상위 SECTION-1
-  대부분이 TABLE/TBODY/TR 안에 잘못 중첩되고, `_walk()`가 BODY 직속
-  SECTION-1만 최상위로 인정하기 때문에 이 문서 내용이 통째로 유실된다
-  (2026-08-16, 회사 일반화 검증 2라운드에서 발견). 재현: 현대자동차
-  최신 사업보고서 원문 154개 TITLE 중 파싱되는 건 2개뿐(대표이사확인+
-  I.회사의개요), "II.사업의내용"(매출 섹션 포함)~"XII.상세표"가 전부
-  유실. KB금융도 182개 중 3개만 생존. **400개 periodic 샘플 스캔 결과
-  116건(29%) 영향**(현대차/현대모비스/현대오토에버/POSCO홀딩스/현대제철/
-  고려아연/KB금융/신한지주/하나금융지주/메리츠금융지주 등, 일부는 최상위
-  섹션 0개인 완전 유실 사례도 있음). lxml 자체는 recover 모드로도 전체
-  TITLE 155개를 다 복구하지만(`root.iter('TITLE')`), 우리 파서 로직이
-  표 안에 재배치된 SECTION 을 못 알아본다. 개선안 두 가지: (a) TABLE 안에
-  중첩된 SECTION-1 을 감지해 최상위로 승격, (b) 파싱 전 `&(?!amp;|lt;|gt;
-  |quot;|apos;|#)` 를 `&amp;`로 사전 치환해 애초에 recover 모드가 덜
-  필요하게 만들기 — (b)가 더 근본적. 삼성전자/삼성SDI/LG에너지솔루션/
-  한미반도체는 이번 스캔에서 안 걸림(우연히 회피) — Stage 1~14 가 이
-  버그를 못 잡은 이유. 상세: `results/generalization_check/summary.md`.
-- **[미수정]** 다중행 표 요약 시 답변 모델(HCX-005)이 숫자를 잘못 읽음
-  — 알테오젠 라이선스 계약(ALT-L9, 원문 ₩8,000,000,000=80억원)을
-  "800억원"으로 10배 오답. validator(`numbers_grounded=False`)가 정확히
-  잡아낸 진짜 오류(오탐 아님) — 원문 대조로 확인됨.
-- **[미수정]** "정정"이라는 단어에 agent 가 과민반응해 `get_correction_
-  history`(기재정정 이력 전용)를 잘못 선택 — "계약이 해지되거나
-  **정정**된 적 있어?" 같은 이벤트성 질문에서 `search_disclosures`를
-  아예 안 씀(HD현대중공업 사례).
+### 최근 발견/수정 (회사 일반화 검증 트랙, 2026-08-15~16)
+
+- **[수정됨, 검증 완료]** malformed XML(escape 안 된 `&`, `<`)이 lxml
+  recover 모드를 오동작시켜 문서 대부분이 TABLE 안에 파묻혀 유실되는 버그.
+  400개 샘플 중 116건(29%) 영향 확인(현대차/현대모비스/POSCO홀딩스/
+  KB금융/신한지주/하나금융지주/메리츠금융지주 등). `dart_xml_parser.py`에
+  `_escape_bare_special_chars()` 추가해 파싱 전 사전 치환 — 재스캔 결과
+  116건→0건(같은 진단 기준). KB금융/현대자동차 실제 질의로 end-to-end
+  재검증 완료(§5 참고, `matrix.csv`에 [재검증] PASS 행 추가). 회귀 테스트
+  4건 `tests/test_parsers.py`에 추가.
+- **[별개 이슈로 재확인, 미수정]** 3번째 malformation 패턴(속성값 안
+  이스케이프 안 된 따옴표, 예: `ENG="" KB Insurance Co., Ltd ""`) —
+  전체 코퍼스 재스캔(2,732건)으로 정밀 정량화: **여전히 627건(23.0%)
+  영향**, 전부 periodic, 금융지주·대기업 계열의 특수관계자/종속기업
+  현황 표(영문 회사명을 ENG 속성에 넣는 표)에 집중. 속성값 경계를
+  정규식으로 안전하게 판별하기 어려워 여전히 미수정(잘못 고치면 정상
+  데이터를 깨뜨릴 위험) — 다음에 손댈 후보면 §12 참고. 상세: `results/
+  generalization_check/summary.md`.
+- **[수정됨]** TOC(목차) 표가 청크로 인덱싱돼 BM25 허위매칭 유발 —
+  `chunkers.py`의 `_is_toc_table()`로 필터링.
+- **[수정됨]** 카운팅 질문("몇 건이야?")이 calculation route로 오분류돼
+  `calculate_cagr`을 무의미한 인자로 반복 호출 — system prompt 문구 추가 +
+  동일 tool 중복호출 방지 dedup guard(`agent_loop.py`).
+- **[수정됨]** Validator 오탐 2건 — (a) `get_correction_history`만 호출된
+  경우 citation 오탐, (b) "(약 ...)" 괄호 안 숫자 재표기 오탐(`validator.py`).
+- **[미수정]** 다중행 표 요약 시 답변 모델이 숫자를 잘못 읽음(알테오젠
+  80억원→800억원 10배 오답, validator가 정확히 잡아냄 — 오탐 아님).
+- **[미수정]** "정정" 단어에 과민반응해 `get_correction_history` 오선택
+  (이벤트성 계약해지 질문에서).
 - **[미수정]** 비교 질문에서 `search_disclosures` 대신 `get_latest_report`
-  (메타데이터만 반환)를 잘못 선택 — "당기와 전기 매출액을 비교해줘"
-  질문에서 본문 검색을 안 함(알테오젠 사례).
-- **[관찰됨, 버그 아님— validator 정상 동작 확인]** 답변 모델이 evidence
-  의 두 원시 숫자로 스스로 뺄셈한 파생값(예: 2,164,043−1,795,249=368,794,
-  현대자동차 영업이익 비교)이 문자 그대로 evidence 에 없어 validator 가
-  ungrounded 로 표시 — 직접 검산 결과 계산 자체는 정확했음(오탐이지만
-  해가 없는 케이스, 알테오젠의 10배 오류와는 성격이 다름 — 둘을 구분할 것).
-- **[수정됨]** `LIBRARY` XML wrapper 태그를 skip 처리해서 holding 문서
-  SECTION 전체가 silent 하게 유실되던 버그.
-- **[수정됨]** SECTION 밖 최상위 loose content 가 조용히 버려지던 버그 →
-  synthetic section 으로 보존하도록 수정.
-- **[수정됨]** colspan 확장 시 같은 값이 3번 반복 출력되던 표 렌더링 버그
-  (RLE dedup 미적용) → classify_grid 에서 먼저 dedup 하도록 수정.
-- **[수정됨]** 표 분할이 행 수만 기준이라 컬럼이 매우 많은 표(예: 삼성전자
-  특수관계자 주석)에서 chunk 가 9,000+ 토큰까지 폭주 → token 예산도 같이
-  고려하도록 수정(그래도 헤더 자체가 넓은 극단 케이스는 잔여 — §9-6 참고).
-- **[수정됨]** malformed XML 에서 lxml recover 모드가 문서 TR 12,184개 중
-  11,786개를 표 하나에 잘못 몰아넣는 심각한 오동작 발견(현대자동차
-  정관 5호 의안 표) → TR 500행 cap 으로 방어.
-- **[수정됨]** Retrieval 인덱스에 parent chunk 가 섞여 있어 BGE-M3 CPU
-  임베딩이 30분+ 로 폭주 → `filter_leaf_chunks()` 로 leaf 만 인덱싱.
-- **[수정됨]** `search_disclosures` tool 이 HCX 가 잘못 추측한 period
-  포맷("2025-08-15~2026-08-15" 같은 날짜 범위)을 그대로 필터링해 결과
-  0건으로 만들던 문제 → 필터 단계적 완화 재시도 로직 추가.
-- **[수정됨]** `report_name_contains` 매칭이 원문 특수문자("ㆍ")와 HCX 가
-  자연스럽게 쓰는 무구분자 형태를 매칭 못 하던 문제 → 구분자 제거 후 비교.
-- **[관찰됨, 미해결]** 일부 chunk 가 여전히 최대 26,027자까지 커지는 경우
-  있음(§5 현재 진행 작업 원인 추정) — 표 컬럼 그룹 단위 분할은 추후 개선
-  과제로 README 에 이미 기록됨.
-- **[관찰됨]** HCX API 가 짧은 시간 연속 호출 시 간헐적으로 400
-  ("Unsupported function")을 내는 rate-limit 성 패턴 — exponential backoff
-  재시도(3s/6s/12s/24s)로 대부분 우회됨(`hcx_client.py`).
-- **[수정됨]** HCX-007(reasoning 모델)은 thinking 모드가 기본 on 상태라
-  `tools` 파라미터와 같이 쓰면 400("Invalid parameter: tools, thinking")이
-  남 → `thinking={"effort":"none"}`을 명시하면 해결. `hcx_client.py` 의
-  `HCXClient`가 모델명에 "007"이 포함되면 자동으로 이 파라미터를 붙이도록
-  수정(호출부 무수정으로 HCX-007 사용 가능, Stage 10 에서 발견/수정).
-- **[수정됨]** HCX-007 은 max token 제한 파라미터 이름도 다르다 —
-  "maxTokens"를 주면 400("Invalid parameter: maxTokens"), 대신
-  "maxCompletionTokens"를 써야 정상 동작(Stage 12 답변생성 경로에서 발견
-  — agent loop 는 tool-calling 모드라 애초에 max_tokens 를 안 보내서
-  Stage 10 에서는 드러나지 않았던 버그). `hcx_client.py`의
-  `self._max_tokens_param`이 모델명으로 자동 분기하도록 수정.
-- **[수정됨]** periodic 문서의 목차(TOC) 페이지가 표로 파싱돼 그대로
-  인덱싱되는 버그 발견(2026-08-15, 대회 참고 질의를 실제 파이프라인에 태워본
-  스모크테스트에서 재현 — 정식 Stage 실험 범위 밖). "SECTION 밖 loose
-  content 보존" 수정(§10 위 항목) 덕에 유실은 안 되지만, [제목 | 긴 대시
-  필러 | 페이지번호] 텍스트가 실제 section 제목과 키워드가 겹쳐 BM25에서
-  허위로 높은 점수를 받아 진짜 본문을 top-k 밖으로 밀어냄(실제 질의
-  "삼성전자 2023 vs 2025 사업보고서 비교 → 핵심 사업 변화"에서 재현:
-  2023년 근거로 목차만 잡혀 "확인할 수 없음"으로 오답). `chunkers.py`에
-  `_is_toc_table()` 추가해 목차 표를 chunk 후보에서 제외(파싱 트리 자체는
-  보존). 1차 구현은 "-" 한 글자만 봐서 재무표 결측치 표기와 헷갈려
-  오탐(내부통제 인력 현황표)이 났고, 대시 필러 최소 길이(10자) 조건을
-  추가해 해결 — `tests/test_chunkers.py`에 회귀 테스트 2건 추가.
-  **중요 caveat**: 삼성전자 100개 문서 중 6건, 300개 periodic 샘플 중 6건
-  꼴로 존재하는 것으로 확인(약 2%) — Stage 1~14 ablation 은 이 버그가
-  있는 상태로 진행됐다. Report-level Recall/MRR/NDCG 지표는 "정답 리포트의
-  아무 chunk나 top-k에 있으면 성공"으로 채점하므로 목차 chunk가 걸려도
-  성공으로 잡혀 **지표가 실제보다 살짝 유리하게 나왔을 가능성**이 있다
-  (안전 방향은 아님 — 재실행하면 오히려 소폭 하락할 수 있음). 전체
-  Stage 1~14 재실행은 하지 않았다(범위 밖) — 재검증이 필요하면 이 caveat
-  부터 확인할 것.
-- **[수정됨]** "몇 건이야?" 같은 카운팅 질문이 route=calculation 으로
-  오분류되면, agent 가 `calculate_cagr`을 완전히 동일한 무의미한 인자
-  (n_years=0 등 이미 실패가 확정된 입력)로 여러 번 연속 호출하다 포기하는
-  버그 발견(2026-08-16, 회사 일반화 스모크테스트 — 한미반도체 "2024년
-  체결 계약 몇 건" 질문에서 재현, 정답 5건인데 "확인 불가"로 오답).
-  `agent_loop.py`에 두 가지 수정: (a) AGENT_SYSTEM_PROMPT 에 "개수를 세는
-  질문은 검색 결과 개수로 직접 답하세요" 추가(186자, 300자 안전마진 유지),
-  (b) 이름+인자가 완전히 동일한 tool 호출은 실제로 재실행하지 않고 캐시된
-  결과+안내 메시지를 돌려주는 dedup guard 추가(모든 route 공통 적용,
-  calculate_cagr 특정 문제가 아니라 구조적 방지책). 재검증: 동일 질의
-  재실행 시 5건 정답, 반복 호출 없음 확인. 회귀 테스트:
-  `tests/test_agent.py::test_agent_loop_skips_redundant_identical_tool_calls`.
-- **[수정됨]** Validator 오탐 2건 발견(2026-08-16, 같은 스모크테스트).
-  (a) `get_correction_history`만 호출돼 `evidence_pack.citations`가
-  비어있으면 답변이 근거를 정확히 인용해도 무조건 `has_citation=False`로
-  잡힘 — `validator.py`가 `tool_results_summary`에서 report_id 패턴
-  (`_DOC_ID_PAT`)을 스캔하도록 수정. (b) "7조 6,615억원"처럼 같은 숫자를
-  조/억 단위로 재표기한 괄호 `(약 ...)` 안 숫자가 evidence 원문과 글자
-  그대로 안 겹친다는 이유로 "근거 없는 숫자"로 오탐 — `_extract_numbers`
-  가 `(약 ...)` 괄호를 grounding 검사 전에 제거하도록 수정. 재검증: 둘 다
-  재실행 후 정상(citation=True, ungrounded=set()) 확인. 회귀 테스트:
-  `test_validator_has_citation_from_correction_history_tool_result`,
-  `test_validator_ignores_approx_paren_restatement`.
+  오선택.
+- **[미수정]** 업종별 회계 용어 차이 미적응(금융지주 "매출액"↔"영업수익").
+- **[미수정]** 복합추론_Open(다년도/장문 비교) retrieval breadth 부족.
+- **[관찰됨, 버그 아님]** 답변 모델이 evidence 숫자로 스스로 계산한 파생값
+  (뺄셈 등)이 validator에 ungrounded로 잡히는 경우 있음 — 검산 결과 계산은
+  정확했던 사례 확인(알테오젠 10배 오류와는 다른 성격, 구분해서 볼 것).
+- **[기존부터 있던 flaky 테스트, 파싱버그와 무관 확인됨]**
+  `tests/test_dense_retriever.py::test_bge_m3_dense_retriever_finds_
+  relevant_chunk` — top-5에 R&D 관련 청크는 들어오지만 assertion이 요구하는
+  정확한 문자열 "연구개발"이 없어 실패. `git stash`로 파싱 수정을 뺀
+  베이스라인에서도 동일하게 실패함을 확인(2026-08-16) — 회귀 아님, 원래도
+  brittle 했던 테스트. 고치려면 assertion을 "R&D"도 인정하도록 완화.
+
+### 이전 발견/수정 (Phase 개발~Stage 1~14)
+- HCX-007 `thinking`/`maxCompletionTokens` 파라미터 자동분기 (`hcx_client.py`)
+- CrossEncoderReranker `max_length` 미지정 시 outlier chunk에서 처리시간 폭증
+- `LIBRARY` wrapper skip으로 holding SECTION 유실, SECTION 밖 loose content
+  유실 → synthetic section 보존
+- colspan 확장 시 텍스트 3배 반복(RLE dedup 누락)
+- 표 분할이 행 수만 기준이라 컬럼 많은 표에서 chunk 폭주
+- TR 12,184개 중 11,786개가 표 하나에 몰린 malformed XML 오동작(§9 참고,
+  이번에 근본원인 규명됨) → TR 500행 cap 으로 방어(유지)
+- Retrieval 인덱스에 parent chunk 혼입 → 임베딩 30분+ 폭주
+- `search_disclosures` period 필터 완화 재시도 로직
+- `report_name_contains` 구분자("ㆍ") 불일치 매칭 실패
 
 ---
 
-## 11. 남은 TODO (Stage 순서대로)
+## 11. 남은 TODO
 
-- [x] **Stage 5 — Reranker**: 완료. `results/reranker/` 전체 커밋됨.
-- [x] **Stage 8 — Entity Extraction**: 완료. Rule only 압승.
-      `results/entity/` 전체(failure_analysis.md 포함) 커밋됨.
-- [x] **Stage 9 — Router**: 완료. hcx_structured_router 채택.
-      `results/router/` 전체(failure_analysis.md 포함) 커밋됨.
-- [x] **Stage 10 — Agent HCX 모델**: 완료. HCX-007 채택, `.env` 갱신됨.
-      `results/agent/`(failure_analysis.md 포함) 커밋됨.
-- [x] **Stage 11 — E2E RAG**: 완료. 단일 winner 없음 — hybrid_reranker(정확도
-      최우선)와 full_agentic(현재 baseline, task_success 강함이나 필터 과도
-      축소로 랭킹 품질은 raw retrieval 보다 낮음)으로 시나리오 분리 권고.
-      `results/e2e_rag/`(failure_analysis.md 포함) 커밋됨.
-- [x] **Stage 12 — Answer HCX 모델**: 완료. HCX-005 채택(answer 역할).
-      `results/answer/`(failure_analysis.md 포함) 커밋됨.
-- [x] **Stage 14 — Final E2E**: 완료. test set(n=10) 최초/유일 사용,
-      efficiency(reranker off) 유지 결론. `results/e2e_final/`
-      (failure_analysis.md 포함) 커밋됨.
-- [x] 각 Stage 리포트 형식 `[Experiment]/[Candidates]/[Metrics]/[Best]/
-      [Trade-off]/[Failure Cases]/[Recommendation]`: 매 Stage 완료 시
-      사용자에게 이 형식으로 보고 완료(대화 로그 참고, 별도 저장 파일 없음).
-- [x] **모든 실험 완료 후 `results/` 전체를 하나의 최종 요약 문서로 정리**
-      (사용자가 "이거 다 돌리고 폴더 하나 파서 잘 정리해줘" 라고 요청함) —
-      완료. `results/FINAL_SUMMARY.md`(git 커밋됨) + Artifact 대시보드
-      게시(claude.ai 링크, git 미포함 — 세션에서 사용자에게 전달됨).
-      **모든 실험 arc 종료.**
+**Stage 1~14 전부 완료.** 남은 건 §12의 "다음에 바로 해야 할 작업" 참고.
 
 ---
 
 ## 12. 다음에 바로 해야 할 작업
 
-**Stage 1~14 실험 arc는 완전히 종료됨.** 현재는 그 뒤에 시작된 **"회사
-일반화 검증"** 트랙이 진행 중이다(§5 참고).
+**파싱 버그 재검증 체크리스트(1~7)는 전부 완료됨** (§5 참고). 다음은
+사용자가 명시적으로 요청할 경우의 후보 목록.
 
-### 완료된 것 (GPU 임베딩 회수 이후)
-- [x] 전체 70개사 GPU 임베딩 완료 + 로컬 회수 + 검증(467,043개 청크
-      정확히 일치) — `gpu_embeddings/`(git 제외, 로컬 전용 2.8GB)
-- [x] 8개 업종(기존 3개 + 신규 금융보험/바이오제약/조선/자동차/건설/통신
-      6개) 10개사, 12개사 조합으로 매트릭스 2라운드 확장(72칸 중 36칸=50%),
-      `results/generalization_check/matrix.csv` + raw 결과 2건
-- [x] 카운팅 오분류 + tool 중복호출 버그 수정 (§10)
-- [x] Validator 오탐 2건 수정 (§10)
-- [x] 회귀 테스트 3건 추가(`tests/test_agent.py`)
+### 후보 (우선순위순 아님, 사용자 요청 시 진행)
+- **3번째 malformation 패턴(속성값 안 따옴표) 수정 검토** — 이제 실제
+  실패 시그니처를 확보함(`ENG="" 회사명 ""` 형태, 종속기업/특수관계자
+  표에 집중, 전체 periodic의 23%). "속성값 경계 판별이 위험하다"는 기존
+  우려가 여전히 유효한지, 이 특정 패턴(빈 따옴표+공백으로 시작·끝나는
+  ENG 속성값)만 좁게 타겟팅하면 안전하게 고칠 수 있는지 재검토 가치 있음.
+- 복합추론_Open retrieval breadth 개선(top_k 확대, 하위키워드 분할검색,
+  전용 tool 등)
+- Router 파인튜닝 데이터 1,200건까지 확대(현재 149건, `results/router_tuning/`)
+  — CLOVA Studio 콘솔에서 라벨 형식(언더스코어 포함 route 이름 허용여부),
+  분류 태스크 권장 모델(HCX-DASH-001?) 재확인 먼저 필요.
+- `ask.py`에 answer 전용 모델(HCX-005) 분리 적용
+- char_2gram BM25 토크나이저 재검토
+- Stage 14 test set 표본 확대(n=10 한계 보완)
+- TOC 버그가 Stage 1~14 지표에 준 영향 재검증(선택적, 비용 큼)
+- `test_dense_retriever.py`의 brittle assertion 완화(§10 참고, 급하지 않음)
 
-### 아직 미해결(우선순위 순, 2라운드 이후 갱신)
-1. **[신규, 최우선] malformed XML(`&` 미이스케이프)로 인한 파싱 단계
-   문서 대량 유실** — 400개 periodic 샘플 중 29% 영향, 일부 회사는
-   문서 대부분(최대 98%의 TITLE)이 사라짐. §10 상세 참고. 개선 방향:
-   파싱 전 `&(?!amp;|lt;|gt;|quot;|apos;|#)` 를 `&amp;`로 사전 치환하는
-   전처리 추가(가장 근본적인 해법으로 추정) — 다음 세션 시작 시 바로
-   착수할 후보 1순위. 수정 후에는 반드시 (a) 이번에 만든 400건 스캔
-   스크립트로 재검증, (b) 영향받았던 KB금융/현대자동차 질의로 재검증,
-   (c) TR 500행 cap 등 기존 malformed-XML 방어 로직과 상호작용 확인.
-2. **복합추론_Open(다년도/장문 비교) retrieval breadth 부족** — 삼성전자
-   "2023 vs 2025 사업보고서 비교", 한미반도체 "해지 이력 시간순 정리"(7건
-   중 6건만) 둘 다 top_k=5로 넓은 주제 질의의 본문을 충분히 못 찾음.
-3. **다중행 표 요약 시 답변 모델의 숫자 오독** — 알테오젠 라이선스 계약
-   정리 질의에서 원문 80억원을 800억원으로 10배 오답(validator가 정확히
-   잡아낸 진짜 오류).
-4. **"정정" 단어에 과민반응해 잘못된 tool 선택**(신규) — 이벤트성 계약
-   해지 질문에 `get_correction_history`만 호출.
-5. **비교 질문에서 검색 대신 메타데이터 tool 오선택**(신규) — `search_
-   disclosures` 대신 `get_latest_report` 호출.
-6. **업종별 회계 용어 차이에 agent 가 적응 못함** — 금융지주는 "매출액"
-   대신 "영업수익/영업손익"을 쓰는데 검색어를 안 바꾸고 반복.
-
-**주의**: 2~6번 중 상당수(특히 KB금융/현대자동차 관련 실패)가 실제로는
-1번(파싱 버그)의 하위 증상일 수 있다 — 1번을 먼저 고치고 나서 2~6번이
-여전히 재현되는지 재확인이 필요하다.
-
-### 다음 세션에서 이어갈 만한 다른 후보 (사용자가 명시적으로 요청할 경우에만)
-- Stage 11/14 에서 식별된 `search_disclosures` 필터 완화 로직 개선
-  (ownership/보유비율 질의 실패의 근본 원인)
-- `ask.py`에 answer 전용 모델(HCX-005) 분리 적용(현재는 agent client 를
-  answer 생성에도 재사용 — Stage 12 결론이 프로덕션에 아직 반영 안 됨)
-- char_2gram BM25 토크나이저 재검토(Stage 2 에서 수치상 1위였으나 보류)
-- test set 표본 확대(Stage 14 의 n=10 한계 보완용 confirmatory set)
-- TOC 버그 수정이 Stage 1~14 지표에 준 영향 재검증(§10 caveat 참고 —
-  선택적, 비용이 크므로 사용자가 명시적으로 요청할 때만)
-
-### 로컬 임시 캐시 (git 미포함, 세션 재시작 시 사라짐)
-- `/tmp/bgem3_chunks_vectors.pkl`: 삼성전자 33개 문서/1,411개 청크(TOC
-  수정 반영 안 됨 — 삼성전자는 원래 TOC 문제 없었던 문서들이라 무관).
-- `/tmp/extra_companies_vectors.pkl`: 삼성SDI/LG에너지솔루션/한미반도체/
-  삼성전자FY2023 총 21개 문서, 2,110개 청크(TOC 수정 반영됨). 재생성 코드는
-  세션 스크립트 `embed_extra_companies.py` 참고(scratchpad, 세션 종료 시
-  사라짐 — doc_id 목록은 대화 로그 및 `results/generalization_check/`
-  raw json 파일에 남아있음).
-- `/private/tmp/.../scratchpad/`(세션별 경로) 안의 `competition_check.py`,
-  `other_companies_check.py`, `verify_fixes.py`: 4개사 스모크테스트/재검증
-  스크립트 원본 — 세션 종료 시 사라지지만 결과는 `results/generalization_check/`
-  에 이미 저장됨.
-- `~/Desktop/embedding/`, `~/Desktop/embedding.tar.gz`: GPU 서버 전달용
-  번들(코드+corpus). GPU 결과 받아온 뒤에는 삭제해도 무방.
-
-참고로 `/tmp/stage_eval_doc_ids.json`, `/tmp/bgem3_chunks_vectors.pkl` 등
-   `/tmp` 임시 파일들이 세션 재시작으로 사라졌다면, 아래 코드로 재생성:
-   ```python
-   # doc_ids 재생성 (삼성전자 33개 문서: periodic 최신 2 + major 전체 19 +
-   # exchange 전체 2 + holding 최신 10)
-   from disclosure_rag.common.manifest_loader import load_manifest
-   manifest = load_manifest("corpus")
-   samsung = [r for r in manifest if r.corp_name == "삼성전자"]
-   periodic = sorted([r for r in samsung if r.doc_group=="periodic" and not r.is_correction], key=lambda r: r.rcept_dt, reverse=True)[:2]
-   major = [r for r in samsung if r.doc_group=="major"]
-   exchange = [r for r in samsung if r.doc_group=="exchange"]
-   holding = sorted([r for r in samsung if r.doc_group=="holding"], key=lambda r: r.rcept_dt, reverse=True)[:10]
-   doc_ids = [r.doc_id for r in periodic+major+exchange+holding]
-   ```
-   `eval/gold_queries.json` (git에 커밋되어 있음, 40개 gold query)은 그대로 사용.
-5. TaskList 로 진행상황 재확인 (Task #14~25, id 25가 마지막 미완료 작업).
+### 로컬 임시 리소스 (git 미포함)
+- `gpu_embeddings/`(2.8GB, 전체 70개사 467,043 chunk) — 로컬 영구 보관,
+  삭제하지 말 것. 재사용법은 §7.
+- `/tmp/bgem3_chunks_vectors.pkl`(삼성전자 33개 문서), `/tmp/
+  extra_companies_vectors.pkl`(삼성SDI/LG엔솔/한미반도체 등), `/tmp/
+  expand_sectors_vectors.pkl`(KB금융/알테오젠/HD현대중공업/현대자동차/
+  현대건설/SK텔레콤) — 세션 재시작 시 사라짐, 필요시 §7 방법으로
+  `gpu_embeddings/`에서 재추출.
+- `~/Desktop/embedding/`, `~/Desktop/embedding.tar.gz` — GPU 서버 전달용
+  번들, 이제 삭제해도 무방.
+- TaskList로 진행상황 재확인 가능(Task #14~25 전부 completed).

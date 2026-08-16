@@ -15,6 +15,7 @@ TABLE / TABLE-GROUP 안의 TE[ACODE], TU[AUNIT/AUNITVALUE] 코드는 문서 유�
 from __future__ import annotations
 
 import logging
+import re
 
 from lxml import etree
 
@@ -22,6 +23,37 @@ from disclosure_rag.common.doc_tree import ParsedDocument, SectionNode, TextNode
 from disclosure_rag.parsing.table_parser import RawCell, classify_grid, expand_grid
 
 logger = logging.getLogger(__name__)
+
+# 회귀 발견(2026-08-16, 회사 일반화 검증 2라운드): 원본 XML 콘텐츠 안에
+# escape 안 된 "&"("S&P")나 "<"("<신  설>" 같은 꺾쇠괄호 표기)가 그대로
+# 들어있으면 lxml 의 recover=True 모드가 태그 구조 자체를 오정렬시켜, 최상위
+# SECTION-1 대부분이 TABLE/TBODY/TR 안에 잘못 중첩되고 _walk() 가 이를
+# "표 안 내용"으로 취급해 문서 대부분(현대자동차 154개 TITLE 중 2개만 생존,
+# 400개 표본 중 29% 영향)을 통째로 유실시킨다. _MAX_TABLE_ROWS 캡은 이
+# malformation 의 증상(표 하나가 비정상적으로 커짐)만 막아줄 뿐 근본 원인은
+# 못 고쳤다 — 파싱 전에 유효하지 않은 "&"/"<" 만 골라 각각 "&amp;"/"&lt;"로
+# 치환해서 애초에 recover 모드가 덜 필요하게 만든다.
+#
+# 주의(완전하지 않음, 알려진 한계): 실측으로 최소 3가지 서로 다른 malformation
+# 패턴이 같은 문서에서 발견됐다 — (1) bare "&", (2) 콘텐츠 안 bare "<"(둘 다
+# 여기서 처리), (3) 속성값 안에 이스케이프 안 된 따옴표(예: `ENG=""Other
+# receivables"`)는 속성값 경계를 정규식으로 안전하게 판별하기 어려워 손대지
+# 않았다 — 이 패턴이 있는 문서는 여전히 부분적으로만 복구된다(완전 유실
+# 보다는 훨씬 낫지만 100% 복구는 아님). 새 malformation 패턴을 더 찾으면
+# 여기 주석에 이어서 기록할 것.
+_BARE_AMPERSAND_PAT = re.compile(rb"&(?!amp;|lt;|gt;|quot;|apos;|#\d+;|#x[0-9a-fA-F]+;)")
+# 진짜 DART 태그는 전부 대문자/숫자/하이픈이고 이름 뒤에 공백/'/'/'>' 가 온다
+# (여는 태그: <TABLE-GROUP ...> / 닫는 태그: </TD> / 특수: <!-- , <?xml).
+# "<Manufacturing Excellence>"처럼 영문 소문자가 섞인 콘텐츠는 이 패턴에
+# 안 걸려 안전하게 구분된다.
+_VALID_TAG_START = rb"(?:/?[A-Z][A-Z0-9\-]*(?=[\s/>])|[!?])"
+_BARE_LT_PAT = re.compile(rb"<(?!" + _VALID_TAG_START + rb")")
+
+
+def _escape_bare_special_chars(file_bytes: bytes) -> bytes:
+    fixed = _BARE_AMPERSAND_PAT.sub(b"&amp;", file_bytes)
+    fixed = _BARE_LT_PAT.sub(b"&lt;", fixed)
+    return fixed
 
 _SKIP_TAGS = {"PGBRK", "COVER", "SUMMARY", "FORMULA-VERSION"}
 
@@ -150,7 +182,7 @@ def parse_dart_xml(
     source_path: str,
 ) -> ParsedDocument:
     parser = etree.XMLParser(recover=True, huge_tree=True)
-    root = etree.fromstring(file_bytes, parser=parser)
+    root = etree.fromstring(_escape_bare_special_chars(file_bytes), parser=parser)
 
     warnings: list[str] = []
     if root is None:

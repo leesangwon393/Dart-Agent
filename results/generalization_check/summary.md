@@ -16,7 +16,7 @@ HCX-007 agent + HCX-005 answer + hybrid_fusion, no reranker)으로 직접
   코드에서 수정 → (3) 같은 질의로 재검증 → (4) 가능하면 API 호출 없는 순수
   유닛 회귀 테스트로 `tests/`에 박제.
 
-## ⚠️ 최우선 발견: 파싱 단계에서 문서 대부분이 유실되는 심각한 버그
+## ✅ 발견 및 수정 완료: 파싱 단계에서 문서 대부분이 유실되는 심각한 버그
 
 2라운드 매트릭스 확장 중 KB금융/현대자동차의 검색 실패를 원문 대조하다가
 발견. **`corp/xml_parser.py`가 malformed XML(주로 `S&P`처럼 escape 안 된
@@ -41,11 +41,29 @@ SECTION 대부분이 TABLE/TBODY/TR 안에 잘못 중첩되고 우리 파서가 
   않음** — Stage 1~14 및 이전 스모크테스트가 우연히 이 버그를 피해간
   것으로 보이며, 그래서 지금까지 이 문제가 안 보였던 것.
 
-**개선 방향(미착수)**: (a) TABLE/TBODY/TR 안에 중첩된 SECTION-1을 감지해
-최상위로 승격시키는 후처리 로직 추가, (b) 더 근본적으로 파싱 전에 `&`
-같은 미이스케이프 문자를 정규식으로 사전 치환(`&(?!amp;|lt;|gt;|quot;|apos;|#)`
-→ `&amp;`)해서 애초에 recover 모드가 필요 없게 만들기 — (b)가 더 안전하고
-근본적인 해법으로 보임. **다음 세션 최우선 작업 후보.**
+**수정 완료(2026-08-16)**: `dart_xml_parser.py`에 `_escape_bare_special_chars()`
+추가 — 파싱 전에 (a) 유효하지 않은 bare `&`를 `&amp;`로, (b) DART 태그
+패턴(전부 대문자/숫자/하이픈)이 아닌 bare `<`를 `&lt;`로 사전 치환해서
+애초에 lxml recover 모드가 덜 필요하게 만들었다.
+
+- **400건 재스캔: 116건(29%) → 0건**(같은 진단 기준). 현대자동차 main
+  report: 2 section → 7 section("III.재무에 관한 사항"까지 복원). KB금융:
+  3 → 5.
+- **End-to-end 재검증(실제 질의)**: KB금융 "사업 부문 구성을 설명해줘" →
+  PASS(4개 부문 정확히 설명, 5건 근거 인용). 현대자동차 "2025년 매출액은
+  얼마야?" → PASS(정직한 실패 — III.재무 섹션은 복원돼 근거는 인용되지만
+  문서 자체에 2025년 매출액 단일수치가 없어 할루시네이션 없이 "확인 불가"
+  로 정직하게 답함). `matrix.csv`에 [재검증] 행 반영.
+- **전체 코퍼스 재스캔(2,732건, TITLE 태그 존재 XML 전부)**: 여전히
+  **627건(23.0%)** 영향 — 전부 periodic, 금융지주·대기업 계열 집중.
+  원문 직접 대조로 원인 확정: 이미 알려진 **세 번째 malformation
+  패턴**(속성값 안 이스케이프 안 된 따옴표, 예: KB금융 종속기업 현황 표의
+  `ENG="" KB Insurance Co., Ltd ""`)이 그대로 원인 — 오늘 고친 bare
+  `&`/`<` 버그와는 별개다. 특수관계자/종속기업 현황처럼 영문 회사명을
+  ENG 속성에 넣는 표에 집중돼 있어, 다음에 손댈 후보로는 이 패턴만 좁게
+  타겟팅하는 정규식을 검토할 가치가 있다(`PROJECT_STATE.md` §12 참고).
+- **회귀 테스트**: `tests/test_parsers.py`에 4건 추가(합성 malformed XML
+  단위 테스트 2건 + 현대자동차/KB금융 실제 문서 회귀 테스트 2건).
 
 ## 현재 커버리지 (2026-08-16 기준, 2라운드 완료)
 
@@ -56,10 +74,10 @@ SECTION 대부분이 TABLE/TBODY/TR 안에 잘못 중첩되고 우리 파서가 
 | LG에너지솔루션(2차전지) | PASS | PASS | – | – | – | – |
 | 한미반도체(반도체) | – | – | PASS(수정후) | – | PASS | PARTIAL |
 | 삼성SDI+LG에너지솔루션(교차) | – | – | PASS | – | – | – |
-| KB금융(금융보험) | PASS | FAIL(파싱버그) | – | – | PASS | – |
+| KB금융(금융보험) | PASS | PASS(재검증) | – | – | PASS | – |
 | 알테오젠(바이오제약) | PASS | FAIL(실제오류) | – | FAIL(도구오선택) | – | – |
 | HD현대중공업(조선) | PASS | PASS | – | – | FAIL(도구오선택) | – |
-| 현대자동차(자동차) | FAIL(파싱버그) | – | – | PASS(검증오탐) | – | PASS |
+| 현대자동차(자동차) | PASS(재검증,정직한실패) | – | – | PASS(검증오탐) | – | PASS |
 | 현대건설(건설) | PASS | – | – | PASS | PASS | – |
 | SK텔레콤(통신) | PASS | – | – | – | – | PASS |
 | SK텔레콤+KB금융(교차업종) | – | – | PASS(비효율) | – | – | – |
@@ -94,6 +112,18 @@ SECTION 대부분이 TABLE/TBODY/TR 안에 잘못 중첩되고 우리 파서가 
    - 검증: 두 케이스 모두 재실행 후 정상(citation=True, ungrounded=set()).
    - 회귀 테스트: `test_validator_has_citation_from_correction_history_tool_result`,
      `test_validator_ignores_approx_paren_restatement`
+4. **파싱 단계 대량 문서 유실** (`src/disclosure_rag/parsing/dart_xml_parser.py`)
+   — 위 "발견 및 수정 완료" 섹션에 전체 경위 기록. 요약: bare `&`/`<`
+   사전 이스케이프로 400건 재스캔 기준 116건(29%)→0건. 실제 질의(KB금융/
+   현대자동차) 재검증 PASS. 전체 코퍼스(2,732건) 재스캔 결과 별개의
+   3번째 malformation 패턴으로 인해 627건(23.0%)이 여전히 부분 영향
+   받지만, 이는 새 버그가 아니라 기존에 알려진 채 의도적으로 미수정 상태로
+   남긴 한계의 정밀한 정량화다.
+   - 회귀 테스트: `tests/test_parsers.py`의
+     `test_escape_bare_special_chars_preserves_valid_xml_syntax`,
+     `test_parse_dart_xml_recovers_sections_despite_malformed_ampersand_and_bracket`,
+     `test_hyundai_motor_periodic_report_recovers_financial_section`,
+     `test_kb_financial_periodic_report_recovers_financial_section`
 
 ## 미해결로 남은 것 (별도 이슈, 이번엔 안 고침)
 
@@ -104,6 +134,12 @@ SECTION 대부분이 TABLE/TBODY/TR 안에 잘못 중첩되고 우리 파서가 
   우선순위.
 - 삼성SDI 매출액 수치가 top_k 값에 따라 다른 chunk(실적치 vs 예상치로
   추정)를 집어오는 변동성 관찰됨 — 버그로 확정하진 않았으나 추가 조사 대상.
+- **3번째 XML malformation 패턴(속성값 안 이스케이프 안 된 따옴표)**:
+  `dart_xml_parser.py` 참고. periodic 문서의 23.0%(627/2,732건, 전체 재스캔
+  기준)가 이 패턴으로 여전히 부분 영향받음, 금융지주 계열의 특수관계자/
+  종속기업 현황 표에 집중. 속성값 경계 판별이 위험해 정규식으로 안전하게
+  고치기 어렵다고 판단해 미수정 — 좁게 타겟팅하면 가능할 수도 있어 재검토
+  후보(`PROJECT_STATE.md` §12).
 
 ## 새로 발견한 문제(업종 확장 라운드, 미수정 — 파싱 버그는 위에서 별도 정리)
 
