@@ -1,0 +1,817 @@
+[
+  {
+    "label": "삼성전자(IT/반도체)",
+    "category": "검색추출_Closed",
+    "query": "삼성전자의 2025년 매출액은 얼마인가?",
+    "companies": [
+      "삼성전자"
+    ]
+  },
+  {
+    "label": "삼성SDI(2차전지)",
+    "category": "검색추출_Closed",
+    "query": "삼성SDI의 2025년 영업이익은 얼마야?",
+    "companies": [
+      "삼성SDI"
+    ]
+  },
+  {
+    "label": "LG에너지솔루션(2차전지)",
+    "category": "검색추출_Closed",
+    "query": "LG에너지솔루션의 최근 자기주식 취득 결정 규모는 얼마야?",
+    "companies": [
+      "LG에너지솔루션"
+    ]
+  },
+  {
+    "label": "한미반도체(반도체)",
+    "category": "검색추출_Closed",
+    "query": "한미반도체의 2025년 부채비율은 얼마야?",
+    "companies": [
+      "한미반도체"
+    ]
+  },
+  {
+    "label": "KB금융(금융)",
+    "category": "검색추출_Closed",
+    "query": "KB금융의 최근 체결한 단일판매·공급계약 금액은 얼마야?",
+    "companies": [
+      "KB금융"
+    ]
+  },
+  {
+    "label": "알테오젠(바이오)",
+    "category": "검색추출_Closed",
+    "query": "알테오젠의 2025년 매출액은 얼마인가?",
+    "companies": [
+      "알테오젠"
+    ]
+  },
+  {
+    "label": "HD현대중공업(조선)",
+    "category": "검색추출_Closed",
+    "query": "HD현대중공업의 2025년 영업이익은 얼마야?",
+    "companies": [
+      "HD현대중공업"
+    ]
+  },
+  {
+    "label": "현대자동차(자동차)",
+    "category": "검색추출_Closed",
+    "query": "현대자동차의 최근 자기주식 취득 결정 규모는 얼마야?",
+    "companies": [
+      "현대자동차"
+    ]
+  },
+  {
+    "label": "현대건설(건설)",
+    "category": "검색추출_Closed",
+    "query": "현대건설의 2025년 부채비율은 얼마야?",
+    "companies": [
+      "현대건설"
+    ]
+  },
+  {
+    "label": "SK텔레콤(통신)",
+    "category": "검색추출_Closed",
+    "query": "SK텔레콤의 최근 체결한 단일판매·공급계약 금액은 얼마야?",
+    "companies": [
+      "SK텔레콤"
+    ]
+  },
+  {
+    "label": "기아(자동차)",
+    "category": "검색추출_Closed",
+    "query": "기아의 2025년 매출액은 얼마인가?",
+    "companies": [
+      "기아"
+    ]
+  },
+  {
+    "label": "SK하이닉스(반도체)",
+    "category": "검색추출_Closed",
+    "query": "SK하이닉스의 2025년 영업이익은 얼마야?",
+    "companies": [
+      "SK하이닉스"
+    ]
+  },
+  {
+    "label": "NAVER(IT/플랫폼)",
+    "category": "검색추출_Closed",
+    "query": "NAVER의 최근 자기주식 취득 결정 규모는 얼마야?",
+    "companies": [
+      "NAVER"
+    ]
+  },
+  {
+    "label": "카카오(IT/플랫폼)",
+    "category": "검색추출_Closed",
+    "query": "카카오의 2025년 부채비율은 얼마야?",
+    "companies": [
+      "카카오"
+    ]
+  },
+  {
+    "label": "신한지주(금융)",
+    "category": "검색추출_Closed",
+    "query": "신한지주의 최근 체결한 단일판매·공급계약 금액은 얼마야?",
+    "companies": [
+      "신한지주"
+    ]
+  },
+  {
+    "label": "삼성바이오로직스(바이오)",
+    "category": "검색추출_Closed",
+    "query": "삼성바이오로직스의 2025년 매출액은 얼마인가?",
+    "companies": [
+      "삼성바이오로직스"
+    ]
+  },
+  {
+    "label": "셀트리온(바이오)",
+    "category": "검색추출_Closed",
+    "query": "셀트리온의 2025년 영업이익은 얼마야?",
+    "companies": [
+      "셀트리온"
+    ]
+  },
+  {
+    "label": "하이브(엔터)",
+    "category": "검색추출_Closed",
+    "query": "하이브의 최근 자기주식 취득 결정 규모는 얼마야?",
+    "companies": [
+      "하이브"
+    ]
+  },
+  {
+    "label": "와이지엔터테인먼트(엔터)",
+    "category": "검색추출_Closed",
+    "query": "와이지엔터테인먼트의 2025년 부채비율은 얼마야?",
+    "companies": [
+      "와이지엔터테인먼트"
+    ]
+  },
+  {
+    "label": "크래프톤(게임)",
+    "category": "검색추출_Closed",
+    "query": "크래프톤의 최근 체결한 단일판매·공급계약 금액은 얼마야?",
+    "companies": [
+      "크래프톤"
+    ]
+  },
+  {
+    "label": "두산로보틱스(로봇)",
+    "category": "검색추출_Open",
+    "query": "두산로보틱스의 주요 사업부문 구성을 설명해줘",
+    "companies": [
+      "두산로보틱스"
+    ]
+  },
+  {
+    "label": "레인보우로보틱스(로봇)",
+    "category": "검색추출_Open",
+    "query": "레인보우로보틱스의 최근 투자 계획을 정리해줘",
+    "companies": [
+      "레인보우로보틱스"
+    ]
+  },
+  {
+    "label": "한화에어로스페이스(방산)",
+    "category": "검색추출_Open",
+    "query": "한화에어로스페이스의 주요 매출처를 정리해줘",
+    "companies": [
+      "한화에어로스페이스"
+    ]
+  },
+  {
+    "label": "한국항공우주(방산)",
+    "category": "검색추출_Open",
+    "query": "한국항공우주의 주요 사업부문 구성을 설명해줘",
+    "companies": [
+      "한국항공우주"
+    ]
+  },
+  {
+    "label": "이마트(유통)",
+    "category": "검색추출_Open",
+    "query": "이마트의 최근 투자 계획을 정리해줘",
+    "companies": [
+      "이마트"
+    ]
+  },
+  {
+    "label": "LG생활건강(화장품)",
+    "category": "검색추출_Open",
+    "query": "LG생활건강의 주요 매출처를 정리해줘",
+    "companies": [
+      "LG생활건강"
+    ]
+  },
+  {
+    "label": "아모레퍼시픽(화장품)",
+    "category": "검색추출_Open",
+    "query": "아모레퍼시픽의 주요 사업부문 구성을 설명해줘",
+    "companies": [
+      "아모레퍼시픽"
+    ]
+  },
+  {
+    "label": "POSCO홀딩스(철강)",
+    "category": "검색추출_Open",
+    "query": "POSCO홀딩스의 최근 투자 계획을 정리해줘",
+    "companies": [
+      "POSCO홀딩스"
+    ]
+  },
+  {
+    "label": "고려아연(비철금속)",
+    "category": "검색추출_Open",
+    "query": "고려아연의 주요 매출처를 정리해줘",
+    "companies": [
+      "고려아연"
+    ]
+  },
+  {
+    "label": "HMM(해운)",
+    "category": "검색추출_Open",
+    "query": "HMM의 주요 사업부문 구성을 설명해줘",
+    "companies": [
+      "HMM"
+    ]
+  },
+  {
+    "label": "현대글로비스(물류)",
+    "category": "검색추출_Open",
+    "query": "현대글로비스의 최근 투자 계획을 정리해줘",
+    "companies": [
+      "현대글로비스"
+    ]
+  },
+  {
+    "label": "대우건설(건설)",
+    "category": "검색추출_Open",
+    "query": "대우건설의 주요 매출처를 정리해줘",
+    "companies": [
+      "대우건설"
+    ]
+  },
+  {
+    "label": "케이티(통신)",
+    "category": "검색추출_Open",
+    "query": "케이티의 주요 사업부문 구성을 설명해줘",
+    "companies": [
+      "케이티"
+    ]
+  },
+  {
+    "label": "LG유플러스(통신)",
+    "category": "검색추출_Open",
+    "query": "LG유플러스의 최근 투자 계획을 정리해줘",
+    "companies": [
+      "LG유플러스"
+    ]
+  },
+  {
+    "label": "미래에셋증권(증권)",
+    "category": "검색추출_Open",
+    "query": "미래에셋증권의 주요 매출처를 정리해줘",
+    "companies": [
+      "미래에셋증권"
+    ]
+  },
+  {
+    "label": "기아+현대자동차(자동차+자동차)",
+    "category": "비교연산_Closed",
+    "query": "기아와 현대자동차의 2025년 매출액을 비교해줘",
+    "companies": [
+      "기아",
+      "현대자동차"
+    ]
+  },
+  {
+    "label": "SK하이닉스+삼성전자(반도체+IT/반도체)",
+    "category": "비교연산_Closed",
+    "query": "SK하이닉스와 삼성전자의 2025년 설비투자 규모를 비교해줘",
+    "companies": [
+      "SK하이닉스",
+      "삼성전자"
+    ]
+  },
+  {
+    "label": "NAVER+카카오(IT/플랫폼+IT/플랫폼)",
+    "category": "비교연산_Closed",
+    "query": "NAVER와 카카오의 2025년 영업이익을 비교해줘",
+    "companies": [
+      "NAVER",
+      "카카오"
+    ]
+  },
+  {
+    "label": "신한지주+KB금융(금융+금융)",
+    "category": "비교연산_Closed",
+    "query": "신한지주와 KB금융의 2025년 영업수익을 비교해줘",
+    "companies": [
+      "신한지주",
+      "KB금융"
+    ]
+  },
+  {
+    "label": "삼성SDI+LG에너지솔루션(2차전지+2차전지)",
+    "category": "비교연산_Closed",
+    "query": "삼성SDI와 LG에너지솔루션의 2025년 매출액을 비교해줘",
+    "companies": [
+      "삼성SDI",
+      "LG에너지솔루션"
+    ]
+  },
+  {
+    "label": "삼성바이오로직스+셀트리온(바이오+바이오)",
+    "category": "비교연산_Closed",
+    "query": "삼성바이오로직스와 셀트리온의 2025년 매출액을 비교해줘",
+    "companies": [
+      "삼성바이오로직스",
+      "셀트리온"
+    ]
+  },
+  {
+    "label": "하이브+와이지엔터테인먼트(엔터+엔터)",
+    "category": "비교연산_Closed",
+    "query": "하이브와 와이지엔터테인먼트의 2025년 영업이익을 비교해줘",
+    "companies": [
+      "하이브",
+      "와이지엔터테인먼트"
+    ]
+  },
+  {
+    "label": "두산로보틱스+레인보우로보틱스(로봇+로봇)",
+    "category": "비교연산_Closed",
+    "query": "두산로보틱스와 레인보우로보틱스의 2025년 매출액을 비교해줘",
+    "companies": [
+      "두산로보틱스",
+      "레인보우로보틱스"
+    ]
+  },
+  {
+    "label": "한화에어로스페이스+한국항공우주(방산+방산)",
+    "category": "비교연산_Closed",
+    "query": "한화에어로스페이스와 한국항공우주의 2025년 매출액을 비교해줘",
+    "companies": [
+      "한화에어로스페이스",
+      "한국항공우주"
+    ]
+  },
+  {
+    "label": "LG생활건강+아모레퍼시픽(화장품+화장품)",
+    "category": "비교연산_Closed",
+    "query": "LG생활건강와 아모레퍼시픽의 2025년 영업이익을 비교해줘",
+    "companies": [
+      "LG생활건강",
+      "아모레퍼시픽"
+    ]
+  },
+  {
+    "label": "POSCO홀딩스+고려아연(철강+비철금속)",
+    "category": "비교연산_Closed",
+    "query": "POSCO홀딩스와 고려아연의 2025년 매출액을 비교해줘",
+    "companies": [
+      "POSCO홀딩스",
+      "고려아연"
+    ]
+  },
+  {
+    "label": "HMM+현대글로비스(해운+물류)",
+    "category": "비교연산_Closed",
+    "query": "HMM와 현대글로비스의 2025년 매출액을 비교해줘",
+    "companies": [
+      "HMM",
+      "현대글로비스"
+    ]
+  },
+  {
+    "label": "현대건설+대우건설(건설+건설)",
+    "category": "비교연산_Closed",
+    "query": "현대건설와 대우건설의 2025년 매출액을 비교해줘",
+    "companies": [
+      "현대건설",
+      "대우건설"
+    ]
+  },
+  {
+    "label": "SK텔레콤+케이티(통신+통신)",
+    "category": "비교연산_Closed",
+    "query": "SK텔레콤와 케이티의 2025년 영업이익을 비교해줘",
+    "companies": [
+      "SK텔레콤",
+      "케이티"
+    ]
+  },
+  {
+    "label": "현대모비스+삼성전기(자동차부품+전자부품)",
+    "category": "비교연산_Closed",
+    "query": "현대모비스와 삼성전기의 2025년 매출액을 비교해줘",
+    "companies": [
+      "현대모비스",
+      "삼성전기"
+    ]
+  },
+  {
+    "label": "에코프로비엠(2차전지소재)",
+    "category": "비교연산_Open",
+    "query": "에코프로비엠의 당기 대비 전기 영업이익 변화를 정리해줘",
+    "companies": [
+      "에코프로비엠"
+    ]
+  },
+  {
+    "label": "현대모비스(자동차부품)",
+    "category": "비교연산_Open",
+    "query": "현대모비스의 최근 자금조달 내역을 유형별로 정리해줘",
+    "companies": [
+      "현대모비스"
+    ]
+  },
+  {
+    "label": "삼성전기(전자부품)",
+    "category": "비교연산_Open",
+    "query": "삼성전기의 당기 대비 전기 영업이익 변화를 정리해줘",
+    "companies": [
+      "삼성전기"
+    ]
+  },
+  {
+    "label": "삼성전자(IT/반도체)",
+    "category": "비교연산_Open",
+    "query": "삼성전자의 최근 자금조달 내역을 유형별로 정리해줘",
+    "companies": [
+      "삼성전자"
+    ]
+  },
+  {
+    "label": "삼성SDI(2차전지)",
+    "category": "비교연산_Open",
+    "query": "삼성SDI의 당기 대비 전기 영업이익 변화를 정리해줘",
+    "companies": [
+      "삼성SDI"
+    ]
+  },
+  {
+    "label": "LG에너지솔루션(2차전지)",
+    "category": "비교연산_Open",
+    "query": "LG에너지솔루션의 최근 자금조달 내역을 유형별로 정리해줘",
+    "companies": [
+      "LG에너지솔루션"
+    ]
+  },
+  {
+    "label": "한미반도체(반도체)",
+    "category": "비교연산_Open",
+    "query": "한미반도체의 당기 대비 전기 영업이익 변화를 정리해줘",
+    "companies": [
+      "한미반도체"
+    ]
+  },
+  {
+    "label": "KB금융(금융)",
+    "category": "비교연산_Open",
+    "query": "KB금융의 최근 자금조달 내역을 유형별로 정리해줘",
+    "companies": [
+      "KB금융"
+    ]
+  },
+  {
+    "label": "알테오젠(바이오)",
+    "category": "비교연산_Open",
+    "query": "알테오젠의 당기 대비 전기 영업이익 변화를 정리해줘",
+    "companies": [
+      "알테오젠"
+    ]
+  },
+  {
+    "label": "HD현대중공업(조선)",
+    "category": "비교연산_Open",
+    "query": "HD현대중공업의 최근 자금조달 내역을 유형별로 정리해줘",
+    "companies": [
+      "HD현대중공업"
+    ]
+  },
+  {
+    "label": "현대자동차(자동차)",
+    "category": "복합추론_Closed",
+    "query": "현대자동차가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "현대자동차"
+    ]
+  },
+  {
+    "label": "현대건설(건설)",
+    "category": "복합추론_Closed",
+    "query": "현대건설의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "현대건설"
+    ]
+  },
+  {
+    "label": "SK텔레콤(통신)",
+    "category": "복합추론_Closed",
+    "query": "SK텔레콤가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "SK텔레콤"
+    ]
+  },
+  {
+    "label": "기아(자동차)",
+    "category": "복합추론_Closed",
+    "query": "기아의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "기아"
+    ]
+  },
+  {
+    "label": "SK하이닉스(반도체)",
+    "category": "복합추론_Closed",
+    "query": "SK하이닉스가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "SK하이닉스"
+    ]
+  },
+  {
+    "label": "NAVER(IT/플랫폼)",
+    "category": "복합추론_Closed",
+    "query": "NAVER의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "NAVER"
+    ]
+  },
+  {
+    "label": "카카오(IT/플랫폼)",
+    "category": "복합추론_Closed",
+    "query": "카카오가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "카카오"
+    ]
+  },
+  {
+    "label": "신한지주(금융)",
+    "category": "복합추론_Closed",
+    "query": "신한지주의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "신한지주"
+    ]
+  },
+  {
+    "label": "삼성바이오로직스(바이오)",
+    "category": "복합추론_Closed",
+    "query": "삼성바이오로직스가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "삼성바이오로직스"
+    ]
+  },
+  {
+    "label": "셀트리온(바이오)",
+    "category": "복합추론_Closed",
+    "query": "셀트리온의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "셀트리온"
+    ]
+  },
+  {
+    "label": "하이브(엔터)",
+    "category": "복합추론_Closed",
+    "query": "하이브가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "하이브"
+    ]
+  },
+  {
+    "label": "와이지엔터테인먼트(엔터)",
+    "category": "복합추론_Closed",
+    "query": "와이지엔터테인먼트의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "와이지엔터테인먼트"
+    ]
+  },
+  {
+    "label": "크래프톤(게임)",
+    "category": "복합추론_Closed",
+    "query": "크래프톤가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "크래프톤"
+    ]
+  },
+  {
+    "label": "두산로보틱스(로봇)",
+    "category": "복합추론_Closed",
+    "query": "두산로보틱스의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "두산로보틱스"
+    ]
+  },
+  {
+    "label": "레인보우로보틱스(로봇)",
+    "category": "복합추론_Closed",
+    "query": "레인보우로보틱스가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "레인보우로보틱스"
+    ]
+  },
+  {
+    "label": "한화에어로스페이스(방산)",
+    "category": "복합추론_Closed",
+    "query": "한화에어로스페이스의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "한화에어로스페이스"
+    ]
+  },
+  {
+    "label": "한국항공우주(방산)",
+    "category": "복합추론_Closed",
+    "query": "한국항공우주가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "한국항공우주"
+    ]
+  },
+  {
+    "label": "이마트(유통)",
+    "category": "복합추론_Closed",
+    "query": "이마트의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "이마트"
+    ]
+  },
+  {
+    "label": "LG생활건강(화장품)",
+    "category": "복합추론_Closed",
+    "query": "LG생활건강가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "LG생활건강"
+    ]
+  },
+  {
+    "label": "아모레퍼시픽(화장품)",
+    "category": "복합추론_Closed",
+    "query": "아모레퍼시픽의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "아모레퍼시픽"
+    ]
+  },
+  {
+    "label": "POSCO홀딩스(철강)",
+    "category": "복합추론_Open",
+    "query": "POSCO홀딩스의 최근 자사주 취득/처분 이력을 정리해줘",
+    "companies": [
+      "POSCO홀딩스"
+    ]
+  },
+  {
+    "label": "고려아연(비철금속)",
+    "category": "복합추론_Open",
+    "query": "고려아연의 계약 해지 이력을 시간순으로 정리해줘",
+    "companies": [
+      "고려아연"
+    ]
+  },
+  {
+    "label": "HMM(해운)",
+    "category": "복합추론_Open",
+    "query": "HMM의 최근 공시 이력을 종합해서 정리해줘",
+    "companies": [
+      "HMM"
+    ]
+  },
+  {
+    "label": "현대글로비스(물류)",
+    "category": "복합추론_Open",
+    "query": "현대글로비스의 최근 자사주 취득/처분 이력을 정리해줘",
+    "companies": [
+      "현대글로비스"
+    ]
+  },
+  {
+    "label": "대우건설(건설)",
+    "category": "복합추론_Open",
+    "query": "대우건설의 계약 해지 이력을 시간순으로 정리해줘",
+    "companies": [
+      "대우건설"
+    ]
+  },
+  {
+    "label": "케이티(통신)",
+    "category": "복합추론_Open",
+    "query": "케이티의 최근 공시 이력을 종합해서 정리해줘",
+    "companies": [
+      "케이티"
+    ]
+  },
+  {
+    "label": "LG유플러스(통신)",
+    "category": "복합추론_Open",
+    "query": "LG유플러스의 최근 자사주 취득/처분 이력을 정리해줘",
+    "companies": [
+      "LG유플러스"
+    ]
+  },
+  {
+    "label": "미래에셋증권(증권)",
+    "category": "복합추론_Open",
+    "query": "미래에셋증권의 계약 해지 이력을 시간순으로 정리해줘",
+    "companies": [
+      "미래에셋증권"
+    ]
+  },
+  {
+    "label": "에코프로비엠(2차전지소재)",
+    "category": "복합추론_Open",
+    "query": "에코프로비엠의 최근 공시 이력을 종합해서 정리해줘",
+    "companies": [
+      "에코프로비엠"
+    ]
+  },
+  {
+    "label": "현대모비스(자동차부품)",
+    "category": "복합추론_Open",
+    "query": "현대모비스의 최근 자사주 취득/처분 이력을 정리해줘",
+    "companies": [
+      "현대모비스"
+    ]
+  },
+  {
+    "label": "삼성전기(전자부품)",
+    "category": "복합추론_Open",
+    "query": "삼성전기의 계약 해지 이력을 시간순으로 정리해줘",
+    "companies": [
+      "삼성전기"
+    ]
+  },
+  {
+    "label": "삼성전자(IT/반도체)",
+    "category": "복합추론_Open",
+    "query": "삼성전자의 최근 공시 이력을 종합해서 정리해줘",
+    "companies": [
+      "삼성전자"
+    ]
+  },
+  {
+    "label": "삼성SDI(2차전지)",
+    "category": "복합추론_Open",
+    "query": "삼성SDI의 최근 자사주 취득/처분 이력을 정리해줘",
+    "companies": [
+      "삼성SDI"
+    ]
+  },
+  {
+    "label": "LG에너지솔루션(2차전지)",
+    "category": "복합추론_Open",
+    "query": "LG에너지솔루션의 계약 해지 이력을 시간순으로 정리해줘",
+    "companies": [
+      "LG에너지솔루션"
+    ]
+  },
+  {
+    "label": "한미반도체(반도체)",
+    "category": "복합추론_Open",
+    "query": "한미반도체의 최근 공시 이력을 종합해서 정리해줘",
+    "companies": [
+      "한미반도체"
+    ]
+  },
+  {
+    "label": "KB금융(금융)",
+    "category": "복합추론_Open",
+    "query": "KB금융의 최근 자사주 취득/처분 이력을 정리해줘",
+    "companies": [
+      "KB금융"
+    ]
+  },
+  {
+    "label": "알테오젠(바이오)",
+    "category": "복합추론_Open",
+    "query": "알테오젠의 계약 해지 이력을 시간순으로 정리해줘",
+    "companies": [
+      "알테오젠"
+    ]
+  },
+  {
+    "label": "HD현대중공업(조선)",
+    "category": "복합추론_Open",
+    "query": "HD현대중공업의 최근 공시 이력을 종합해서 정리해줘",
+    "companies": [
+      "HD현대중공업"
+    ]
+  },
+  {
+    "label": "현대자동차(자동차)",
+    "category": "복합추론_Open",
+    "query": "현대자동차의 최근 자사주 취득/처분 이력을 정리해줘",
+    "companies": [
+      "현대자동차"
+    ]
+  },
+  {
+    "label": "현대건설(건설)",
+    "category": "복합추론_Open",
+    "query": "현대건설의 계약 해지 이력을 시간순으로 정리해줘",
+    "companies": [
+      "현대건설"
+    ]
+  }
+]
