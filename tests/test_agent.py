@@ -111,6 +111,16 @@ def test_agent_correction_analysis_uses_both_versions_and_two_plus_turns():
     assert "exchange_20250731800028" in report_ids_cited
 
 
+def test_agent_system_prompt_stays_under_300_chars():
+    """잠긴 제약: AGENT_SYSTEM_PROMPT 가 ~300자 넘으면 tool-calling 2턴째부터
+    결정적으로 400 에러가 난다(3회 독립 재현). 느린 실API 통합 테스트
+    (`test_agent_correction_analysis_uses_both_versions_and_two_plus_turns`)
+    말고도 빠르게 이 회귀를 잡을 수 있게 길이만 따로 고정한다."""
+    from disclosure_rag.agent.agent_loop import AGENT_SYSTEM_PROMPT
+
+    assert len(AGENT_SYSTEM_PROMPT) < 300
+
+
 def test_validator_catches_hallucinated_citation():
     """실측 재현: 답변이 evidence 에 없는 report_id 를 인용하면 has_citation=False 가 돼야 한다."""
     from disclosure_rag.agent.evidence import EvidencePack
@@ -170,6 +180,98 @@ def test_validator_has_citation_from_correction_history_tool_result():
     answer = "정정이 4번 있었습니다.\n근거: report_id(major_20250519000120)"
     result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
     assert result.has_citation is True
+
+
+# ── 2026-08-18 회귀 테스트: 답변 모델이 tool 없이 evidence 숫자를 직접 조합해
+# 암산한 경우를 구분(맞으면 통과, 틀리면 여전히 의심) — 사용자 피드백
+# "숫자 계산은 LLM 안 시키고 직접 계산하는 게 맞는 것 같다"로 시작됨.
+# 실측 사례(matrix.csv): 현대자동차 "당기 대비 전기 영업이익 변화" 질문에서
+# 답변이 2,164,043 - 1,795,249 = 368,794 를 암산했는데, 이전 로직은 이걸
+# "근거 없는 숫자"로 오탐(실제로는 정확한 계산이었음) — validator가 직접
+# 검산해서 구분해야 한다.
+
+
+def test_validator_verifies_correct_ad_hoc_subtraction():
+    from disclosure_rag.agent.evidence import EvidencePack
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    pack = EvidencePack(
+        question="q",
+        prompt_text="[EVIDENCE 1]\n내용: 당기 영업이익 2164043백만원, 전기 영업이익 1795249백만원\nreport_id: r1\nchunk_id: c1\n",
+        citations=[],
+    )
+    answer = "영업이익은 2164043백만원으로 전기 1795249백만원 대비 368794백만원 증가했습니다. 근거: r1"
+    result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
+    assert result.numbers_grounded, f"검산 가능한 뺄셈이 오탐됨: {result.ungrounded_numbers}"
+    assert "368794" in result.verified_derived_numbers
+
+
+def test_validator_still_flags_incorrect_ad_hoc_arithmetic():
+    """핵심 회귀: 검산 로직이 있다고 해서 아무 숫자나 통과시키면 안 된다 —
+    실제 evidence 숫자들의 사칙연산으로 설명 안 되는 값(예: 알테오젠 10배
+    오류처럼 자릿수를 잘못 읽은 경우)은 여전히 의심스러운 숫자로 남아야 한다."""
+    from disclosure_rag.agent.evidence import EvidencePack
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    pack = EvidencePack(
+        question="q",
+        prompt_text="[EVIDENCE 1]\n내용: 계약금액 8000000000원\nreport_id: r1\nchunk_id: c1\n",
+        citations=[],
+    )
+    answer = "계약금액은 80000000000원입니다. 근거: r1"  # 10배 부풀려진 오답
+    result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
+    assert not result.numbers_grounded
+    assert "80000000000" in result.ungrounded_numbers
+    assert result.verified_derived_numbers == {}
+
+
+def test_ask_retries_answer_generation_when_numbers_dont_verify():
+    """핵심 회귀: ask() 가 검산 실패한 답변을 그냥 로그만 남기고 사용자에게
+    그대로 돌려주면 안 된다 — 교정 지시를 덧붙여 재생성을 시도하고, 재생성된
+    (검산 통과한) 답변을 최종 결과로 써야 한다."""
+    from disclosure_rag.agent.ask import ask
+    from disclosure_rag.agent.tools import ToolDef
+
+    dummy_tool = ToolDef(
+        name="dummy_tool", description="테스트용",
+        parameters={"type": "object", "properties": {"x": {"type": "integer"}}, "required": ["x"]},
+        handler=lambda x: {"value": x},
+    )
+    responses = [
+        # 1) run_agent_loop: tool 한 번 호출
+        {"role": "assistant", "content": "", "toolCalls": [
+            {"id": "id1", "type": "function", "function": {"name": "dummy_tool", "arguments": {"x": 100000}}},
+        ]},
+        # 2) run_agent_loop: 더 이상 tool 호출 없음 -> 종료
+        {"role": "assistant", "content": "완료", "toolCalls": None},
+        # 3) generate_answer 1차 시도: 검산 안 되는 숫자를 암산해서 답변에 넣음
+        {"role": "assistant", "content": "값은 999999999입니다. 근거: r1", "toolCalls": None},
+        # 4) generate_answer 재시도: 교정 지시를 받아 암산 없이 답변
+        {"role": "assistant", "content": "계산 결과가 제공되지 않았습니다.", "toolCalls": None},
+    ]
+    client = _StubHCXClient(responses)
+    extractor = EntityExtractor(corpus_root=CORPUS_ROOT, metric_terms_path=CONFIG_ROOT / "metric_terms.txt")
+
+    result = ask(client, [dummy_tool], "테스트 질문", entity_extractor=extractor, max_iterations=6)
+
+    assert result.answer == "계산 결과가 제공되지 않았습니다.", "재생성된 답변으로 교체되지 않음"
+    assert result.validation.numbers_grounded, "재시도 후에도 검산 실패로 남아있음"
+
+
+def test_validator_verifies_correct_ratio_calculation():
+    """min_digits=3 필터 때문에 결과가 3자리 이상 나오는 숫자로 검증한다
+    (예: "25%"는 2자리라 애초에 검사 대상이 아님 — 150%로 검증)."""
+    from disclosure_rag.agent.evidence import EvidencePack
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    pack = EvidencePack(
+        question="q",
+        prompt_text="[EVIDENCE 1]\n내용: 영업이익 1500000원, 매출액 1000000원\nreport_id: r1\nchunk_id: c1\n",
+        citations=[],
+    )
+    answer = "영업이익률은 150%입니다(영업이익 1500000원 / 매출액 1000000원). 근거: r1"
+    result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
+    assert result.numbers_grounded, f"검산 가능한 비율이 오탐됨: {result.ungrounded_numbers}"
 
 
 class _StubHCXClient:

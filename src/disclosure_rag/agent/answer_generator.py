@@ -18,17 +18,31 @@ ANSWER_SYSTEM_PROMPT = """당신은 금융공시(DART) 근거 기반 답변 생�
 3. 정정(기재정정) 관련 질문이 아니라면 "정정 상태: 원본 (최신)" 또는
    "정정본 (최신)"으로 표시된 최신 유효본 근거를 우선 사용하세요.
 4. 정정 전후 비교 질문이면 원본과 정정본 근거를 모두 명시적으로 비교해서 답하세요.
-5. 답변 마지막 줄에 "근거: report_id(chunk_id), ..." 형식으로 실제로 사용한
+5. 증가율/차이/비율처럼 숫자 두 개 이상을 계산해야 나오는 값은 [TOOL RESULT]에
+   calculate_growth_rate/calculate_ratio/calculate_cagr 결과가 있으면 그 값만
+   쓰세요. 그런 계산 결과가 없으면 암산하지 말고 원본 숫자만 각각 제시하거나
+   "계산 결과가 제공되지 않았습니다"라고 답하세요 — 스스로 뺄셈/나눗셈해서
+   답을 만들지 마세요.
+6. 답변 마지막 줄에 "근거: report_id(chunk_id), ..." 형식으로 실제로 사용한
    근거를 나열하세요."""
 
 
-def generate_answer(client: HCXClient, evidence_pack: EvidencePack, *, max_tokens: int = 800) -> str:
+def generate_answer(
+    client: HCXClient, evidence_pack: EvidencePack, *, max_tokens: int = 800,
+    extra_instruction: str | None = None,
+) -> str:
+    """`extra_instruction`: 검산 실패 후 재생성할 때(§ask.py 의 self-correction
+    retry) 원래 evidence 는 그대로 두고 교정 지시만 덧붙이기 위한 훅."""
     if not evidence_pack.citations and not evidence_pack.tool_results_summary:
         return "제공된 근거로는 확인할 수 없습니다. (검색된 공시 근거가 없습니다.)"
 
+    user_content = evidence_pack.prompt_text
+    if extra_instruction:
+        user_content = f"{user_content}\n\n[재작성 지시]\n{extra_instruction}"
+
     messages = [
         {"role": "system", "content": ANSWER_SYSTEM_PROMPT},
-        {"role": "user", "content": evidence_pack.prompt_text},
+        {"role": "user", "content": user_content},
     ]
     result = client.chat(messages, max_tokens=max_tokens, temperature=0.2)
     return result.get("content", "")

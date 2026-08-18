@@ -17,6 +17,53 @@ _APPROX_PAREN_PAT = re.compile(r"\(약[^)]*\)")
 _DOC_ID_PAT = re.compile(r"\b(?:periodic|major|exchange|holding)_\d{10,}\b")
 
 
+_MAX_VERIFY_NUMBERS = 200  # 안전장치: evidence 숫자가 너무 많으면 O(n^2) 검산을 생략
+
+
+def _verify_derived_number(claimed: str, evidence_numbers: set[str]) -> str | None:
+    """`claimed` 가 evidence 안의 서로 다른 두 숫자로 정확히 설명되는
+    사칙연산/비율 결과인지 검산한다. 설명되면 그 식을 문자열로 반환하고
+    (grounded 로 인정), 아니면 None(여전히 근거 없음).
+
+    2026-08-18 도입 배경: 답변 모델(HCX-005, 계산 tool 을 안 쓰는 자유
+    텍스트 생성)이 evidence 안의 두 숫자로 직접 뺄셈/비율을 암산해서
+    답변에 적는 경우가 실측으로 확인됐다(예: "영업이익 2,164,043백만원 vs
+    1,795,249백만원, 368,794백만원 증가" — 368,794 는 그 자체로 evidence에
+    없지만 두 숫자의 차이와 정확히 일치했다). 기존 로직은 이런 "암산이지만
+    맞는 계산"과 "완전히 틀린/지어낸 숫자"를 똑같이 "근거 없음"으로만
+    표시해서 구분이 안 됐다(알테오젠 10배 오류 사례와 동일한 경고로 보임).
+    여기서 실제로 검산해서, 맞으면 통과시키고 틀리면(=어떤 조합으로도
+    설명 안 되면) 그대로 의심스러운 숫자로 남긴다 — "LLM 암산을 신뢰하지
+    않고 직접 확인한다"는 원칙(calculation.py 최상단 docstring)을 답변
+    생성 이후 단계에서도 관철한다."""
+    try:
+        target = float(claimed)
+    except ValueError:
+        return None
+
+    parsed: list[tuple[str, float]] = []
+    for n in evidence_numbers:
+        try:
+            parsed.append((n, float(n)))
+        except ValueError:
+            continue
+    if len(parsed) > _MAX_VERIFY_NUMBERS:
+        return None  # 성능 안전장치 — 이 경우는 검산 없이 기존 방식(근거없음 의심)으로 처리
+
+    tol = max(abs(target) * 0.005, 0.5)  # 반올림 오차 허용: 상대 0.5% 또는 절대 0.5
+    for s1, v1 in parsed:
+        for s2, v2 in parsed:
+            if s1 == s2:
+                continue
+            candidates = {f"{s1} - {s2}": v1 - v2, f"{s1} + {s2}": v1 + v2}
+            if v2 != 0:
+                candidates[f"{s1} / {s2} * 100(%)"] = v1 / v2 * 100
+            for expr, val in candidates.items():
+                if abs(val - target) <= tol:
+                    return expr
+    return None
+
+
 def _extract_numbers(text: str, *, min_digits: int = 3) -> set[str]:
     """콤마/소수점을 제거한 뒤, 우연한 오검출(1~2자리 숫자, 연도 등)을 줄이기 위해
     min_digits 자리 이상만 취급한다.
@@ -44,6 +91,11 @@ class ValidationResult:
     has_citation: bool
     correction_evidence_complete: bool | None  # None = 해당 없음(정정 질문 아님)
     warnings: list[str] = field(default_factory=list)
+    # {답변에 적힌 숫자: 그 숫자를 설명하는 evidence 사칙연산 식} — 답변 모델이
+    # calculate_* tool 을 안 쓰고 evidence 숫자를 직접 조합해 계산했지만 검산
+    # 결과 맞았던 경우. numbers_grounded=True 로 인정되긴 하지만, "LLM이 tool
+    # 없이 암산했다"는 신호이므로 별도로 노출한다(§2026-08-18 처리 방식 참고).
+    verified_derived_numbers: dict[str, str] = field(default_factory=dict)
 
     @property
     def passed(self) -> bool:
@@ -58,10 +110,22 @@ def validate_answer(answer: str, evidence_pack: EvidencePack, entities: Extracte
         evidence_numbers |= _extract_numbers(str(tr))
 
     answer_numbers = _extract_numbers(answer)
-    ungrounded = answer_numbers - evidence_numbers
+    not_literally_present = answer_numbers - evidence_numbers
+
+    ungrounded: set[str] = set()
+    verified_derived: dict[str, str] = {}
+    for n in not_literally_present:
+        expr = _verify_derived_number(n, evidence_numbers)
+        if expr is not None:
+            verified_derived[n] = expr
+        else:
+            ungrounded.add(n)
+
     numbers_grounded = not ungrounded
     if ungrounded:
-        warnings.append(f"[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 에서 찾을 수 없는 숫자: {sorted(ungrounded)}")
+        warnings.append(f"[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: {sorted(ungrounded)}")
+    if verified_derived:
+        warnings.append(f"[참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {verified_derived}")
 
     # 회귀 발견(2026-08-16): get_correction_history/get_latest_report 만 호출된
     # 답변(search_disclosures 를 안 써서 evidence_pack.citations 가 비어있는
@@ -92,5 +156,5 @@ def validate_answer(answer: str, evidence_pack: EvidencePack, entities: Extracte
     return ValidationResult(
         numbers_grounded=numbers_grounded, ungrounded_numbers=ungrounded,
         has_citation=has_citation, correction_evidence_complete=correction_evidence_complete,
-        warnings=warnings,
+        warnings=warnings, verified_derived_numbers=verified_derived,
     )

@@ -54,6 +54,7 @@ User Query → Entity Extraction + Query Normalize → HCX Router(hint)
 | **XML 파싱 전 bare `&`/`<` 사전 이스케이프** (2026-08-16 추가) | malformed XML(`S&P`, `<신 설>` 같은 미이스케이프 특수문자)이 lxml recover 모드를 오동작시켜 문서 대부분이 표 안에 파묻혀 유실되는 버그를 근본적으로 방지. §10 참고 |
 | HCX Agent/Router system prompt = 짧게 유지(~300자 이내) | **3회 독립 재현된 버그**: system prompt 가 길면 tool-calling 이 결정적으로 400 에러. `agent_loop.py`/router 코드 상단 주석 참고 |
 | HCX-007 은 `thinking`/`maxCompletionTokens` 파라미터 필요 | `hcx_client.py` 가 모델명으로 자동 분기(호출부 무수정) |
+| **숫자 계산은 LLM 암산에 맡기지 않고 deterministic Python + 사후 검산** (2026-08-18 강화) | `calculation.py`(tool)로 계산을 유도하되, 답변 모델이 그래도 tool 없이 암산하는 경우가 실측으로 있어(§5-B) validator가 evidence 숫자의 사칙연산 조합으로 사후 검산 + `ask()`가 검산 실패 시 최대 1회 재생성 |
 | 최종 확정 baseline | §8 참고 |
 
 ---
@@ -140,6 +141,40 @@ semantic=0.600)는 이번 n=54~55 재측정과 방향이 반대로 나왔는데,
 여전한 한계). **남은 후보**: HCX 자체의 오분류(routes.py로는 못 고침)를
 줄이려면 `classify_route` tool schema에 route별 짧은 description 추가
 검토(§12).
+
+### 5-B. [완료] 숫자 계산: LLM 암산 방지 + 사후 검산 + 자동 재생성
+사용자 질문: "숫자 계산하는건 llm 안시키고 직접 계산하는게 맞는거 같은데
+어떤식으로 처리해야하지". `calculation.py`(`calculate_growth_rate/ratio/
+cagr`)는 원래부터 "계산은 LLM이 아니라 deterministic Python으로" 원칙으로
+만들어져 있었지만, **agent가 tool을 안 쓰고 두 숫자를 그냥 검색해온 뒤
+답변 모델(HCX-005, tool 없는 자유 텍스트 생성)이 스스로 뺄셈/비율을
+암산하는 경우**가 실측으로 있었다(matrix.csv 현대자동차 사례: 2,164,043 -
+1,795,249 = 368,794 를 암산 — 이번엔 맞았지만 검산 없이는 알테오젠 10배
+오류와 똑같이 "근거 없는 숫자"로만 보였다).
+
+**3중 방어로 수정**:
+1. **예방**: `agent_loop.py`의 `AGENT_SYSTEM_PROMPT`에 "차이도 calculate_*로,
+   암산 금지" 문구 추가(186→199자, 300자 안전마진 안에서). `answer_
+   generator.py`의 `ANSWER_SYSTEM_PROMPT`에 "계산 결과가 tool에 없으면
+   암산하지 말고 원본 숫자만 제시하거나 '계산 결과 없음'이라 답하라" 규칙
+   추가(tool-calling이 아니라 300자 제한과 무관).
+2. **검산**(`validator.py`, 핵심): `_verify_derived_number()` 추가 — 답변에
+   있지만 evidence에 문자 그대로 없는 숫자를, evidence 숫자들의 사칙연산
+   (차이/합/비율)으로 설명 가능한지 직접 재계산해서 확인한다. 설명되면
+   `verified_derived_numbers`로 인정(grounded 처리), 설명 안 되면(=진짜
+   지어낸/틀린 숫자, 알테오젠 10배 오류 같은 케이스) 여전히
+   `ungrounded_numbers`로 남는다 — "암산이지만 맞음"과 "틀림"을 최초로
+   구분할 수 있게 됨.
+3. **자동 교정**(`ask.py`): `validation.numbers_grounded=False`면 그냥
+   경고 로그만 남기지 않고, 교정 지시를 덧붙여 `generate_answer()`를
+   최대 1회(`max_answer_retries`) 재호출 — 검산 실패한 답변이 그대로
+   사용자에게 나가지 않도록 최종 출력 단계에서 막는다.
+
+회귀 테스트 5건 추가(`tests/test_agent.py`, 전부 stub 기반 — 올바른
+뺄셈/비율 검산 통과, 틀린 계산은 여전히 flag, ask() 재시도가 실제로
+답변을 교체하는지, AGENT_SYSTEM_PROMPT 길이 가드). 실제 다중턴 HCX
+통합테스트(`test_agent_correction_analysis_uses_both_versions_and_two_
+plus_turns`)로 프롬프트 길이 변경이 tool-calling을 안 깨는지도 재확인.
 
 ### 5-0. [진행 중, 최우선] 100문항 일반화 테스트 — 준비만 끝남, 실행 전
 사용자 요청("질문 100개 생성해서 잘 파악하는지 확인해봐")으로 시작한 작업.

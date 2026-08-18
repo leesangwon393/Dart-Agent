@@ -29,8 +29,8 @@ logger = logging.getLogger(__name__)
 # 라운드트립(2턴 이상)까지 통과하는지 확인 후 반영할 것.
 AGENT_SYSTEM_PROMPT = (
     "당신은 금융공시(DART) 분석 Agent입니다. 추측하지 말고 tool 로 확인하세요. "
-    "정정/최신본 확인은 get_correction_history/get_latest_report, 계산(비율/증가율/CAGR)은 "
-    "calculate_*, 개수를 세는 질문은 검색 결과 개수로 직접 답하세요. 근거가 충분하면 tool "
+    "정정/최신본 확인은 get_correction_history/get_latest_report, 계산(비율/증가율/CAGR/차이)은 "
+    "calculate_*로 하고 암산 금지, 개수를 세는 질문은 검색 결과 개수로 직접 답하세요. 근거가 충분하면 tool "
     "호출을 멈추세요."
 )
 
