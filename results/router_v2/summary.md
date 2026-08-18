@@ -92,17 +92,54 @@ Stage 9 가 보고했던 것보다 훨씬 크다는 걸 보여준다(당시 표�
    (0.796 vs 0.818), semantic 단독은 "unclear"를 낼 수 없는 것도 여전히
    맞고, out-of-distribution 질문에 대한 안전판으로 HCX escalation 경로를
    유지하는 게 가치 있다고 판단.
-2. **다음 우선순위는 라우팅 메커니즘이 아니라 route 정의 정리다** — 특히
-   calculation ↔ single_lookup, event_analysis ↔ single_lookup 사이 경계를
-   `routes.py` utterance 세트에서 다시 그어야 한다(예: calculation 은
-   "계산해줘/증가율이 몇 %인지 계산" 처럼 명시적 연산 요청으로 좁히고,
-   "얼마야?/몇 %야?" 류의 단순 조회 어투는 single_lookup 쪽에 확실히
-   배치). 이건 라우터 알고리즘이 아니라 **데이터(taxonomy) 문제**라
-   CascadingRouter 를 아무리 잘 만들어도 못 고친다.
+2. **[완료, 아래 "후속" 섹션 참고] routes.py 경계 재정리** — 라우팅
+   알고리즘이 아니라 **데이터(taxonomy) 문제**라 CascadingRouter 를
+   아무리 잘 만들어도 못 고치는 부분이었다. calculation/event_analysis
+   ↔ single_lookup 경계를 겨냥한 utterance 19개를 추가해서 semantic
+   router 쪽(따라서 CascadingRouter fast-path)을 개선했다 — 단, HCX 는
+   routes.py 를 안 보므로 HCX 자체 오분류는 이 수정으로 해결 안 됨(별도
+   후보로 남음).
 3. n=54~55 는 여전히 통계적으로 약한 표본이다(Stage 14 의 n=10 경고와
    같은 종류의 한계). 위 결론(특히 calculation/event_analysis 혼동
    패턴)은 방향성은 신뢰할 만하지만 정확한 수치(0.685, 0.818 등)에
    과도한 의미를 부여하지 말 것.
+
+## 후속: routes.py 경계 재정리 (2026-08-18, 같은 날 이어서 진행)
+
+위 "솔직한 결론"에서 지목한 taxonomy 중첩(calculation/event_analysis ↔
+single_lookup, 71%가 이 패턴)을 `routes.py` utterance 보강으로 직접
+공략했다. HCX 는 routes.py 를 전혀 참조하지 않으므로(시스템 프롬프트가
+300자 제한 때문에 few-shot 예시를 못 담음) 이 수정은 **semantic_router
+(따라서 CascadingRouter 의 fast-path)에만 영향**을 준다 — HCX 자체의
+오분류 패턴은 이 수정으로는 안 고쳐진다(HCX 쪽은 §12 에 별도 후보로
+남겨둠: tool schema 에 route별 짧은 description 추가).
+
+**수정 내용**: `routes.py` 6개 route 전부에 실패 패턴을 직접 겨냥한
+utterance 19개 추가(calculation 6개 — "계산해줘" 동사 없이 증가율/성장률/
+증감폭을 묻는 표현, event_analysis 6개 — "~한 적 있어?/계획 있어?" 류
+이벤트-존재 질문, single_lookup 2개 — 총수/개수류 단순조회, correction_
+analysis 2개, multi_compare 1개). 등록 utterance 는 EVAL_SET 과 반드시
+겹치면 안 되는데(§48, `test_eval_set_disjoint_from_training_utterances`)
+1건 실수로 그대로 베껴써서 테스트가 실패했었다 — 즉시 paraphrase로 수정.
+
+**효과 (EVAL_SET 55건, HCX 쪽은 재호출 안 함 — routes.py 변경이 HCX 결과에
+영향을 줄 이유가 없어서 기존 `hcx_unclear_results.json` 그대로 재사용)**:
+
+| | 수정 전 | 수정 후 |
+|---|---|---|
+| semantic 단독 accuracy | 0.818 | **0.836** |
+| CascadingRouter accuracy | 0.796 | **0.889** |
+| CascadingRouter mean latency | 1.34s | **1.01s** |
+| CascadingRouter escalate 비율 | 56%(31/55) | **42%(23/55)** |
+| margin>=0.05 구간(fast-path) accuracy | 1.000(23/55) | 1.000(**31/55**) |
+
+**CascadingRouter가 이제 pure semantic 단독(0.836)과 pure HCX(0.685)
+둘 다 명확히 앞선다** — 수정 전에는 pure semantic보다 근소하게 낮았던
+역전 현상이 사라졌다. 더 많은 질문이 순수 로컬 임베딩만으로 100%
+정확하게 빠르게 처리되면서(fast-path 42%→56% 확대), 오히려 정확도가
+불안정한 HCX 로 넘어가는 비율 자체가 줄어든 게 정확도 개선의 핵심
+메커니즘이다(escalate 비율이 56%→42%로 준 것도 같은 원인 — margin이
+큰 쪽으로 더 많은 질문이 재배치됨).
 
 ## 재현 방법
 ```python

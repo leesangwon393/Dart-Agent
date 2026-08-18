@@ -32,6 +32,10 @@ ROUTE_UTTERANCES: dict[str, list[str]] = {
         "[COMPANY] 재고자산 규모 알려줘",
         "[COMPANY] 매출채권 얼마나 돼?",
         "[COMPANY] 최근 분기보고서 요약해줘",
+        # 2026-08-18 추가: calculation/event_analysis/ownership_analysis 로
+        # 잘못 끌려가던 "총수/개수" 류 단순 조회 보강 (Router v2, §5-A/§12)
+        "[COMPANY] 발행주식총수가 몇 주야?",
+        "[COMPANY] 종속회사가 몇 개야?",
     ],
     # §40: 정정 이유/항목/전후비교/최종본/다중 정정 이력
     "correction_analysis": [
@@ -53,6 +57,10 @@ ROUTE_UTTERANCES: dict[str, list[str]] = {
         "[COMPANY] 반기보고서 정정된 부분만 알려줘",
         "[COMPANY] 계약금액이 정정으로 얼마나 바뀌었어?",
         "[COMPANY] 최근 정정공시 있었어?",
+        # 2026-08-18 추가: multi_compare/ownership_analysis 로 잘못 끌려가던
+        # "최초-최종 대조"/"수치 수정" 표현 보강 (Router v2, §5-A/§12)
+        "[COMPANY] 최초 공시와 최종 공시가 어떻게 달라?",
+        "[COMPANY] 재무 수치가 정정된 적 있어?",
     ],
     # §41: 다중 비교 (기업간/기간간)
     "multi_compare": [
@@ -70,6 +78,9 @@ ROUTE_UTTERANCES: dict[str, list[str]] = {
         "[COMPANY_1]과 [COMPANY_2]와 [COMPANY_3] 매출 순위 매겨줘",
         "[COMPANY]의 상반기와 하반기 매출 비교",
         "[COMPANY_1]과 [COMPANY_2] 중 배당수익률이 더 높은 곳은?",
+        # 2026-08-18 추가: calculation 으로 잘못 끌려가던 "연도간 차이" 보강
+        # (Router v2, §5-A/§12)
+        "[COMPANY]의 [YEAR_1]년 대비 [YEAR_2]년 수치 차이를 보여줘",
     ],
     # §42: 계산 (증가율/CAGR/비율)
     "calculation": [
@@ -86,6 +97,16 @@ ROUTE_UTTERANCES: dict[str, list[str]] = {
         "[COMPANY] 부채가 몇 % 늘었어?",
         "[COMPANY] 유상증자로 지분이 몇 % 희석됐어?",
         "[COMPANY] 3개년 평균 영업이익 계산해줘",
+        # 2026-08-18 추가: single_lookup 으로 잘못 끌려가던 "계산해줘/구해줘"
+        # 없는 증가율·성장률·증감폭 표현 보강(HCX 오류의 71%가 이 패턴,
+        # Router v2 §5-A/§12) — "계산" 동사가 없어도 기간간 변화·비율을
+        # 묻는 질문은 calculation 이라는 관례를 명시적으로 더 densify.
+        "[COMPANY] 매출 성장률이 몇 %야?",
+        "[COMPANY] 최근 몇 년간 연평균성장률이 어떻게 돼?",
+        "[COMPANY] 영업이익이 전년 대비 얼마나 늘었어?",
+        "[COMPANY] 당기순이익률이 몇 %야?",
+        "[COMPANY] 매출이 줄어든 폭이 얼마나 돼?",
+        "[COMPANY] 자기자본이익률이 몇 %야?",
     ],
     # §43: 지분/최대주주 분석
     "ownership_analysis": [
@@ -120,5 +141,14 @@ ROUTE_UTTERANCES: dict[str, list[str]] = {
         "[COMPANY] 자사주 소각했어?",
         "[COMPANY] 최근 어떤 이벤트가 있었어?",
         "[COMPANY] 해외 상장 관련 공시 있었어?",
+        # 2026-08-18 추가: single_lookup/ownership_analysis 로 잘못 끌려가던
+        # "~한 적 있어?/계획 있어?" 류 이벤트-존재 질문 보강(HCX 오류의
+        # 71%가 이 계열 패턴, Router v2 §5-A/§12).
+        "[COMPANY] 최근 큰 규모 계약을 체결한 적 있어?",
+        "[COMPANY] 회사채를 발행한 적이 있어?",
+        "[COMPANY] 생산설비 증설을 계획하고 있어?",
+        "[COMPANY] 최근 다른 기업을 인수한 적 있어?",
+        "[COMPANY] 최근 시설투자 규모가 어느 정도였어?",
+        "[COMPANY] 자기주식을 매입하기로 결정했어?",
     ],
 }

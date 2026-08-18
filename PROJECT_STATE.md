@@ -112,21 +112,34 @@ escalate하는 `CascadingRouter`(사용자가 직접 제안한 구조 그대로 
 `router/eval.py`에 `evaluate_router_ambiguous()` 추가. 테스트 12건 추가
 (전부 stub, API 불필요).
 
-**실측(EVAL_SET 55건 재평가, 상세: `results/router_v2/summary.md`)**:
-절대 유사도 점수는 정답/오답 구분력이 거의 없었다(정답 median=0.781 vs
-오답 median=0.804 — 오답이 더 높음!). margin은 뚜렷한 구분력이 있었다
-(margin>=0.05 부분집합 accuracy=1.000). CascadingRouter는 pure HCX 대비
-accuracy +0.111(0.796 vs 0.685), latency -41%(1.34s vs 2.26s)로 명확히
-우위 — 채택. **다만 예상과 다르게** pure semantic 단독(0.818)보다는
-근소하게 낮았고, escalate된 hard 케이스에서 HCX가 semantic보다 오히려
-살짝 더 틀렸다(0.645 vs 0.677) — 원인은 라우팅 메커니즘이 아니라
-calculation/event_analysis ↔ single_lookup 사이 **route 정의 자체의
-taxonomy 중첩**(17개 HCX 오류 중 12개가 이 패턴 하나에 집중). 다음
-우선순위는 라우터 알고리즘이 아니라 `routes.py`의 utterance 경계 재정리.
-Stage 9 원본 "n=30" 결과(hcx=0.800, semantic=0.600)는 이번 n=54~55
-재측정과 방향이 반대로 나왔는데, git 히스토리가 스쿼시돼 있어 원래
-n=30이 어떻게 뽑힌 서브셋인지 재구성 불가 — 이번 결과가 더 신뢰할 만한
-수치로 봐야 한다(그래도 n이 작은 건 여전한 한계).
+**실측 1차(EVAL_SET 55건, routes.py 수정 전)**: 절대 유사도 점수는
+정답/오답 구분력이 거의 없었다(정답 median=0.781 vs 오답 median=0.804 —
+오답이 더 높음!). margin은 뚜렷한 구분력이 있었다(margin>=0.05 부분집합
+accuracy=1.000). CascadingRouter는 pure HCX 대비 accuracy +0.111(0.796
+vs 0.685), latency -41%(1.34s vs 2.26s)로 명확히 우위였지만, **예상과
+다르게** pure semantic 단독(0.818)보다는 근소하게 낮았다 — escalate된
+hard 케이스에서 HCX가 semantic보다 오히려 살짝 더 틀렸다(0.645 vs
+0.677). 원인 분석 결과 라우팅 메커니즘이 아니라 calculation/
+event_analysis ↔ single_lookup 사이 **route 정의 자체의 taxonomy
+중첩**(17개 HCX 오류 중 12개가 이 패턴 하나에 집중) 문제로 판명.
+
+**즉시 후속 조치(같은 날, routes.py 경계 재정리 완료)**: 사용자 요청으로
+`routes.py`에 실패 패턴을 직접 겨냥한 utterance 19개 추가(calculation 6개
+— "계산해줘" 동사 없이 증가율/성장률/증감폭을 묻는 표현, event_analysis
+6개 — "~한 적 있어?" 류 이벤트-존재 질문, 나머지 4개 route에 소량씩).
+HCX는 routes.py를 안 보므로(system prompt 300자 제한상 few-shot 불가)
+이 수정은 semantic_router/CascadingRouter의 fast-path에만 영향 — **재측정
+결과 semantic 단독 0.818→0.836, CascadingRouter 0.796→0.889로 개선**,
+이제 pure semantic·pure HCX 둘 다 명확히 앞선다(HCX는 그대로 0.685,
+재호출 불필요 — routes.py 변경이 HCX 결과에 영향 줄 이유가 없음). fast-path
+비율도 42%→56%로 늘고 mean latency도 1.34s→1.01s로 줄었다 — 상세:
+`results/router_v2/summary.md`. Stage 9 원본 "n=30" 결과(hcx=0.800,
+semantic=0.600)는 이번 n=54~55 재측정과 방향이 반대로 나왔는데, git
+히스토리가 스쿼시돼 있어 원래 n=30이 어떻게 뽑힌 서브셋인지 재구성
+불가 — 이번 결과가 더 신뢰할 만한 수치로 봐야 한다(그래도 n이 작은 건
+여전한 한계). **남은 후보**: HCX 자체의 오분류(routes.py로는 못 고침)를
+줄이려면 `classify_route` tool schema에 route별 짧은 description 추가
+검토(§12).
 
 ### 5-0. [진행 중, 최우선] 100문항 일반화 테스트 — 준비만 끝남, 실행 전
 사용자 요청("질문 100개 생성해서 잘 파악하는지 확인해봐")으로 시작한 작업.
@@ -308,7 +321,7 @@ doc_ids = [r.doc_id for r in periodic+major+exchange+holding]
 | 4 Fusion | Normalized Weighted Fusion | R@10=0.903 R@20=0.940 MRR=0.713 NDCG@10=0.735 |
 | 5 Reranker | No-Reranker(CPU 배포) | Hit@1=0.633 MRR=0.712(42.7ms) vs bge_reranker Hit@1=0.667 MRR=0.773(11,053.8ms, 258배 느림) |
 | 8 Entity Extraction | Rule only | company_EM=1.0 metric_F1=0.971 period_F1=1.0(12μs) — hcx 계열 압승, trade-off 없음 |
-| 9 Router | ~~hcx_structured_router~~ → **CascadingRouter**(v2, §5-A) | 원래 n=30: hcx 0.800/4.5s vs semantic 0.600/38.7ms. **n=54~55 재측정(2026-08-18) 후 뒤집힘**: semantic 0.818/40ms, hcx 0.685/2.26s, CascadingRouter(margin 게이팅) 0.796/1.34s 채택 — `results/router_v2/summary.md` |
+| 9 Router | ~~hcx_structured_router~~ → **CascadingRouter**(v2, §5-A) | 원래 n=30: hcx 0.800/4.5s vs semantic 0.600/38.7ms. n=54~55 재측정(2026-08-18) 후 뒤집힘, routes.py 경계 재정리까지 반영한 최종: semantic 0.836/40ms, hcx 0.685/2.26s, **CascadingRouter 0.889/1.01s 채택** — `results/router_v2/summary.md` |
 | 10 Agent HCX 모델 | **HCX-007** | tool_acc=0.966 arg_acc=0.980 task_success=0.793(13.9s) — 정확도·지연·비용 전부 우위 |
 | 11 E2E RAG | 시나리오 분리 | hybrid_reranker R@5=0.820(5.4s, 정확도 최우선) vs full_agentic R@5=0.622(15.7s, task_success=0.759, 실시간성+도구조합) |
 | 12 Answer HCX 모델 | **HCX-005**(Agent와 다른 모델) | pass_rate 0.750 vs HCX-007 0.690 vs DASH-002 0.321 |
@@ -419,14 +432,15 @@ BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
 사용자가 명시적으로 요청할 경우의 후보 목록.
 
 ### 후보 (우선순위순 아님, 사용자 요청 시 진행)
-- **routes.py의 calculation/event_analysis ↔ single_lookup 경계 재정리**
-  (§5-A에서 새로 발견, 아마 가장 임팩트 큰 후보) — HCX 라우터 오류 17건 중
-  12건(71%)이 "매출 증가율 몇 %야?" 류 질문을 calculation/event_analysis
-  대신 single_lookup으로 오분류하는 단일 패턴에 집중. utterance 예시를
-  "계산해줘/계산해서" 같은 명시적 연산 요청은 calculation에, "얼마야/몇
-  %야" 류 단순 조회 어투는 single_lookup에 확실히 갈리도록 재작성 검토.
-  라우팅 알고리즘(CascadingRouter)이 아니라 route 정의 자체의 문제라
-  algorithm 개선으로는 안 풀림.
+- **[완료 2026-08-18] ~~routes.py의 calculation/event_analysis ↔
+  single_lookup 경계 재정리~~** — utterance 19개 추가로 semantic 단독
+  0.818→0.836, CascadingRouter 0.796→0.889 개선 확인(§5-A). **남은 부분**:
+  이 수정은 semantic_router 쪽만 개선했고 HCX 자체(escalate된 hard
+  케이스에서 여전히 오답 다수 발생)는 못 고쳤다 — HCX는 routes.py를
+  안 보므로, `hcx_router.py`의 `classify_route` tool schema에 route별
+  짧은 description(예: "calculation: 증가율/CAGR/비율처럼 두 수치를
+  비교·연산해야 나오는 값. single_lookup: 문서에 그대로 적힌 단일
+  수치/사실")을 추가해서 HCX 쪽 오분류를 직접 줄이는 게 다음 후보.
 - **CascadingRouter/HCXStructuredRouter를 `ask.py` 진입점에 실제 배선**
   — 구현+테스트는 완료(§5-A)됐지만 아직 어떤 production 스크립트도
   이걸로 router를 조립하지 않음(지금까지 이 프로젝트의 모든 스크립트가
