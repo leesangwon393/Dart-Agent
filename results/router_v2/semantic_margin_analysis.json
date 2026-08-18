@@ -1,0 +1,606 @@
+[
+  {
+    "query": "[COMPANY] 재무제표 좀 보여줘",
+    "expected": "single_lookup",
+    "predicted": "single_lookup",
+    "score": 0.7970199912056297,
+    "score2": 0.7513396649852405,
+    "margin": 0.0456803262203892,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 올해 매출 규모가 어느 정도야?",
+    "expected": "single_lookup",
+    "predicted": "calculation",
+    "score": 0.8624423030124965,
+    "score2": 0.8472266642538067,
+    "margin": 0.015215638758689809,
+    "correct": false,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 감사의견이 뭐였어?",
+    "expected": "single_lookup",
+    "predicted": "single_lookup",
+    "score": 0.6501160157233443,
+    "score2": 0.6348740667041607,
+    "margin": 0.015241949019183632,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 임원 수가 몇 명이야?",
+    "expected": "single_lookup",
+    "predicted": "single_lookup",
+    "score": 0.7107247868694619,
+    "score2": 0.0,
+    "margin": 0.7107247868694619,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 본사가 어디 있어?",
+    "expected": "single_lookup",
+    "predicted": "single_lookup",
+    "score": 0.683073240486904,
+    "score2": 0.6408347980500089,
+    "margin": 0.04223844243689512,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY]의 총 발행주식수는?",
+    "expected": "single_lookup",
+    "predicted": "single_lookup",
+    "score": 0.6787356862999465,
+    "score2": 0.6507085867870265,
+    "margin": 0.02802709951292004,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 계열회사가 몇 개야?",
+    "expected": "single_lookup",
+    "predicted": "event_analysis",
+    "score": 0.6735205711418457,
+    "score2": 0.6663386859602056,
+    "margin": 0.007181885181640091,
+    "correct": false,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 최근 분기 순이익 알려줘",
+    "expected": "single_lookup",
+    "predicted": "multi_compare",
+    "score": 0.8569041092718171,
+    "score2": 0.8559511827922787,
+    "margin": 0.0009529264795384851,
+    "correct": false,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 설립일이 언제야",
+    "expected": "single_lookup",
+    "predicted": "single_lookup",
+    "score": 0.6914324375622454,
+    "score2": 0.635820149361702,
+    "margin": 0.055612288200543425,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 종업원 평균 근속연수는?",
+    "expected": "single_lookup",
+    "predicted": "single_lookup",
+    "score": 0.6511515070772684,
+    "score2": 0.6374883785908172,
+    "margin": 0.013663128486451237,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 공시 수정된 이유 설명해줘",
+    "expected": "correction_analysis",
+    "predicted": "correction_analysis",
+    "score": 0.8219396423375004,
+    "score2": 0.0,
+    "margin": 0.8219396423375004,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 재무제표 수치가 바뀐 부분이 있어?",
+    "expected": "correction_analysis",
+    "predicted": "ownership_analysis",
+    "score": 0.8041633528263987,
+    "score2": 0.7916869405873284,
+    "margin": 0.012476412239070367,
+    "correct": false,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 정정신고 몇 차례나 했어?",
+    "expected": "correction_analysis",
+    "predicted": "correction_analysis",
+    "score": 0.7948067670373213,
+    "score2": 0.0,
+    "margin": 0.7948067670373213,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 어느 부분이 잘못 기재됐던 거야?",
+    "expected": "correction_analysis",
+    "predicted": "correction_analysis",
+    "score": 0.7216437346470399,
+    "score2": 0.0,
+    "margin": 0.7216437346470399,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 가장 최근 정정본 기준으로 알려줘",
+    "expected": "correction_analysis",
+    "predicted": "correction_analysis",
+    "score": 0.8070315551000139,
+    "score2": 0.7568048016668809,
+    "margin": 0.05022675343313299,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 기재정정 사유 알려줘",
+    "expected": "correction_analysis",
+    "predicted": "correction_analysis",
+    "score": 0.8046209096234241,
+    "score2": 0.7425683982044562,
+    "margin": 0.06205251141896795,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 정정 전 수치와 정정 후 수치 둘 다 보여줘",
+    "expected": "correction_analysis",
+    "predicted": "correction_analysis",
+    "score": 0.7191035242329192,
+    "score2": 0.0,
+    "margin": 0.7191035242329192,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 공시 오류 정정한 적 있어?",
+    "expected": "correction_analysis",
+    "predicted": "correction_analysis",
+    "score": 0.8255981708242952,
+    "score2": 0.0,
+    "margin": 0.8255981708242952,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 최초 제출본이랑 최종본 차이점",
+    "expected": "correction_analysis",
+    "predicted": "correction_analysis",
+    "score": 0.6944196175469499,
+    "score2": 0.0,
+    "margin": 0.6944196175469499,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 정정 히스토리 알려줘",
+    "expected": "correction_analysis",
+    "predicted": "correction_analysis",
+    "score": 0.741558730114796,
+    "score2": 0.0,
+    "margin": 0.741558730114796,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY_1]하고 [COMPANY_2] 중에 어디가 이익이 더 나?",
+    "expected": "multi_compare",
+    "predicted": "multi_compare",
+    "score": 0.8657129464192257,
+    "score2": 0.0,
+    "margin": 0.8657129464192257,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 지난 분기랑 이번 분기 실적 어떻게 달라졌어",
+    "expected": "multi_compare",
+    "predicted": "single_lookup",
+    "score": 0.8115044607076398,
+    "score2": 0.7782207651898297,
+    "margin": 0.033283695517810075,
+    "correct": false,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY_1], [COMPANY_2], [COMPANY_3] 매출 규모 순서대로 알려줘",
+    "expected": "multi_compare",
+    "predicted": "multi_compare",
+    "score": 0.7980623693913032,
+    "score2": 0.758512373557856,
+    "margin": 0.039549995833447205,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 연도별 매출 흐름 정리해줘",
+    "expected": "multi_compare",
+    "predicted": "multi_compare",
+    "score": 0.7724663207242672,
+    "score2": 0.7677553691594379,
+    "margin": 0.004710951564829369,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY_1] vs [COMPANY_2] 부채비율 어디가 낮아?",
+    "expected": "multi_compare",
+    "predicted": "multi_compare",
+    "score": 0.8218473972903375,
+    "score2": 0.0,
+    "margin": 0.8218473972903375,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY]의 [YEAR_1]년이랑 [YEAR_2]년 영업이익 차이 보여줘",
+    "expected": "multi_compare",
+    "predicted": "multi_compare",
+    "score": 0.8522184177195513,
+    "score2": 0.7761276058360431,
+    "margin": 0.07609081188350819,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY_1]과 [COMPANY_2] 시가총액 격차가 얼마나 나?",
+    "expected": "multi_compare",
+    "predicted": "multi_compare",
+    "score": 0.8538241971295626,
+    "score2": 0.0,
+    "margin": 0.8538241971295626,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 최근 몇 년간 실적 트렌드 알려줘",
+    "expected": "multi_compare",
+    "predicted": "multi_compare",
+    "score": 0.8093951593486454,
+    "score2": 0.7724595143337089,
+    "margin": 0.03693564501493651,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY_1]과 [COMPANY_2] 둘 다 실적 알려주고 비교해줘",
+    "expected": "multi_compare",
+    "predicted": "multi_compare",
+    "score": 0.8797566435558875,
+    "score2": 0.0,
+    "margin": 0.8797566435558875,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 매출 증가율 몇 %야?",
+    "expected": "calculation",
+    "predicted": "calculation",
+    "score": 0.8188676434005779,
+    "score2": 0.7981176403704873,
+    "margin": 0.02075000303009067,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 부채비율이 몇 퍼센트인지 계산해줘",
+    "expected": "calculation",
+    "predicted": "single_lookup",
+    "score": 0.8606149800155565,
+    "score2": 0.8421525526791735,
+    "margin": 0.018462427336382925,
+    "correct": false,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 최근 3개년 연평균성장률 알려줘",
+    "expected": "calculation",
+    "predicted": "calculation",
+    "score": 0.8189065435372683,
+    "score2": 0.8040208236596709,
+    "margin": 0.014885719877597459,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 영업이익이 작년보다 얼마나 늘었어?",
+    "expected": "calculation",
+    "predicted": "calculation",
+    "score": 0.8338527345065249,
+    "score2": 0.8116310383325471,
+    "margin": 0.022221696173977734,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 순이익률 몇 %야",
+    "expected": "calculation",
+    "predicted": "calculation",
+    "score": 0.7825837268803055,
+    "score2": 0.7291389723591699,
+    "margin": 0.05344475452113562,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] R&D 비중이 매출의 몇 %인지 계산해줘",
+    "expected": "calculation",
+    "predicted": "calculation",
+    "score": 0.7625631263750988,
+    "score2": 0.7244676233196691,
+    "margin": 0.03809550305542975,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 매출 감소폭이 얼마야?",
+    "expected": "calculation",
+    "predicted": "single_lookup",
+    "score": 0.7646097535819407,
+    "score2": 0.7610820869451785,
+    "margin": 0.0035276666367621834,
+    "correct": false,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] ROE 얼마인지 구해줘",
+    "expected": "calculation",
+    "predicted": "calculation",
+    "score": 0.7126829126673124,
+    "score2": 0.6749683301905645,
+    "margin": 0.03771458247674797,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 부채가 전년 대비 몇 % 늘었어",
+    "expected": "calculation",
+    "predicted": "calculation",
+    "score": 0.8400598598022327,
+    "score2": 0.8228548954508186,
+    "margin": 0.017204964351414165,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 대주주가 누구야?",
+    "expected": "ownership_analysis",
+    "predicted": "single_lookup",
+    "score": 0.7697171243495934,
+    "score2": 0.7656229545232609,
+    "margin": 0.004094169826332483,
+    "correct": false,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 지분 5% 이상 가진 사람 있어?",
+    "expected": "ownership_analysis",
+    "predicted": "ownership_analysis",
+    "score": 0.7577018560418265,
+    "score2": 0.0,
+    "margin": 0.7577018560418265,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 최대주주 지분이 줄었어 늘었어?",
+    "expected": "ownership_analysis",
+    "predicted": "ownership_analysis",
+    "score": 0.7831257659112985,
+    "score2": 0.0,
+    "margin": 0.7831257659112985,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 특수관계인 보유 현황 알려줘",
+    "expected": "ownership_analysis",
+    "predicted": "ownership_analysis",
+    "score": 0.7188714761822361,
+    "score2": 0.7159708553725262,
+    "margin": 0.002900620809709875,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 대량보유 신고 있었어?",
+    "expected": "ownership_analysis",
+    "predicted": "ownership_analysis",
+    "score": 0.7517010846518972,
+    "score2": 0.7408675935485447,
+    "margin": 0.010833491103352522,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 최대주주 바뀐 적 있어?",
+    "expected": "ownership_analysis",
+    "predicted": "ownership_analysis",
+    "score": 0.8332379770272581,
+    "score2": 0.0,
+    "margin": 0.8332379770272581,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 주식 보유 목적이 경영참여야 단순투자야?",
+    "expected": "ownership_analysis",
+    "predicted": "ownership_analysis",
+    "score": 0.5900879566562974,
+    "score2": 0.5725362552823386,
+    "margin": 0.017551701373958783,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 자사주 비율이 어떻게 돼?",
+    "expected": "ownership_analysis",
+    "predicted": "ownership_analysis",
+    "score": 0.7807219694797632,
+    "score2": 0.7087654548775152,
+    "margin": 0.07195651460224806,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 최근에 큰 계약 따낸 거 있어?",
+    "expected": "event_analysis",
+    "predicted": "event_analysis",
+    "score": 0.8137865093188907,
+    "score2": 0.0,
+    "margin": 0.8137865093188907,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 채권 발행한 적 있어?",
+    "expected": "event_analysis",
+    "predicted": "event_analysis",
+    "score": 0.7580517270956785,
+    "score2": 0.7147431626110428,
+    "margin": 0.043308564484635714,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 공장 증설 계획 있어?",
+    "expected": "event_analysis",
+    "predicted": "event_analysis",
+    "score": 0.7714432159995223,
+    "score2": 0.7207316955159464,
+    "margin": 0.050711520483575856,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 다른 회사 인수했어?",
+    "expected": "event_analysis",
+    "predicted": "ownership_analysis",
+    "score": 0.7393230811813186,
+    "score2": 0.73693300095723,
+    "margin": 0.0023900802240885977,
+    "correct": false,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 자사주 매입 결정했어?",
+    "expected": "event_analysis",
+    "predicted": "event_analysis",
+    "score": 0.7734139774342713,
+    "score2": 0.743446792609781,
+    "margin": 0.029967184824490345,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 최근 수주 소식 있어?",
+    "expected": "event_analysis",
+    "predicted": "event_analysis",
+    "score": 0.8153735597848292,
+    "score2": 0.7964238174610695,
+    "margin": 0.018949742323759677,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 합병 관련 이슈 있었어?",
+    "expected": "event_analysis",
+    "predicted": "event_analysis",
+    "score": 0.7631211280296161,
+    "score2": 0.7307929792710631,
+    "margin": 0.032328148758552944,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 최근 공시 중에 이벤트성 뉴스 있어?",
+    "expected": "event_analysis",
+    "predicted": "correction_analysis",
+    "score": 0.8023268600590047,
+    "score2": 0.7928868701829428,
+    "margin": 0.009439989876061872,
+    "correct": false,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "[COMPANY] 시설투자 규모 얼마야?",
+    "expected": "event_analysis",
+    "predicted": "event_analysis",
+    "score": 0.7418831550720019,
+    "score2": 0.7058664671670388,
+    "margin": 0.03601668790496304,
+    "correct": true,
+    "set": "EVAL_SET"
+  },
+  {
+    "query": "정정된 영업이익이 몇 % 줄었어?",
+    "expected": [
+      "correction_analysis",
+      "calculation"
+    ],
+    "predicted": "calculation",
+    "score": 0.9690113282165714,
+    "score2": 0.7296745773107484,
+    "margin": 0.23933675090582307,
+    "correct": true,
+    "set": "AMBIGUOUS_SET"
+  },
+  {
+    "query": "[COMPANY] 정정 전후 부채비율 계산해서 비교해줘",
+    "expected": [
+      "correction_analysis",
+      "calculation",
+      "multi_compare"
+    ],
+    "predicted": "correction_analysis",
+    "score": 0.8438406191850378,
+    "score2": 0.8176014115153528,
+    "margin": 0.026239207669685016,
+    "correct": true,
+    "set": "AMBIGUOUS_SET"
+  },
+  {
+    "query": "[COMPANY_1]과 [COMPANY_2] 중 어디가 최대주주 지분율이 더 높아?",
+    "expected": [
+      "multi_compare",
+      "ownership_analysis"
+    ],
+    "predicted": "multi_compare",
+    "score": 0.85337141918429,
+    "score2": 0.7513900863621652,
+    "margin": 0.10198133282212485,
+    "correct": true,
+    "set": "AMBIGUOUS_SET"
+  },
+  {
+    "query": "유상증자 이후 [COMPANY] 최대주주 지분이 몇 % 줄었어?",
+    "expected": [
+      "ownership_analysis",
+      "calculation",
+      "event_analysis"
+    ],
+    "predicted": "calculation",
+    "score": 0.8222909566824372,
+    "score2": 0.7511551944777801,
+    "margin": 0.07113576220465712,
+    "correct": true,
+    "set": "AMBIGUOUS_SET"
+  }
+]

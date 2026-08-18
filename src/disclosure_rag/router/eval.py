@@ -14,6 +14,50 @@ FALLBACK_LABEL = "__FALLBACK__"
 
 
 @dataclass
+class AmbiguousEvalReport:
+    """§47 AMBIGUOUS_SET 전용 평가. 정답이 여러 개(acceptable route 목록)이고,
+    라우터가 그 중 하나를 골랐거나 정직하게 fallback(route=None) 했으면
+    '적절한 처리'로 카운트한다 — 진짜 애매한 질문에서는 fallback 도 오답이
+    아니라 정답으로 본다(§48/hcx_router.py 참고, 2026-08-18)."""
+
+    n: int
+    appropriate_rate: float  # (acceptable에 속하거나 fallback인) 비율
+    fallback_rate: float
+    forced_wrong_rate: float  # acceptable도 아니고 fallback도 아닌, 명백한 오답
+    details: list[dict]
+
+
+def evaluate_router_ambiguous(
+    router: Router, examples: list[tuple[str, list[str]]],
+) -> AmbiguousEvalReport:
+    """`router/eval_dataset.py`의 `AMBIGUOUS_SET`을 평가한다. `evaluate_router()`와
+    분리한 이유: AMBIGUOUS_SET은 정답이 단일 label이 아니라 acceptable route
+    목록이라 accuracy/F1 계산 방식 자체가 다르다(이전까지 이 데이터셋은
+    정의만 되고 아무 데서도 안 쓰이던 죽은 코드였다)."""
+    details = []
+    n_ok, n_fallback, n_wrong = 0, 0, 0
+    for query, acceptable in examples:
+        result = router.route(query)
+        if result.route is None:
+            n_fallback += 1
+            n_ok += 1
+            outcome = "fallback"
+        elif result.route in acceptable:
+            n_ok += 1
+            outcome = "acceptable"
+        else:
+            n_wrong += 1
+            outcome = "forced_wrong"
+        details.append({"query": query, "acceptable": acceptable, "predicted": result.route,
+                         "score": result.score, "outcome": outcome})
+    n = len(examples)
+    return AmbiguousEvalReport(
+        n=n, appropriate_rate=n_ok / n, fallback_rate=n_fallback / n,
+        forced_wrong_rate=n_wrong / n, details=details,
+    )
+
+
+@dataclass
 class RouterEvalReport:
     accuracy: float
     macro_f1: float
