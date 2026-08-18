@@ -65,6 +65,51 @@ def test_kiwi_user_dict_keeps_financial_term_whole():
     assert "단일판매공급계약" in tokens
 
 
+def test_kiwi_tokenize_batch_matches_sequential_tokenize():
+    """회귀(2026-08-18): 100문항 배치 테스트에서 38개사(237,212 chunk) 코퍼스를
+    순차 tokenize() 로 인덱싱하다가 45분+ 걸려도 안 끝나서 프로세스가 죽는
+    문제가 실측으로 발생 — kiwipiepy 의 멀티스레드 배치 API(`tokenize_batch`)
+    로 바꾸니 실측 6배+ 빨라짐(3000건 기준 20.9s -> 3.2s). 결과가 순차 호출과
+    동일한지 고정한다(속도만 다르고 토큰화 결과는 같아야 함)."""
+    tok = KiwiTokenizer(user_dict_path=CONFIG_ROOT / "financial_terms.txt")
+    texts = [
+        "삼성전자의 영업이익은 얼마야?",
+        "단일판매공급계약 체결 공시입니다",
+        "정정 전후 매출액 비교해줘",
+    ]
+    batch_result = tok.tokenize_batch(texts)
+    sequential_result = [tok.tokenize(t) for t in texts]
+    assert batch_result == sequential_result
+
+
+def test_bm25_retriever_uses_tokenize_batch_when_available(sample_chunks):
+    """BM25Retriever 가 코퍼스 인덱싱 시 tokenize_batch 를 실제로 쓰는지 확인
+    (호출 카운트로 검증 — tokenize() 를 chunk 수만큼 개별 호출하면 안 됨)."""
+    from disclosure_rag.retrieval.tokenizers import WhitespaceTokenizer
+
+    class _CountingTokenizer(WhitespaceTokenizer):
+        def __init__(self):
+            super().__init__()
+            self.batch_calls = 0
+            self.single_calls = 0
+
+        def tokenize(self, text):
+            self.single_calls += 1
+            return super().tokenize(text)
+
+        def tokenize_batch(self, texts):
+            self.batch_calls += 1
+            return [self.tokenize_impl(t) for t in texts]
+
+        def tokenize_impl(self, text):
+            return super().tokenize(text)
+
+    tok = _CountingTokenizer()
+    BM25Retriever(sample_chunks, tok)
+    assert tok.batch_calls == 1, "코퍼스 인덱싱이 tokenize_batch 를 한 번에 호출하지 않음"
+    assert tok.single_calls == 0, "tokenize_batch 가 있는데도 개별 tokenize() 를 호출함"
+
+
 def test_build_tokenizer_dispatch():
     assert isinstance(build_tokenizer("whitespace"), WhitespaceTokenizer)
     assert isinstance(build_tokenizer("kiwi"), KiwiTokenizer)

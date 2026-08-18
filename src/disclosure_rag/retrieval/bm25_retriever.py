@@ -25,7 +25,11 @@ class BM25Retriever:
         self.chunks_by_id = {c.chunk_id: c for c in chunks}
         self._ids = [c.chunk_id for c in chunks]
 
-        corpus_tokens = [tokenizer.tokenize(c.text) for c in chunks]
+        tokenize_batch = getattr(tokenizer, "tokenize_batch", None)
+        if tokenize_batch is not None:
+            corpus_tokens = tokenize_batch([c.text for c in chunks])
+        else:
+            corpus_tokens = [tokenizer.tokenize(c.text) for c in chunks]
         self._bm25 = bm25s.BM25(corpus=self._ids)
         self._bm25.index(corpus_tokens, show_progress=False)
 
