@@ -1,0 +1,957 @@
+[16:18:15] 질문 100건 로드
+[16:18:15] 기존 완료 0건 발견 — 나머지 이어서 실행
+[16:18:18] 캐시 로드: /tmp/hundred_q_vectors.pkl
+[16:18:27] chunks=237212 dim=1024 (9s)
+[16:18:27] Kiwi tokenizer + BM25 인덱스 구축 시작
+2026-08-18 16:29:04 - bm25s - DEBUG - __init__.py:520 - index() - Building index from tokens
+[16:29:46] BM25 인덱스 구축 완료 (679s)
+[16:29:46] BGE-M3 embedding provider 로드 (query 임베딩 + router 인코더 겸용)
+2026-08-18 16:29:53 - sentence_transformers.base.model - INFO - model.py:190 - __init__() - No device provided, using mps
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-08-18 16:29:54 - huggingface_hub.utils._http - WARNING - _http.py:953 - _warn_on_warning_headers() - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-08-18 16:29:54 - sentence_transformers.base.model - INFO - model.py:1022 - _load_modules() - Loading SentenceTransformer model from BAAI/bge-m3.
+Loading weights:   0%|          | 0/391 [00:00<?, ?it/s]Loading weights: 100%|██████████| 391/391 [00:00<00:00, 30590.23it/s]
+[16:30:06] embedding provider 로드 완료 (20s)
+[16:30:06] Dense store(in-memory Qdrant) 에 캐시된 벡터 upsert
+/Users/isang-won/Desktop/공시 agent/src/disclosure_rag/retrieval/qdrant_store.py:121: UserWarning: Local mode is not recommended for collections with more than 20,000 points. Current collection contains 20224 points. Consider using Qdrant in Docker or Qdrant Cloud for better performance with large datasets.
+  self.client.upsert(collection_name=self.collection_name, points=points[i:i + batch_size])
+[16:34:45] Dense store 준비 완료 (279s)
+[16:34:45] manifest / correction index 구축 (전체 코퍼스, tool 조립용)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20241118000171 (corp=삼성전자 date=20241118) 후보 2건 collision — fuzzy tiebreak score=100.0: ['major_20241115000375', 'major_20241118000328']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20241118000328 (corp=삼성전자 date=20241118) 후보 2건 collision — fuzzy tiebreak score=100.0: ['major_20241115000375', 'major_20241118000171']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20230404000050 (corp=SK하이닉스 date=20230403) 후보 2건 collision — fuzzy tiebreak score=70.3: ['major_20230403003950', 'major_20230403004080']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20230404000059 (corp=SK하이닉스 date=20230403) 후보 2건 collision — fuzzy tiebreak score=77.8: ['major_20230403004080', 'major_20230403003950']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20250317000576 원본/직전정정본 미발견 (corp=SK하이닉스 target_date=20201020 target_title='주요사항보고서(영업양수결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20250328000083 원본/직전정정본 미발견 (corp=SK하이닉스 target_date=20201020 target_title='주요사항보고서(영업양수결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20241004000001 (corp=고려아연 date=20241002) 후보 2건 collision — fuzzy tiebreak score=77.8: ['major_20241002000155', 'major_20241002000553']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20241011000053 (corp=고려아연 date=20241002) 후보 2건 collision — fuzzy tiebreak score=77.8: ['major_20241002000155', 'major_20241002000553']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230120000281 원본/직전정정본 미발견 (corp=KB금융 target_date=20221202 target_title='주요사항보고서 / 거래소 신고의무 사항(상각형 조건부자본증권 발행결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230130000190 원본/직전정정본 미발견 (corp=KB금융 target_date=20221202 target_title='주요사항보고서 / 거래소 신고의무 사항(상각형 조건부자본증권 발행결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20240216000257 (corp=KB금융 date=20240207) 후보 2건 collision — fuzzy tiebreak score=41.9: ['major_20240207000810', 'major_20240207000618']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20240216000810 (corp=KB금융 date=20240207) 후보 2건 collision — fuzzy tiebreak score=41.9: ['major_20240207000810', 'major_20240207000618']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20240222001853 (corp=KB금융 date=20240207) 후보 2건 collision — fuzzy tiebreak score=41.9: ['major_20240207000810', 'major_20240207000618']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230116000238 원본/직전정정본 미발견 (corp=신한지주 target_date=20221220 target_title='주요사항보고서(상각형 조건부자본증권 발행결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230120000388 원본/직전정정본 미발견 (corp=신한지주 target_date=20221220 target_title='주요사항보고서(상각형 조건부자본증권 발행결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20250828000787 (corp=신한지주 date=20250725) 후보 2건 collision — fuzzy tiebreak score=36.0: ['major_20250725000344', 'major_20250725000288']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20250828000787 원본/직전정정본 미발견 (corp=신한지주 target_date=20250725 target_title='주요사항보고서 (상각형 조건부 자본증권 발행결정)' 후보수=2)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20250903000277 (corp=신한지주 date=20250725) 후보 2건 collision — fuzzy tiebreak score=36.0: ['major_20250725000344', 'major_20250725000288']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20250903000277 원본/직전정정본 미발견 (corp=신한지주 target_date=20250725 target_title='주요사항보고서 (상각형 조건부 자본증권 발행결정)' 후보수=2)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230203000150 원본/직전정정본 미발견 (corp=하나금융지주 target_date=20221125 target_title='주요사항보고서 / 거래소 신고의무 사항 (상각형 조건부자본증권 발행결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230209000504 원본/직전정정본 미발견 (corp=하나금융지주 target_date=20221125 target_title='주요사항보고서 / 거래소 신고의무 사항 (상각형 조건부자본증권 발행결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20250304000581 (corp=하나금융지주 date=20250204) 후보 2건 collision — fuzzy tiebreak score=41.9: ['major_20250204000210', 'major_20250204000177']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20250310000343 (corp=하나금융지주 date=20250204) 후보 2건 collision — fuzzy tiebreak score=41.9: ['major_20250204000210', 'major_20250204000177']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20250819000117 (corp=하나금융지주 date=20250725) 후보 2건 collision — fuzzy tiebreak score=41.9: ['major_20250725000436', 'major_20250725000416']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20250825000228 (corp=하나금융지주 date=20250725) 후보 2건 collision — fuzzy tiebreak score=41.9: ['major_20250725000436', 'major_20250725000416']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20251117000069 (corp=하나금융지주 date=20251028) 후보 2건 collision — fuzzy tiebreak score=41.9: ['major_20251028000222', 'major_20251028000206']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20251121000110 (corp=하나금융지주 date=20251028) 후보 2건 collision — fuzzy tiebreak score=41.9: ['major_20251028000222', 'major_20251028000206']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230131000048 원본/직전정정본 미발견 (corp=우리금융지주 target_date=20221216 target_title='상각형 조건부자본증권 발행결정' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230206000116 원본/직전정정본 미발견 (corp=우리금융지주 target_date=20221216 target_title='상각형 조건부자본증권 발행결정' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20230601000186 (corp=우리금융지주 date=20230526) 후보 2건 collision — fuzzy tiebreak score=94.4: ['major_20230526000444', 'major_20230526000455']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20230601000190 (corp=우리금융지주 date=20230526) 후보 2건 collision — fuzzy tiebreak score=94.4: ['major_20230526000444', 'major_20230526000455']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20230616000293 (corp=우리금융지주 date=20230526) 후보 2건 collision — fuzzy tiebreak score=94.4: ['major_20230526000444', 'major_20230526000455']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20230616000296 (corp=우리금융지주 date=20230526) 후보 2건 collision — fuzzy tiebreak score=94.4: ['major_20230526000444', 'major_20230526000455']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20260323001206 원본/직전정정본 미발견 (corp=NAVER target_date=20220302 target_title='주요사항보고서(자기주식 처분 결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20260323001224 원본/직전정정본 미발견 (corp=NAVER target_date=20220401 target_title='주요사항보고서(자기주식 처분 결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20240423000177 (corp=카카오 date=20240422) 후보 2건 collision — fuzzy tiebreak score=70.3: ['major_20240422000499', 'major_20240422000513']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20240423000184 (corp=카카오 date=20240422) 후보 2건 collision — fuzzy tiebreak score=77.8: ['major_20240422000513', 'major_20240422000499']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20250225004703 (corp=카카오 date=20240422) 후보 2건 collision — fuzzy tiebreak score=77.8: ['major_20240422000513', 'major_20240422000499']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230112000230 원본/직전정정본 미발견 (corp=한화오션 target_date=20220926 target_title='주요사항보고서(유상증자 결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230508000263 원본/직전정정본 미발견 (corp=한화오션 target_date=20220926 target_title='주요사항보고서(유상증자 결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230523000110 원본/직전정정본 미발견 (corp=한화오션 target_date=20161223 target_title='전환사채권 발행결정' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230523000113 원본/직전정정본 미발견 (corp=한화오션 target_date=20170628 target_title='전환사채권 발행결정' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230523000116 원본/직전정정본 미발견 (corp=한화오션 target_date=20180220 target_title='전환사채권 발행결정' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230601000229 원본/직전정정본 미발견 (corp=한화오션 target_date=20161223 target_title='전환사채권 발행결정' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230601000234 원본/직전정정본 미발견 (corp=한화오션 target_date=20170628 target_title='전환사채권 발행결정' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230601000238 원본/직전정정본 미발견 (corp=한화오션 target_date=20180220 target_title='전환사채권 발행결정' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230811001932 원본/직전정정본 미발견 (corp=한전기술 target_date=20220401 target_title='주요사항보고서(유형자산양도결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20250206000060 원본/직전정정본 미발견 (corp=한전기술 target_date=20220401 target_title='주요사항보고서(유형자산 양도 결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20240430000578 (corp=아모레퍼시픽 date=20231031) 후보 3건 collision — fuzzy tiebreak score=60.0: ['major_20231031000001', 'major_20231031000003', 'major_20231031000004']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20250430000008 (corp=아모레퍼시픽 date=20231031) 후보 3건 collision — fuzzy tiebreak score=60.0: ['major_20231031000001', 'major_20231031000003', 'major_20231031000004']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20250120000481 (corp=이마트 date=20250120) 후보 3건 collision — fuzzy tiebreak score=57.1: ['major_20250120000327', 'major_20250120000339', 'major_20250120000483']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20250120000483 (corp=이마트 date=20250120) 후보 3건 collision — fuzzy tiebreak score=57.1: ['major_20250120000339', 'major_20250120000327', 'major_20250120000481']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230104000326 원본/직전정정본 미발견 (corp=한화솔루션 target_date=20221028 target_title='주요사항보고서(유상증자결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230330001007 원본/직전정정본 미발견 (corp=OCI홀딩스 target_date=20221123 target_title='주요사항보고서(회사분할결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20241219000378 원본/직전정정본 미발견 (corp=JYP Ent target_date=20231024 target_title='주요사항보고서(유형자산양수결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20251219000396 원본/직전정정본 미발견 (corp=JYP Ent target_date=20231024 target_title='주요사항보고서(유형자산양수결정)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20230224003382 (corp=에스엠 date=20230207) 후보 2건 collision — fuzzy tiebreak score=36.4: ['major_20230207000209', 'major_20230207000196']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230224003382 원본/직전정정본 미발견 (corp=에스엠 target_date=20230207 target_title='유상증자 결정' 후보수=2)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20230306000007 (corp=에스엠 date=20230207) 후보 2건 collision — fuzzy tiebreak score=36.4: ['major_20230207000209', 'major_20230207000196']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230306000007 원본/직전정정본 미발견 (corp=에스엠 target_date=20230207 target_title='유상증자 결정' 후보수=2)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=major_20230306000008 (corp=에스엠 date=20230207) 후보 2건 collision — fuzzy tiebreak score=35.7: ['major_20230207000196', 'major_20230207000209']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=major_20230306000008 원본/직전정정본 미발견 (corp=에스엠 target_date=20230207 target_title='전환사채권 발행결정' 후보수=2)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240426900872 원본/직전정정본 미발견 (corp=레인보우로보틱스 target_date=20220628 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251217800853 (corp=LG에너지솔루션 date=20241015) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20241015800258', 'exchange_20241015800261']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241022900223 원본/직전정정본 미발견 (corp=에코프로비엠 target_date=20241022 target_title='신규 시설투자 등' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250120800751 원본/직전정정본 미발견 (corp=고려아연 target_date=20221123 target_title='신규 시설투자 등(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250905800516 원본/직전정정본 미발견 (corp=NC target_date=20210910 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230206800712 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20200805 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230206800778 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20200522 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230306800412 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20220328 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230328801361 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20211223 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230328801524 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20220425 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230426800350 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20200805 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230426800398 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20200522 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230605800006 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20210115 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230629800664 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20211223 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230629800701 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20220425 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230731800350 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20200522 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230830800295 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20211223 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230830800318 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20220425 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230831800001 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20180430 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231128800002 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20190426 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231128800004 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20191128 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231128800005 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20190426 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231128800011 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20190514 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231129800273 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20220425 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231129800277 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20211223 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231219800348 (corp=삼성바이오로직스 date=20230605) 후보 3건 collision — fuzzy tiebreak score=61.5: ['exchange_20230605800001', 'exchange_20230605800274', 'exchange_20230605800006']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231226800400 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20231226 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240108800006 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20200727 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240306800636 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20171221 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240320800925 (corp=삼성바이오로직스 date=20230605) 후보 3건 collision — fuzzy tiebreak score=61.5: ['exchange_20230605800001', 'exchange_20230605800274', 'exchange_20230605800006']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240327800758 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20211223 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240327800775 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20220425 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240508800294 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20220328 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240531801103 (corp=삼성바이오로직스 date=20230605) 후보 3건 collision — fuzzy tiebreak score=61.5: ['exchange_20230605800001', 'exchange_20230605800274', 'exchange_20230605800006']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240618800007 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20170721 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240625800283 (corp=삼성바이오로직스 date=20230605) 후보 3건 collision — fuzzy tiebreak score=61.5: ['exchange_20230605800001', 'exchange_20230605800274', 'exchange_20230605800006']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240626800343 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20220425 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240626800348 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20211223 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240702800163 (corp=삼성바이오로직스 date=20230605) 후보 3건 collision — fuzzy tiebreak score=61.5: ['exchange_20230605800001', 'exchange_20230605800274', 'exchange_20230605800006']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240730800522 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20211223 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240730800525 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20220425 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240814801059 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20181128 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240829800252 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20220425 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240829800256 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20211223 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241029800376 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20211223 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241029800394 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20220425 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241118800246 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20210115 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241118800315 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20210115 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241217800697 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20201006 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241218800342 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20191203 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241219800011 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20220425 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241219800014 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20211223 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250331802214 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20221230 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251104800075 (corp=삼성바이오로직스 date=20250526) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20250526800003', 'exchange_20250526800004']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251106800105 (corp=삼성바이오로직스 date=20250526) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20250526800003', 'exchange_20250526800004']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251113800386 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20190426 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251113800392 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20191128 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251113800400 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20190426 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251113800444 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20190514 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251113800810 (corp=삼성바이오로직스 date=20231128) 후보 5건 collision — fuzzy tiebreak score=95.7: ['exchange_20231128800002', 'exchange_20231128800004', 'exchange_20231128800005', 'exchange_20231128800011', 'exchange_20231128800014']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251121800479 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20170704 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251127800584 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20180601 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251204800370 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20180814 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251212800785 원본/직전정정본 미발견 (corp=삼성바이오로직스 target_date=20190517 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241112800233 원본/직전정정본 미발견 (corp=셀트리온 target_date=20201118 target_title='신규시설투자등' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250115900492 원본/직전정정본 미발견 (corp=파마리서치 target_date=20200110 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240201800503 (corp=한미약품 date=20230801) 후보 3건 collision — fuzzy tiebreak score=61.5: ['exchange_20230801800520', 'exchange_20230801800558', 'exchange_20230801800563']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250109800693 원본/직전정정본 미발견 (corp=한미약품 target_date=20220103 target_title='투자판단 관련 주요경영사항' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230227801085 원본/직전정정본 미발견 (corp=한화오션 target_date=20210714 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230629800004 원본/직전정정본 미발견 (corp=한화오션 target_date=20200608 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230714800140 원본/직전정정본 미발견 (corp=한화오션 target_date=20220111 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231020800413 원본/직전정정본 미발견 (corp=한화오션 target_date=20181207 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231030800433 원본/직전정정본 미발견 (corp=한화오션 target_date=20210316 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231122800337 원본/직전정정본 미발견 (corp=한화오션 target_date=20210512 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231130800481 원본/직전정정본 미발견 (corp=한화오션 target_date=20201223 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231130800495 원본/직전정정본 미발견 (corp=한화오션 target_date=20210312 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231205800431 원본/직전정정본 미발견 (corp=한화오션 target_date=20210629 target_title='단일판매ㆍ공급계약' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231211800451 원본/직전정정본 미발견 (corp=한화오션 target_date=20211203 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231221800398 원본/직전정정본 미발견 (corp=한화오션 target_date=20210512 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231222800421 원본/직전정정본 미발견 (corp=한화오션 target_date=20181207 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231222800636 원본/직전정정본 미발견 (corp=한화오션 target_date=20220111 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231229800466 원본/직전정정본 미발견 (corp=한화오션 target_date=20201012 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240205800874 원본/직전정정본 미발견 (corp=한화오션 target_date=20211021 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240321801006 원본/직전정정본 미발견 (corp=한화오션 target_date=20220415 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240321801360 원본/직전정정본 미발견 (corp=한화오션 target_date=20220415 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240322800822 원본/직전정정본 미발견 (corp=한화오션 target_date=20181207 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240607800418 원본/직전정정본 미발견 (corp=한화오션 target_date=20181207 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240618800408 원본/직전정정본 미발견 (corp=한화오션 target_date=20210629 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240924800421 원본/직전정정본 미발견 (corp=한화오션 target_date=20210614 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241029800530 원본/직전정정본 미발견 (corp=한화오션 target_date=20181207 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241031800662 원본/직전정정본 미발견 (corp=한화오션 target_date=20210914 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241115800512 원본/직전정정본 미발견 (corp=한화오션 target_date=20211015 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241212800563 원본/직전정정본 미발견 (corp=한화오션 target_date=20210621 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250605800294 (corp=한화오션 date=20231222) 후보 3건 collision — fuzzy tiebreak score=87.0: ['exchange_20231222800421', 'exchange_20231222800636', 'exchange_20231222800809']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250618800597 원본/직전정정본 미발견 (corp=한화오션 target_date=20220106 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250618800600 원본/직전정정본 미발견 (corp=한화오션 target_date=20220203 target_title='단일팬매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260331803529 원본/직전정정본 미발견 (corp=한화오션 target_date=20190412 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230703800336 원본/직전정정본 미발견 (corp=삼성중공업 target_date=20220328 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231121800248 원본/직전정정본 미발견 (corp=삼성중공업 target_date=20221219 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231218800171 원본/직전정정본 미발견 (corp=삼성중공업 target_date=20221129 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231218800177 원본/직전정정본 미발견 (corp=삼성중공업 target_date=20221111 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240517800305 원본/직전정정본 미발견 (corp=삼성중공업 target_date=20211221 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240517800327 원본/직전정정본 미발견 (corp=삼성중공업 target_date=20201223 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240517800335 원본/직전정정본 미발견 (corp=삼성중공업 target_date=20201222 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240530800272 원본/직전정정본 미발견 (corp=삼성중공업 target_date=20221226 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240612800459 원본/직전정정본 미발견 (corp=삼성중공업 target_date=20211018 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240612800468 원본/직전정정본 미발견 (corp=삼성중공업 target_date=20201123 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241219800233 (corp=삼성중공업 date=20241024) 후보 2건 collision — fuzzy tiebreak score=87.0: ['exchange_20241024800507', 'exchange_20241024800562']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241230800259 (corp=삼성중공업 date=20231218) 후보 2건 collision — fuzzy tiebreak score=87.0: ['exchange_20231218800171', 'exchange_20231218800177']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241230800261 (corp=삼성중공업 date=20231218) 후보 2건 collision — fuzzy tiebreak score=87.0: ['exchange_20231218800171', 'exchange_20231218800177']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250425800546 원본/직전정정본 미발견 (corp=삼성중공업 target_date=20220328 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251128800865 (corp=삼성중공업 date=20241024) 후보 2건 collision — fuzzy tiebreak score=87.0: ['exchange_20241024800507', 'exchange_20241024800562']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240429800788 원본/직전정정본 미발견 (corp=두산에너빌리티 target_date=20190425 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240617800437 원본/직전정정본 미발견 (corp=두산에너빌리티 target_date=20210730 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250113800603 원본/직전정정본 미발견 (corp=두산에너빌리티 target_date=20210730 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251015800386 원본/직전정정본 미발견 (corp=두산에너빌리티 target_date=20220923 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260227801276 원본/직전정정본 미발견 (corp=두산에너빌리티 target_date=20201029 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230105800282 원본/직전정정본 미발견 (corp=한전기술 target_date=20201222 target_title='[기재정정] 단일판매·공급계약' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231120800519 원본/직전정정본 미발견 (corp=한전기술 target_date=20201111 target_title='[기재정정]단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231120800531 원본/직전정정본 미발견 (corp=한전기술 target_date=20210507 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231128800359 원본/직전정정본 미발견 (corp=한전기술 target_date=20200821 target_title='[기재정정]단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231229800416 원본/직전정정본 미발견 (corp=한전기술 target_date=20160318 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240531800927 원본/직전정정본 미발견 (corp=한전기술 target_date=20220401 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240730800209 원본/직전정정본 미발견 (corp=한전기술 target_date=20221125 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240925800280 (corp=한전기술 date=20231120) 후보 2건 collision — fuzzy tiebreak score=87.0: ['exchange_20231120800519', 'exchange_20231120800531']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241202800420 원본/직전정정본 미발견 (corp=한전기술 target_date=20201229 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241212800740 (corp=한전기술 date=20231120) 후보 2건 collision — fuzzy tiebreak score=87.0: ['exchange_20231120800519', 'exchange_20231120800531']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241223800452 원본/직전정정본 미발견 (corp=한전기술 target_date=20220512 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241223800623 원본/직전정정본 미발견 (corp=한전기술 target_date=20210316 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250304800611 (corp=한전기술 date=20231110) 후보 2건 collision — fuzzy tiebreak score=87.0: ['exchange_20231110800801', 'exchange_20231110800807']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250304800613 (corp=한전기술 date=20231110) 후보 2건 collision — fuzzy tiebreak score=87.0: ['exchange_20231110800801', 'exchange_20231110800807']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250331802095 원본/직전정정본 미발견 (corp=한전기술 target_date=20221230 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250723800477 원본/직전정정본 미발견 (corp=한전기술 target_date=20220831 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251016800167 (corp=한전기술 date=20250304) 후보 2건 collision — fuzzy tiebreak score=87.0: ['exchange_20250304800611', 'exchange_20250304800613']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251027800516 (corp=한전기술 date=20231229) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20231229800416', 'exchange_20231229800432']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251231800317 (corp=한전기술 date=20250304) 후보 2건 collision — fuzzy tiebreak score=87.0: ['exchange_20250304800611', 'exchange_20250304800613']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260109800243 원본/직전정정본 미발견 (corp=한전기술 target_date=20260109 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230203900959 원본/직전정정본 미발견 (corp=우리기술 target_date=20220720 target_title='단일판매공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241127900310 원본/직전정정본 미발견 (corp=우리기술 target_date=20221130 target_title='단일판매공급계약체결(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241224900713 원본/직전정정본 미발견 (corp=우리기술 target_date=20220513 target_title='단일판매공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251029900740 원본/직전정정본 미발견 (corp=우리기술 target_date=20251029 target_title='단일판매공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230410800882 원본/직전정정본 미발견 (corp=한화에어로스페이스 target_date=20211216 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231018800203 원본/직전정정본 미발견 (corp=한화에어로스페이스 target_date=20220823 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240412800076 원본/직전정정본 미발견 (corp=한화에어로스페이스 target_date=20191230 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240822800429 원본/직전정정본 미발견 (corp=한화에어로스페이스 target_date=20211216 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250311800990 원본/직전정정본 미발견 (corp=한화에어로스페이스 target_date=20220718 target_title='단일판매ㆍ공급계약 체결(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250821800313 원본/직전정정본 미발견 (corp=한화에어로스페이스 target_date=20221226 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251208800562 원본/직전정정본 미발견 (corp=한화에어로스페이스 target_date=20220718 target_title='단일판매ㆍ공급계약 체결(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251222800329 (corp=한화에어로스페이스 date=20251222) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20251222800006', 'exchange_20251222800010']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251223800006 원본/직전정정본 미발견 (corp=한화에어로스페이스 target_date=20191118 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251224800947 원본/직전정정본 미발견 (corp=한화에어로스페이스 target_date=20191230 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230206800764 원본/직전정정본 미발견 (corp=현대로템 target_date=20210524 target_title='단일판매 공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230517800005 원본/직전정정본 미발견 (corp=현대로템 target_date=20210421 target_title='단일판매 공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230628800572 원본/직전정정본 미발견 (corp=현대로템 target_date=20180820 target_title='단일판매 공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230727800179 원본/직전정정본 미발견 (corp=현대로템 target_date=20141215 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230727800412 원본/직전정정본 미발견 (corp=현대로템 target_date=20210901 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231227800562 원본/직전정정본 미발견 (corp=현대로템 target_date=20200622 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240404800588 원본/직전정정본 미발견 (corp=현대로템 target_date=20220825 target_title='단일판매 공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240712800050 (corp=현대로템 date=20240514) 후보 2건 collision — fuzzy tiebreak score=87.0: ['exchange_20240514801290', 'exchange_20240514801320']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240712800053 (corp=현대로템 date=20240514) 후보 2건 collision — fuzzy tiebreak score=87.0: ['exchange_20240514801290', 'exchange_20240514801320']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241029800512 원본/직전정정본 미발견 (corp=현대로템 target_date=20210624 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241029800525 원본/직전정정본 미발견 (corp=현대로템 target_date=20220107 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250627800731 원본/직전정정본 미발견 (corp=현대로템 target_date=20221207 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251112800698 원본/직전정정본 미발견 (corp=현대로템 target_date=20220211 target_title='단일판매 공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251125800005 (corp=현대로템 date=20241029) 후보 2건 collision — fuzzy tiebreak score=52.2: ['exchange_20241029800512', 'exchange_20241029800525']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231130800362 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20210802 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231228800546 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20231228 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240213800744 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20220829 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240326800001 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20191126 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240326800003 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20191126 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240502800572 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20200812 target_title='단일판매ㆍ공급계약 체결(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241129800455 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20201231 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241227800522 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20171108 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250312801108 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20180608 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250312801192 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20151215 target_title='단일판매ㆍ공급계약 체결(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250326802089 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20200812 target_title='단일판매ㆍ공급계약 체결(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250625800263 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20211215 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250716800365 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20200812 target_title='단일판매ㆍ공급계약 체결(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250915800632 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20181205 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250929800523 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20191209 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251125800192 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20181205 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251226800759 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20221222 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260112800001 원본/직전정정본 미발견 (corp=한국항공우주 target_date=20220919 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230117800244 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20161219 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230829800262 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20161230 target_title='단일판매.공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231013800242 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20201103 target_title='단일판매.공급계약 체결(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231026800191 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20190718 target_title='단일판매.공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231206800115 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20211110 target_title='단일판매.공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240102800261 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20221222 target_title='단일판매.공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240102800264 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20221222 target_title='단일판매.공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240315800460 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20201103 target_title='단일판매ㆍ공급계약 체결(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240417800363 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20211229 target_title='단일판매.공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240520800157 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20221116 target_title='단일판매.공급계약 체결(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241111800001 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20201103 target_title='단일판매.공급계약 체결(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250530800733 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20211110 target_title='단일판매.공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250826800230 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20210514 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251209800316 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20210915 target_title='단일판매.공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251209800318 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20211227 target_title='단일판매.공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251218800001 (corp=LIG디펜스앤에어로스페이스 date=20231222) 후보 4건 collision — fuzzy tiebreak score=95.7: ['exchange_20231222800008', 'exchange_20231222800076', 'exchange_20231222800316', 'exchange_20231222800424']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251218800003 (corp=LIG디펜스앤에어로스페이스 date=20231222) 후보 4건 collision — fuzzy tiebreak score=87.0: ['exchange_20231222800008', 'exchange_20231222800076', 'exchange_20231222800316', 'exchange_20231222800424']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251219800578 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20211229 target_title='단일판매.공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251223800435 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20211229 target_title='단일판매.공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260318800600 원본/직전정정본 미발견 (corp=LIG디펜스앤에어로스페이스 target_date=20211223 target_title='단일판매.공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240228800335 원본/직전정정본 미발견 (corp=아모레퍼시픽 target_date=20161201 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230110800416 원본/직전정정본 미발견 (corp=현대건설 target_date=20220916 target_title='단일판매ㆍ공급계약 체결(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230127800714 원본/직전정정본 미발견 (corp=현대건설 target_date=20201118 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230127800757 원본/직전정정본 미발견 (corp=현대건설 target_date=20201118 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230131800272 원본/직전정정본 미발견 (corp=현대건설 target_date=20210604 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230213800847 원본/직전정정본 미발견 (corp=현대건설 target_date=20221019 target_title='단일판매ㆍ공급계약 체결(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230308800143 원본/직전정정본 미발견 (corp=현대건설 target_date=20210517 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230411800470 (corp=현대건설 date=20230213) 후보 2건 collision — fuzzy tiebreak score=97.1: ['exchange_20230213800847', 'exchange_20230213801292']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230619800470 원본/직전정정본 미발견 (corp=현대건설 target_date=20100720 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230721800455 원본/직전정정본 미발견 (corp=현대건설 target_date=20220126 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230725800160 원본/직전정정본 미발견 (corp=현대건설 target_date=20210712 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240115800806 원본/직전정정본 미발견 (corp=현대건설 target_date=20221104 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240223800627 원본/직전정정본 미발견 (corp=현대건설 target_date=20210624 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240430800940 원본/직전정정본 미발견 (corp=현대건설 target_date=20210624 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240528800193 원본/직전정정본 미발견 (corp=현대건설 target_date=20211015 target_title='단일판매ㆍ공급계약' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240716800272 원본/직전정정본 미발견 (corp=현대건설 target_date=20220520 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240805800101 원본/직전정정본 미발견 (corp=현대건설 target_date=20240805 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240822800251 원본/직전정정본 미발견 (corp=현대건설 target_date=20220128 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240826800404 원본/직전정정본 미발견 (corp=현대건설 target_date=20191025 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240930800333 원본/직전정정본 미발견 (corp=현대건설 target_date=20170929 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250219800925 원본/직전정정본 미발견 (corp=현대건설 target_date=20221007 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250219801084 (corp=현대건설 date=20250219) 후보 3건 collision — fuzzy tiebreak score=95.7: ['exchange_20250219800925', 'exchange_20250219801110', 'exchange_20250219801113']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250219801110 원본/직전정정본 미발견 (corp=현대건설 target_date=20221007 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250219801113 원본/직전정정본 미발견 (corp=현대건설 target_date=20221007 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250328803263 원본/직전정정본 미발견 (corp=현대건설 target_date=20210415 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250414800378 원본/직전정정본 미발견 (corp=현대건설 target_date=20210601 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250424800659 원본/직전정정본 미발견 (corp=현대건설 target_date=20220729 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250806800260 원본/직전정정본 미발견 (corp=현대건설 target_date=20210216 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250813800735 원본/직전정정본 미발견 (corp=현대건설 target_date=20211130 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250825800160 원본/직전정정본 미발견 (corp=현대건설 target_date=20211123 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250910800087 (corp=현대건설 date=20230308) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20230308800143', 'exchange_20230308801043']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251031800848 원본/직전정정본 미발견 (corp=현대건설 target_date=20251031 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251219800239 원본/직전정정본 미발견 (corp=현대건설 target_date=20221207 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260120800597 (corp=현대건설 date=20250929) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20250929800639', 'exchange_20250929800006']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260128800842 원본/직전정정본 미발견 (corp=현대건설 target_date=20220922 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230120800339 원본/직전정정본 미발견 (corp=대우건설 target_date=20190628 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230131800738 원본/직전정정본 미발견 (corp=대우건설 target_date=20171211 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230203800007 원본/직전정정본 미발견 (corp=대우건설 target_date=20220207 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230406800573 원본/직전정정본 미발견 (corp=대우건설 target_date=20221215 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230410800580 원본/직전정정본 미발견 (corp=대우건설 target_date=20220404 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230412800599 원본/직전정정본 미발견 (corp=대우건설 target_date=20220420 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230427800226 원본/직전정정본 미발견 (corp=대우건설 target_date=20220502 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230630800615 (corp=대우건설 date=20230310) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20230310800034', 'exchange_20230310800909']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230712800004 원본/직전정정본 미발견 (corp=대우건설 target_date=20210521 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230824800453 원본/직전정정본 미발견 (corp=대우건설 target_date=20211122 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230828800479 원본/직전정정본 미발견 (corp=대우건설 target_date=20210304 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230831800541 원본/직전정정본 미발견 (corp=대우건설 target_date=20221226 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230911800542 원본/직전정정본 미발견 (corp=대우건설 target_date=20220331 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230915800346 원본/직전정정본 미발견 (corp=대우건설 target_date=20211223 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230915800354 원본/직전정정본 미발견 (corp=대우건설 target_date=20220316 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230927800629 원본/직전정정본 미발견 (corp=대우건설 target_date=20211209 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230927800632 (corp=대우건설 date=20230630) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20230630800613', 'exchange_20230630800615']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231116800429 원본/직전정정본 미발견 (corp=대우건설 target_date=20220613 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231228801034 (corp=대우건설 date=20230927) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20230927800629', 'exchange_20230927800632']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240110800638 원본/직전정정본 미발견 (corp=대우건설 target_date=20201223 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240112800403 (corp=대우건설 date=20230927) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20230927800629', 'exchange_20230927800632']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240115800799 원본/직전정정본 미발견 (corp=대우건설 target_date=20221104 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240228800755 원본/직전정정본 미발견 (corp=대우건설 target_date=20190701 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240228801405 원본/직전정정본 미발견 (corp=대우건설 target_date=20200803 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240625800586 원본/직전정정본 미발견 (corp=대우건설 target_date=20220325 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240705800442 원본/직전정정본 미발견 (corp=대우건설 target_date=20190329 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240814803373 원본/직전정정본 미발견 (corp=대우건설 target_date=20190321 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240927800787 원본/직전정정본 미발견 (corp=대우건설 target_date=20220805 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241106800473 원본/직전정정본 미발견 (corp=대우건설 target_date=20220713 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241227800341 (corp=대우건설 date=20240628) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20240628800693', 'exchange_20240628800687']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250220800255 (corp=대우건설 date=20240228) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20240228800755', 'exchange_20240228801405']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250226800497 원본/직전정정본 미발견 (corp=대우건설 target_date=20221102 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250310800006 원본/직전정정본 미발견 (corp=대우건설 target_date=20200514 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250321800012 원본/직전정정본 미발견 (corp=대우건설 target_date=20220923 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250407800137 원본/직전정정본 미발견 (corp=대우건설 target_date=20201231 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251103800680 원본/직전정정본 미발견 (corp=대우건설 target_date=20201231 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251105800345 원본/직전정정본 미발견 (corp=대우건설 target_date=20211206 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251121800001 (corp=대우건설 date=20240927) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20240927800779', 'exchange_20240927800787']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251128800557 (corp=대우건설 date=20240705) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20240705800442', 'exchange_20240705800606']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251216800001 원본/직전정정본 미발견 (corp=대우건설 target_date=20201231 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260114800154 원본/직전정정본 미발견 (corp=대우건설 target_date=20180928 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260128800877 (corp=대우건설 date=20251224) 후보 3건 collision — fuzzy tiebreak score=95.7: ['exchange_20251224800042', 'exchange_20251224800576', 'exchange_20251224800595']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260212800132 원본/직전정정본 미발견 (corp=대우건설 target_date=20210401 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230109800082 원본/직전정정본 미발견 (corp=삼성E&A target_date=20221227 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230210800576 원본/직전정정본 미발견 (corp=삼성E&A target_date=20190412 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230405800092 원본/직전정정본 미발견 (corp=삼성E&A target_date=20221021 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230405800809 원본/직전정정본 미발견 (corp=삼성E&A target_date=20220209 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230428800993 원본/직전정정본 미발견 (corp=삼성E&A target_date=20200128 target_title='단일판매·공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230515800881 원본/직전정정본 미발견 (corp=삼성E&A target_date=20220311 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230517800369 원본/직전정정본 미발견 (corp=삼성E&A target_date=20221129 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230526800277 원본/직전정정본 미발견 (corp=삼성E&A target_date=20221226 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230530800185 원본/직전정정본 미발견 (corp=삼성E&A target_date=20220622 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230531800167 원본/직전정정본 미발견 (corp=삼성E&A target_date=20221226 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230531800185 원본/직전정정본 미발견 (corp=삼성E&A target_date=20201119 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230622800089 원본/직전정정본 미발견 (corp=삼성E&A target_date=20180904 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230629800068 원본/직전정정본 미발견 (corp=삼성E&A target_date=20220315 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230629800360 원본/직전정정본 미발견 (corp=삼성E&A target_date=20221124 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230727800739 (corp=삼성E&A date=20230405) 후보 2건 collision — fuzzy tiebreak score=87.0: ['exchange_20230405800092', 'exchange_20230405800809']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231006800347 원본/직전정정본 미발견 (corp=삼성E&A target_date=20220811 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231123800368 (corp=삼성E&A date=20230531) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20230531800167', 'exchange_20230531800185']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231127800368 원본/직전정정본 미발견 (corp=삼성E&A target_date=20221226 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231127800392 (corp=삼성E&A date=20230629) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20230629800068', 'exchange_20230629800360']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231206800221 원본/직전정정본 미발견 (corp=삼성E&A target_date=20221214 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231206800224 원본/직전정정본 미발견 (corp=삼성E&A target_date=20221214 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231215801079 원본/직전정정본 미발견 (corp=삼성E&A target_date=20221012 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231219800549 (corp=삼성E&A date=20231127) 후보 3건 collision — fuzzy tiebreak score=100.0: ['exchange_20231127800368', 'exchange_20231127800375', 'exchange_20231127800392']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231226800608 원본/직전정정본 미발견 (corp=삼성E&A target_date=20211029 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240129801020 원본/직전정정본 미발견 (corp=삼성E&A target_date=20221007 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240205800620 (corp=삼성E&A date=20230531) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20230531800167', 'exchange_20230531800185']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240401801465 (corp=삼성E&A date=20240401) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20240401800060', 'exchange_20240401801549']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240507800108 (corp=삼성E&A date=20230629) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20230629800068', 'exchange_20230629800360']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240530800296 원본/직전정정본 미발견 (corp=삼성E&A target_date=20210414 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240618800188 원본/직전정정본 미발견 (corp=삼성E&A target_date=20200227 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240627800409 (corp=삼성E&A date=20240530) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20240530800244', 'exchange_20240530800296']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240627800415 (corp=삼성E&A date=20231219) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20231219800549', 'exchange_20231219800551']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240725800355 (corp=삼성E&A date=20231206) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20231206800221', 'exchange_20231206800224']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240725800411 (corp=삼성E&A date=20231206) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20231206800221', 'exchange_20231206800224']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240725800420 (corp=삼성E&A date=20231127) 후보 3건 collision — fuzzy tiebreak score=100.0: ['exchange_20231127800368', 'exchange_20231127800375', 'exchange_20231127800392']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240930800407 (corp=삼성E&A date=20240627) 후보 4건 collision — fuzzy tiebreak score=100.0: ['exchange_20240627800409', 'exchange_20240627800411', 'exchange_20240627800415', 'exchange_20240627800468']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241024800187 (corp=삼성E&A date=20240627) 후보 4건 collision — fuzzy tiebreak score=100.0: ['exchange_20240627800409', 'exchange_20240627800411', 'exchange_20240627800415', 'exchange_20240627800468']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241028800227 원본/직전정정본 미발견 (corp=삼성E&A target_date=20430531 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241129800158 (corp=삼성E&A date=20240530) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20240530800244', 'exchange_20240530800296']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241219800099 (corp=삼성E&A date=20241024) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20241024800187', 'exchange_20241024800188']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241219800267 (corp=삼성E&A date=20240401) 후보 3건 collision — fuzzy tiebreak score=100.0: ['exchange_20240401800060', 'exchange_20240401801465', 'exchange_20240401801549']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241230800943 (corp=삼성E&A date=20231219) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20231219800549', 'exchange_20231219800551']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241230800946 (corp=삼성E&A date=20231127) 후보 3건 collision — fuzzy tiebreak score=100.0: ['exchange_20231127800368', 'exchange_20231127800375', 'exchange_20231127800392']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250327801215 (corp=삼성E&A date=20241219) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20241219800099', 'exchange_20241219800267']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250619800586 원본/직전정정본 미발견 (corp=삼성E&A target_date=20250619 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250709800227 원본/직전정정본 미발견 (corp=삼성E&A target_date=20220713 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250725800479 원본/직전정정본 미발견 (corp=삼성E&A target_date=20080806 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250826800187 원본/직전정정본 미발견 (corp=삼성E&A target_date=20211201 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250925800332 (corp=삼성E&A date=20240627) 후보 4건 collision — fuzzy tiebreak score=100.0: ['exchange_20240627800409', 'exchange_20240627800411', 'exchange_20240627800415', 'exchange_20240627800468']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250926800514 (corp=삼성E&A date=20241205) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20241205800251', 'exchange_20241205800252']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251113800655 (corp=삼성E&A date=20251030) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20251030800014', 'exchange_20251030800507']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251215801116 (corp=삼성E&A date=20241205) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20241205800251', 'exchange_20241205800252']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251230800450 (corp=삼성E&A date=20240627) 후보 4건 collision — fuzzy tiebreak score=100.0: ['exchange_20240627800409', 'exchange_20240627800411', 'exchange_20240627800415', 'exchange_20240627800468']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251231800357 (corp=삼성E&A date=20241219) 후보 2건 collision — fuzzy tiebreak score=100.0: ['exchange_20241219800099', 'exchange_20241219800267']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240618800206 원본/직전정정본 미발견 (corp=HMM target_date=20210629 target_title='신규시설투자등' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240926800370 원본/직전정정본 미발견 (corp=HMM target_date=20200417 target_title='신규시설투자등' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250117800481 원본/직전정정본 미발견 (corp=현대글로비스 target_date=20221111 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250117800487 원본/직전정정본 미발견 (corp=현대글로비스 target_date=20211228 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250117800494 원본/직전정정본 미발견 (corp=현대글로비스 target_date=20211228 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260116800383 원본/직전정정본 미발견 (corp=현대글로비스 target_date=20220914 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231221800532 원본/직전정정본 미발견 (corp=효성중공업 target_date=20190621 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240321802206 원본/직전정정본 미발견 (corp=효성중공업 target_date=20200918 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240604800414 원본/직전정정본 미발견 (corp=효성중공업 target_date=20181108 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240624800341 원본/직전정정본 미발견 (corp=효성중공업 target_date=20201204 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241018800342 원본/직전정정본 미발견 (corp=효성중공업 target_date=20220630 target_title='단일판매·공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241108800639 원본/직전정정본 미발견 (corp=효성중공업 target_date=20211230 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260108800480 (corp=효성중공업 date=20250618) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20250618800590', 'exchange_20250618800592']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260210801094 (corp=효성중공업 date=20250618) 후보 2건 collision — fuzzy tiebreak score=81.5: ['exchange_20250618800590', 'exchange_20250618800592']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231229800265 원본/직전정정본 미발견 (corp=HD현대일렉트릭 target_date=20231229 target_title='단일판매ㆍ공급계약 체결(계통 안정화 ESS 기자재 1식)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240208801331 원본/직전정정본 미발견 (corp=HD현대일렉트릭 target_date=20240208 target_title='단일판매ㆍ공급계약 체결(계통 안정화 ESS 기자재 1식)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240531801074 원본/직전정정본 미발견 (corp=HD현대일렉트릭 target_date=20240531 target_title='단일판매ㆍ공급계약 체결(계통 안정화 ESS 기자재 1식)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230405800944 원본/직전정정본 미발견 (corp=엘에스일렉트릭 target_date=20221018 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230406800008 원본/직전정정본 미발견 (corp=엘에스일렉트릭 target_date=20200714 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231027800222 원본/직전정정본 미발견 (corp=엘에스일렉트릭 target_date=20210304 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240125800285 원본/직전정정본 미발견 (corp=엘에스일렉트릭 target_date=20220602 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240813800252 원본/직전정정본 미발견 (corp=엘에스일렉트릭 target_date=20240813 target_title='신규 시설투자 등(자율공시)' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250326800100 (corp=엘에스일렉트릭 date=20240103) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20240103800430', 'exchange_20240103800457']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230216800315 원본/직전정정본 미발견 (corp=한화솔루션 target_date=20211221 target_title='신규 시설투자 등' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230331802739 원본/직전정정본 미발견 (corp=두산퓨얼셀 target_date=20220427 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230727800471 원본/직전정정본 미발견 (corp=두산퓨얼셀 target_date=20220728 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20230825800343 원본/직전정정본 미발견 (corp=두산퓨얼셀 target_date=20221216 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231019800345 원본/직전정정본 미발견 (corp=두산퓨얼셀 target_date=20220523 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231019800452 원본/직전정정본 미발견 (corp=두산퓨얼셀 target_date=20220523 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231220800419 원본/직전정정본 미발견 (corp=두산퓨얼셀 target_date=20221004 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20231228800377 원본/직전정정본 미발견 (corp=두산퓨얼셀 target_date=20211221 target_title='신규 시설투자 등' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240321801139 원본/직전정정본 미발견 (corp=두산퓨얼셀 target_date=20221130 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240531801257 원본/직전정정본 미발견 (corp=두산퓨얼셀 target_date=20221223 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240628800803 원본/직전정정본 미발견 (corp=두산퓨얼셀 target_date=20211223 target_title='단일판매ㆍ공급계약 체결' 후보수=0)
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240726800529 (corp=두산퓨얼셀 date=20230825) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20230825800343', 'exchange_20230825800380']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240731800524 (corp=두산퓨얼셀 date=20230825) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20230825800343', 'exchange_20230825800380']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240809800546 (corp=두산퓨얼셀 date=20231228) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20231228800033', 'exchange_20231228800377']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241209800320 (corp=두산퓨얼셀 date=20241125) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20241125800033', 'exchange_20241125800035']
+2026-08-18 16:34:45 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20241209800325 (corp=두산퓨얼셀 date=20241125) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20241125800033', 'exchange_20241125800035']
+2026-08-18 16:34:46 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20250430800633 (corp=두산퓨얼셀 date=20231228) 후보 2건 collision — fuzzy tiebreak score=50.0: ['exchange_20231228800377', 'exchange_20231228800033']
+2026-08-18 16:34:46 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251120800458 (corp=두산퓨얼셀 date=20241206) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20241206800566', 'exchange_20241206800593']
+2026-08-18 16:34:46 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20251120800471 (corp=두산퓨얼셀 date=20241209) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20241209800320', 'exchange_20241209800325']
+2026-08-18 16:34:46 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260130800967 (corp=두산퓨얼셀 date=20251120) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20251120800458', 'exchange_20251120800471']
+2026-08-18 16:34:46 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:172 - _build_event_groups() - [CORRECTION] doc_id=exchange_20260209801002 (corp=두산퓨얼셀 date=20241206) 후보 2건 collision — fuzzy tiebreak score=95.7: ['exchange_20241206800566', 'exchange_20241206800593']
+2026-08-18 16:34:46 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=exchange_20240215900852 원본/직전정정본 미발견 (corp=JYP Ent target_date=20210305 target_title='단일판매ㆍ공급계약체결' 후보수=0)
+2026-08-18 16:34:46 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:198 - find_root() - [CORRECTION] doc_id=exchange_20240514801290 parent chain 순환 감지 — cur=exchange_20240514801290 에서 중단
+2026-08-18 16:34:46 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:198 - find_root() - [CORRECTION] doc_id=exchange_20240514801320 parent chain 순환 감지 — cur=exchange_20240514801320 에서 중단
+2026-08-18 16:34:46 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:198 - find_root() - [CORRECTION] doc_id=exchange_20240712800050 parent chain 순환 감지 — cur=exchange_20240514801290 에서 중단
+2026-08-18 16:34:46 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:198 - find_root() - [CORRECTION] doc_id=exchange_20240712800053 parent chain 순환 감지 — cur=exchange_20240514801290 에서 중단
+2026-08-18 16:34:46 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=holding_20230417000426 원본/직전정정본 미발견 (corp=OCI홀딩스 target_date=20220427 target_title='주식등의 대량보유상황보고서' 후보수=0)
+2026-08-18 16:34:46 - disclosure_rag.correction.correction_graph_builder - WARNING - correction_graph_builder.py:184 - _build_event_groups() - [CORRECTION] doc_id=holding_20230417000428 원본/직전정정본 미발견 (corp=OCI홀딩스 target_date=20221227 target_title='주식등의 대량보유상황보고서' 후보수=0)
+[16:34:46] manifest=4204건 correction_index=4204건 (1s)
+[16:34:46] Semantic Router 구축
+[33m2026-08-18 16:34:46 WARNING semantic_router No index provided. Using default LocalIndex.[0m
+[33m2026-08-18 16:34:58 WARNING semantic_router No config is written for LocalIndex.[0m
+[16:34:58] Router 구축 완료 (13s)
+[16:34:58] agent_client.model=HCX-007 answer_client.model=HCX-005
+[16:34:58] 파이프라인 조립 총 소요 1000s
+[16:35:03] 실행할 질문 100건 (전체 100건 중)
+[16:35:03] [1/100] 삼성전자(IT/반도체) / 검색추출_Closed: 삼성전자의 2025년 매출액은 얼마인가?
+[16:35:28]   -> OK elapsed=25.1s route=single_lookup grounded=True citation=True
+[16:35:31] [2/100] 삼성SDI(2차전지) / 검색추출_Closed: 삼성SDI의 2025년 영업이익은 얼마야?
+[16:35:50]   -> OK elapsed=19.3s route=single_lookup grounded=True citation=True
+[16:35:53] [3/100] LG에너지솔루션(2차전지) / 검색추출_Closed: LG에너지솔루션의 최근 자기주식 취득 결정 규모는 얼마야?
+[16:36:19]   -> OK elapsed=26.0s route=event_analysis grounded=True citation=True
+[16:36:22] [4/100] 한미반도체(반도체) / 검색추출_Closed: 한미반도체의 2025년 부채비율은 얼마야?
+[16:36:36]   -> OK elapsed=13.3s route=calculation grounded=True citation=True
+[16:36:39] [5/100] KB금융(금융) / 검색추출_Closed: KB금융의 최근 체결한 단일판매·공급계약 금액은 얼마야?
+[16:36:54]   -> OK elapsed=15.1s route=event_analysis grounded=True citation=True
+[16:36:57] [6/100] 알테오젠(바이오) / 검색추출_Closed: 알테오젠의 2025년 매출액은 얼마인가?
+2026-08-18 16:37:14 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='알테오젠의 2025년 매출액은 얼마인가?' [참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'215858919957': '20250321 + 215858918957'}
+[16:37:14]   -> OK elapsed=17.6s route=single_lookup grounded=True citation=True
+[16:37:17] [7/100] HD현대중공업(조선) / 검색추출_Closed: HD현대중공업의 2025년 영업이익은 얼마야?
+[16:37:31]   -> OK elapsed=13.5s route=single_lookup grounded=True citation=True
+[16:37:34] [8/100] 현대자동차(자동차) / 검색추출_Closed: 현대자동차의 최근 자기주식 취득 결정 규모는 얼마야?
+2026-08-18 16:37:50 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='현대자동차의 최근 자기주식 취득 결정 규모는 얼마야?' 검산 실패로 재생성 시도 1/1: ['30844960500', '397692435500']
+[16:37:53]   -> OK elapsed=19.1s route=event_analysis grounded=True citation=True
+[16:37:56] [9/100] 현대건설(건설) / 검색추출_Closed: 현대건설의 2025년 부채비율은 얼마야?
+[16:38:13]   -> OK elapsed=16.6s route=calculation grounded=True citation=True
+[16:38:16] [10/100] SK텔레콤(통신) / 검색추출_Closed: SK텔레콤의 최근 체결한 단일판매·공급계약 금액은 얼마야?
+[16:38:29]   -> OK elapsed=13.3s route=event_analysis grounded=True citation=True
+[16:38:29] 체크포인트 저장: 10/100건
+[16:38:32] [11/100] 기아(자동차) / 검색추출_Closed: 기아의 2025년 매출액은 얼마인가?
+[16:38:48]   -> OK elapsed=15.6s route=single_lookup grounded=True citation=True
+[16:38:51] [12/100] SK하이닉스(반도체) / 검색추출_Closed: SK하이닉스의 2025년 영업이익은 얼마야?
+[16:39:04]   -> OK elapsed=13.7s route=single_lookup grounded=True citation=True
+[16:39:07] [13/100] NAVER(IT/플랫폼) / 검색추출_Closed: NAVER의 최근 자기주식 취득 결정 규모는 얼마야?
+[16:39:22]   -> OK elapsed=15.1s route=event_analysis grounded=True citation=True
+[16:39:25] [14/100] 카카오(IT/플랫폼) / 검색추출_Closed: 카카오의 2025년 부채비율은 얼마야?
+[16:39:45]   -> OK elapsed=19.3s route=calculation grounded=True citation=True
+[16:39:48] [15/100] 신한지주(금융) / 검색추출_Closed: 신한지주의 최근 체결한 단일판매·공급계약 금액은 얼마야?
+2026-08-18 16:40:04 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 1/7), 3.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 16:40:08 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 2/7), 6.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 16:40:14 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 3/7), 12.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 16:40:36 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 1/7), 3.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 16:40:40 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 2/7), 6.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 16:40:47 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 3/7), 12.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 16:40:59 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 4/7), 24.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 16:41:24 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 5/7), 48.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+[16:42:37]   -> OK elapsed=169.8s route=event_analysis grounded=True citation=True
+[16:42:40] [16/100] 삼성바이오로직스(바이오) / 검색추출_Closed: 삼성바이오로직스의 2025년 매출액은 얼마인가?
+[16:42:55]   -> OK elapsed=14.2s route=single_lookup grounded=True citation=True
+[16:42:58] [17/100] 셀트리온(바이오) / 검색추출_Closed: 셀트리온의 2025년 영업이익은 얼마야?
+2026-08-18 16:42:59 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 1/7), 3.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 16:43:02 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 2/7), 6.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 16:43:08 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 3/7), 12.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+[16:43:39]   -> OK elapsed=41.3s route=single_lookup grounded=True citation=True
+[16:43:42] [18/100] 하이브(엔터) / 검색추출_Closed: 하이브의 최근 자기주식 취득 결정 규모는 얼마야?
+[16:43:56]   -> OK elapsed=13.6s route=event_analysis grounded=True citation=True
+[16:43:59] [19/100] 와이지엔터테인먼트(엔터) / 검색추출_Closed: 와이지엔터테인먼트의 2025년 부채비율은 얼마야?
+2026-08-18 16:44:21 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='와이지엔터테인먼트의 2025년 부채비율은 얼마야?' [참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'21.17': '136466863977 / 646538789640 * 100(%)'}
+[16:44:21]   -> OK elapsed=22.2s route=calculation grounded=True citation=True
+[16:44:24] [20/100] 크래프톤(게임) / 검색추출_Closed: 크래프톤의 최근 체결한 단일판매·공급계약 금액은 얼마야?
+[16:45:03]   -> OK elapsed=39.0s route=event_analysis grounded=True citation=True
+[16:45:03] 체크포인트 저장: 20/100건
+[16:45:06] [21/100] 두산로보틱스(로봇) / 검색추출_Open: 두산로보틱스의 주요 사업부문 구성을 설명해줘
+2026-08-18 16:45:09 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 1/7), 3.0s 후 재시도: HCX API 오류 400: {"status":{"code":"40009","message":"Unsupported function"},"result":null}
+[16:45:48]   -> OK elapsed=42.3s route=ownership_analysis grounded=True citation=True
+[16:45:51] [22/100] 레인보우로보틱스(로봇) / 검색추출_Open: 레인보우로보틱스의 최근 투자 계획을 정리해줘
+2026-08-18 16:46:16 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='레인보우로보틱스의 최근 투자 계획을 정리해줘' 검산 실패로 재생성 시도 1/1: ['283532']
+2026-08-18 16:46:25 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='레인보우로보틱스의 최근 투자 계획을 정리해줘' [근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['281784', '285332']
+[16:46:25]   -> OK elapsed=34.1s route=event_analysis grounded=False citation=True
+[16:46:28] [23/100] 한화에어로스페이스(방산) / 검색추출_Open: 한화에어로스페이스의 주요 매출처를 정리해줘
+[16:46:44]   -> OK elapsed=15.8s route=single_lookup grounded=True citation=True
+[16:46:47] [24/100] 한국항공우주(방산) / 검색추출_Open: 한국항공우주의 주요 사업부문 구성을 설명해줘
+2026-08-18 16:47:08 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='한국항공우주의 주요 사업부문 구성을 설명해줘' 답변에 근거(report_id/chunk_id) 인용이 없음
+[16:47:08]   -> OK elapsed=20.8s route=ownership_analysis grounded=True citation=False
+[16:47:11] [25/100] 이마트(유통) / 검색추출_Open: 이마트의 최근 투자 계획을 정리해줘
+[16:47:36]   -> OK elapsed=25.5s route=event_analysis grounded=True citation=True
+[16:47:39] [26/100] LG생활건강(화장품) / 검색추출_Open: LG생활건강의 주요 매출처를 정리해줘
+[16:48:08]   -> OK elapsed=29.1s route=single_lookup grounded=True citation=True
+[16:48:11] [27/100] 아모레퍼시픽(화장품) / 검색추출_Open: 아모레퍼시픽의 주요 사업부문 구성을 설명해줘
+[16:48:37]   -> OK elapsed=25.9s route=ownership_analysis grounded=True citation=True
+[16:48:40] [28/100] POSCO홀딩스(철강) / 검색추출_Open: POSCO홀딩스의 최근 투자 계획을 정리해줘
+[16:49:15]   -> OK elapsed=34.3s route=event_analysis grounded=True citation=True
+[16:49:18] [29/100] 고려아연(비철금속) / 검색추출_Open: 고려아연의 주요 매출처를 정리해줘
+[16:49:40]   -> OK elapsed=22.8s route=single_lookup grounded=True citation=True
+[16:49:43] [30/100] HMM(해운) / 검색추출_Open: HMM의 주요 사업부문 구성을 설명해줘
+2026-08-18 16:50:07 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='HMM의 주요 사업부문 구성을 설명해줘' 답변에 근거(report_id/chunk_id) 인용이 없음
+[16:50:07]   -> OK elapsed=23.2s route=ownership_analysis grounded=True citation=False
+[16:50:07] 체크포인트 저장: 30/100건
+[16:50:10] [31/100] 현대글로비스(물류) / 검색추출_Open: 현대글로비스의 최근 투자 계획을 정리해줘
+2026-08-18 16:50:37 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='현대글로비스의 최근 투자 계획을 정리해줘' 검산 실패로 재생성 시도 1/1: ['2025', '2026']
+[16:50:47]   -> OK elapsed=37.9s route=event_analysis grounded=True citation=True
+[16:50:50] [32/100] 대우건설(건설) / 검색추출_Open: 대우건설의 주요 매출처를 정리해줘
+[16:51:18]   -> OK elapsed=27.4s route=single_lookup grounded=True citation=True
+[16:51:21] [33/100] 케이티(통신) / 검색추출_Open: 케이티의 주요 사업부문 구성을 설명해줘
+[16:51:46]   -> OK elapsed=25.2s route=ownership_analysis grounded=True citation=True
+[16:51:49] [34/100] LG유플러스(통신) / 검색추출_Open: LG유플러스의 최근 투자 계획을 정리해줘
+[16:52:14]   -> OK elapsed=25.5s route=event_analysis grounded=True citation=True
+[16:52:17] [35/100] 미래에셋증권(증권) / 검색추출_Open: 미래에셋증권의 주요 매출처를 정리해줘
+[16:52:41]   -> OK elapsed=23.3s route=single_lookup grounded=True citation=True
+[16:52:44] [36/100] 기아+현대자동차(자동차+자동차) / 비교연산_Closed: 기아와 현대자동차의 2025년 매출액을 비교해줘
+[16:53:08]   -> OK elapsed=24.5s route=multi_compare grounded=True citation=True
+[16:53:11] [37/100] SK하이닉스+삼성전자(반도체+IT/반도체) / 비교연산_Closed: SK하이닉스와 삼성전자의 2025년 설비투자 규모를 비교해줘
+2026-08-18 16:53:36 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='SK하이닉스와 삼성전자의 2025년 설비투자 규모를 비교해줘' [참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'527000': '2025.12 + 526511'}
+[16:53:36]   -> OK elapsed=24.3s route=multi_compare grounded=True citation=True
+[16:53:39] [38/100] NAVER+카카오(IT/플랫폼+IT/플랫폼) / 비교연산_Closed: NAVER와 카카오의 2025년 영업이익을 비교해줘
+[16:54:24]   -> OK elapsed=45.5s route=multi_compare grounded=True citation=True
+[16:54:27] [39/100] 신한지주+KB금융(금융+금융) / 비교연산_Closed: 신한지주와 KB금융의 2025년 영업수익을 비교해줘
+2026-08-18 16:55:02 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='신한지주와 KB금융의 2025년 영업수익을 비교해줘' 검산 실패로 재생성 시도 1/1: ['10.6']
+[16:55:09]   -> OK elapsed=41.8s route=multi_compare grounded=True citation=True
+[16:55:12] [40/100] 삼성SDI+LG에너지솔루션(2차전지+2차전지) / 비교연산_Closed: 삼성SDI와 LG에너지솔루션의 2025년 매출액을 비교해줘
+[16:55:39]   -> OK elapsed=27.4s route=multi_compare grounded=True citation=True
+[16:55:39] 체크포인트 저장: 40/100건
+[16:55:42] [41/100] 삼성바이오로직스+셀트리온(바이오+바이오) / 비교연산_Closed: 삼성바이오로직스와 셀트리온의 2025년 매출액을 비교해줘
+[16:56:10]   -> OK elapsed=28.0s route=multi_compare grounded=True citation=True
+[16:56:13] [42/100] 하이브+와이지엔터테인먼트(엔터+엔터) / 비교연산_Closed: 하이브와 와이지엔터테인먼트의 2025년 영업이익을 비교해줘
+[16:56:39]   -> OK elapsed=25.3s route=multi_compare grounded=True citation=True
+[16:56:42] [43/100] 두산로보틱스+레인보우로보틱스(로봇+로봇) / 비교연산_Closed: 두산로보틱스와 레인보우로보틱스의 2025년 매출액을 비교해줘
+[16:57:21]   -> OK elapsed=38.9s route=multi_compare grounded=True citation=True
+[16:57:24] [44/100] 한화에어로스페이스+한국항공우주(방산+방산) / 비교연산_Closed: 한화에어로스페이스와 한국항공우주의 2025년 매출액을 비교해줘
+[16:57:50]   -> OK elapsed=26.8s route=multi_compare grounded=True citation=True
+[16:57:53] [45/100] LG생활건강+아모레퍼시픽(화장품+화장품) / 비교연산_Closed: LG생활건강와 아모레퍼시픽의 2025년 영업이익을 비교해줘
+[16:58:23]   -> OK elapsed=29.5s route=multi_compare grounded=True citation=True
+[16:58:26] [46/100] POSCO홀딩스+고려아연(철강+비철금속) / 비교연산_Closed: POSCO홀딩스와 고려아연의 2025년 매출액을 비교해줘
+[16:58:48]   -> OK elapsed=22.0s route=multi_compare grounded=True citation=True
+[16:58:51] [47/100] HMM+현대글로비스(해운+물류) / 비교연산_Closed: HMM와 현대글로비스의 2025년 매출액을 비교해줘
+2026-08-18 16:59:14 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='HMM와 현대글로비스의 2025년 매출액을 비교해줘' 검산 실패로 재생성 시도 1/1: ['7355054']
+[16:59:21]   -> OK elapsed=30.6s route=multi_compare grounded=True citation=True
+[16:59:24] [48/100] 현대건설+대우건설(건설+건설) / 비교연산_Closed: 현대건설와 대우건설의 2025년 매출액을 비교해줘
+[17:00:01]   -> OK elapsed=36.6s route=multi_compare grounded=True citation=True
+[17:00:04] [49/100] SK텔레콤+케이티(통신+통신) / 비교연산_Closed: SK텔레콤와 케이티의 2025년 영업이익을 비교해줘
+2026-08-18 17:00:18 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 1/7), 3.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 17:00:22 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 2/7), 6.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 17:00:37 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='SK텔레콤와 케이티의 2025년 영업이익을 비교해줘' 검산 실패로 재생성 시도 1/1: ['4959']
+[17:00:40]   -> OK elapsed=35.9s route=multi_compare grounded=True citation=True
+[17:00:43] [50/100] 현대모비스+삼성전기(자동차부품+전자부품) / 비교연산_Closed: 현대모비스와 삼성전기의 2025년 매출액을 비교해줘
+[17:01:17]   -> OK elapsed=33.6s route=multi_compare grounded=True citation=True
+[17:01:17] 체크포인트 저장: 50/100건
+[17:01:20] [51/100] 에코프로비엠(2차전지소재) / 비교연산_Open: 에코프로비엠의 당기 대비 전기 영업이익 변화를 정리해줘
+[18:21:14]   !! 오류: ReadTimeout: HTTPSConnectionPool(host='clovastudio.stream.ntruss.com', port=443): Read timed out. (read timeout=60.0)
+[18:21:14] Traceback (most recent call last):
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connection.py", line 571, in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/isang-won/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/http/client.py", line 1415, in getresponse
+    response.begin()
+TimeoutError: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/requests/adapters.py", line 696, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/util/retry.py", line 498, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='clovastudio.stream.ntruss.com', port=443): Read timed out. (read timeout=60.0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/isang-won/Desktop/공시 agent/results/generalization_check/100q_batch/run_100q_batch.py", line 58, in run_one
+    result = ask(
+             ^^^^
+  File "/Users/isang-won/Desktop/공시 agent/src/disclosure_rag/agent/ask.py", line 46, in ask
+    trace = run_agent_loop(
+            ^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/src/disclosure_rag/agent/agent_loop.py", line 106, in run_agent_loop
+    msg = client.chat(messages, tools=hcx_tools)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='clovastudio.stream.ntruss.com', port=443): Read timed out. (read timeout=60.0)
+
+[18:21:14]   -> ERROR elapsed=4794.7s route=None grounded=None citation=None
+[18:21:17] [52/100] 현대모비스(자동차부품) / 비교연산_Open: 현대모비스의 최근 자금조달 내역을 유형별로 정리해줘
+[18:21:41]   -> OK elapsed=24.0s route=single_lookup grounded=True citation=True
+[18:21:44] [53/100] 삼성전기(전자부품) / 비교연산_Open: 삼성전기의 당기 대비 전기 영업이익 변화를 정리해줘
+2026-08-18 18:22:10 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='삼성전기의 당기 대비 전기 영업이익 변화를 정리해줘' [참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'144.81': '4159378 / 2881532 * 100(%)', '1811378': '548806 + 1261578'}
+[18:22:11]   -> OK elapsed=26.2s route=calculation grounded=True citation=True
+[18:22:14] [54/100] 삼성전자(IT/반도체) / 비교연산_Open: 삼성전자의 최근 자금조달 내역을 유형별로 정리해줘
+[18:22:30]   -> OK elapsed=16.0s route=single_lookup grounded=True citation=True
+[18:22:33] [55/100] 삼성SDI(2차전지) / 비교연산_Open: 삼성SDI의 당기 대비 전기 영업이익 변화를 정리해줘
+2026-08-18 18:22:56 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='삼성SDI의 당기 대비 전기 영업이익 변화를 정리해줘' [참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'2317163': '129858875491 / 5620842 * 100(%)'}
+[18:22:56]   -> OK elapsed=23.4s route=calculation grounded=True citation=True
+[18:22:59] [56/100] LG에너지솔루션(2차전지) / 비교연산_Open: LG에너지솔루션의 최근 자금조달 내역을 유형별로 정리해줘
+2026-08-18 18:23:33 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='LG에너지솔루션의 최근 자금조달 내역을 유형별로 정리해줘' 검산 실패로 재생성 시도 1/1: ['2022']
+2026-08-18 18:23:54 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='LG에너지솔루션의 최근 자금조달 내역을 유형별로 정리해줘' 답변에 근거(report_id/chunk_id) 인용이 없음
+[18:23:54]   -> OK elapsed=55.1s route=single_lookup grounded=True citation=False
+[18:23:57] [57/100] 한미반도체(반도체) / 비교연산_Open: 한미반도체의 당기 대비 전기 영업이익 변화를 정리해줘
+2026-08-18 18:24:17 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='한미반도체의 당기 대비 전기 영업이익 변화를 정리해줘' [참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'2025': '8456257107 / 419047350 * 100(%)', '69008': '15722604093 / 22682853 * 100(%)', '60552': '147391786 / 242364 * 100(%)'}
+[18:24:17]   -> OK elapsed=20.5s route=calculation grounded=True citation=True
+[18:24:20] [58/100] KB금융(금융) / 비교연산_Open: KB금융의 최근 자금조달 내역을 유형별로 정리해줘
+2026-08-18 18:24:42 - disclosure_rag.agent.agent_loop - WARNING - agent_loop.py:130 - run_agent_loop() - [AGENT] max_iterations(6) 도달: question='KB금융의 최근 자금조달 내역을 유형별로 정리해줘'
+[18:24:56]   -> OK elapsed=35.6s route=single_lookup grounded=True citation=True
+[18:24:59] [59/100] 알테오젠(바이오) / 비교연산_Open: 알테오젠의 당기 대비 전기 영업이익 변화를 정리해줘
+2026-08-18 18:25:17 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='알테오젠의 당기 대비 전기 영업이익 변화를 정리해줘' 검산 실패로 재생성 시도 1/1: ['73502111832']
+2026-08-18 18:25:21 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='알테오젠의 당기 대비 전기 영업이익 변화를 정리해줘' [근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['73502111832']
+[18:25:21]   -> OK elapsed=21.5s route=calculation grounded=False citation=True
+[18:25:24] [60/100] HD현대중공업(조선) / 비교연산_Open: HD현대중공업의 최근 자금조달 내역을 유형별로 정리해줘
+[18:25:54]   -> OK elapsed=30.5s route=single_lookup grounded=True citation=True
+[18:25:54] 체크포인트 저장: 60/100건
+[18:25:57] [61/100] 현대자동차(자동차) / 복합추론_Closed: 현대자동차가 최근 체결한 계약 중 해지되거나 정정된 게 있어?
+2026-08-18 18:26:05 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='현대자동차가 최근 체결한 계약 중 해지되거나 정정된 게 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[18:26:05]   -> OK elapsed=7.5s route=event_analysis grounded=True citation=True
+[18:26:08] [62/100] 현대건설(건설) / 복합추론_Closed: 현대건설의 최근 기재정정 이력이 있어?
+2026-08-18 18:26:21 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='현대건설의 최근 기재정정 이력이 있어?' 검산 실패로 재생성 시도 1/1: ['2024', '2025']
+2026-08-18 18:26:27 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='현대건설의 최근 기재정정 이력이 있어?' [근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2023', '2024']
+2026-08-18 18:26:27 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='현대건설의 최근 기재정정 이력이 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[18:26:27]   -> OK elapsed=19.0s route=correction_analysis grounded=False citation=True
+[18:26:30] [63/100] SK텔레콤(통신) / 복합추론_Closed: SK텔레콤가 최근 체결한 계약 중 해지되거나 정정된 게 있어?
+2026-08-18 18:27:00 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='SK텔레콤가 최근 체결한 계약 중 해지되거나 정정된 게 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[18:27:00]   -> OK elapsed=30.0s route=event_analysis grounded=True citation=True
+[18:27:03] [64/100] 기아(자동차) / 복합추론_Closed: 기아의 최근 기재정정 이력이 있어?
+2026-08-18 18:27:15 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='기아의 최근 기재정정 이력이 있어?' 검산 실패로 재생성 시도 1/1: ['2024']
+2026-08-18 18:27:18 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='기아의 최근 기재정정 이력이 있어?' [근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2023']
+2026-08-18 18:27:18 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='기아의 최근 기재정정 이력이 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[18:27:18]   -> OK elapsed=15.1s route=correction_analysis grounded=False citation=True
+[18:27:21] [65/100] SK하이닉스(반도체) / 복합추론_Closed: SK하이닉스가 최근 체결한 계약 중 해지되거나 정정된 게 있어?
+2026-08-18 18:27:46 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='SK하이닉스가 최근 체결한 계약 중 해지되거나 정정된 게 있어?' 답변에 근거(report_id/chunk_id) 인용이 없음
+[18:27:46]   -> OK elapsed=25.5s route=event_analysis grounded=True citation=False
+[18:27:49] [66/100] NAVER(IT/플랫폼) / 복합추론_Closed: NAVER의 최근 기재정정 이력이 있어?
+2026-08-18 18:27:58 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='NAVER의 최근 기재정정 이력이 있어?' 검산 실패로 재생성 시도 1/1: ['2026']
+2026-08-18 18:28:03 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='NAVER의 최근 기재정정 이력이 있어?' [근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2023', '2025', '2026']
+2026-08-18 18:28:03 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='NAVER의 최근 기재정정 이력이 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[18:28:03]   -> OK elapsed=13.8s route=correction_analysis grounded=False citation=True
+[18:28:06] [67/100] 카카오(IT/플랫폼) / 복합추론_Closed: 카카오가 최근 체결한 계약 중 해지되거나 정정된 게 있어?
+[18:28:39]   -> OK elapsed=32.5s route=event_analysis grounded=True citation=True
+[18:28:42] [68/100] 신한지주(금융) / 복합추론_Closed: 신한지주의 최근 기재정정 이력이 있어?
+2026-08-18 18:28:43 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 1/7), 3.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 18:28:47 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 2/7), 6.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 18:28:53 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 3/7), 12.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 18:29:05 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 4/7), 24.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 18:29:37 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='신한지주의 최근 기재정정 이력이 있어?' 검산 실패로 재생성 시도 1/1: ['2024']
+2026-08-18 18:29:40 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='신한지주의 최근 기재정정 이력이 있어?' [근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2024']
+2026-08-18 18:29:40 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='신한지주의 최근 기재정정 이력이 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[18:29:40]   -> OK elapsed=58.2s route=correction_analysis grounded=False citation=True
+[18:29:43] [69/100] 삼성바이오로직스(바이오) / 복합추론_Closed: 삼성바이오로직스가 최근 체결한 계약 중 해지되거나 정정된 게 있어?
+2026-08-18 18:29:55 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='삼성바이오로직스가 최근 체결한 계약 중 해지되거나 정정된 게 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[18:29:55]   -> OK elapsed=12.6s route=event_analysis grounded=True citation=True
+[18:29:58] [70/100] 셀트리온(바이오) / 복합추론_Closed: 셀트리온의 최근 기재정정 이력이 있어?
+2026-08-18 18:30:15 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='셀트리온의 최근 기재정정 이력이 있어?' 검산 실패로 재생성 시도 1/1: ['2025']
+2026-08-18 18:30:15 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 1/7), 3.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 18:30:18 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 2/7), 6.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 18:30:25 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 3/7), 12.0s 후 재시도: HCX API 오류 429: {"status":{"code":"42901","message":"Too many requests: rate exceeded. Check response headers for current limits and retry information."},"result":null}
+2026-08-18 18:30:42 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='셀트리온의 최근 기재정정 이력이 있어?' [근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2025']
+2026-08-18 18:30:42 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='셀트리온의 최근 기재정정 이력이 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[18:30:42]   -> OK elapsed=43.2s route=correction_analysis grounded=False citation=True
+[18:30:42] 체크포인트 저장: 70/100건
+[18:30:45] [71/100] 하이브(엔터) / 복합추론_Closed: 하이브가 최근 체결한 계약 중 해지되거나 정정된 게 있어?
+[19:19:50]   !! 오류: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[19:19:50] Traceback (most recent call last):
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connection.py", line 571, in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/requests/adapters.py", line 696, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/util/retry.py", line 498, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/isang-won/Desktop/공시 agent/results/generalization_check/100q_batch/run_100q_batch.py", line 58, in run_one
+    result = ask(
+             ^^^^
+  File "/Users/isang-won/Desktop/공시 agent/src/disclosure_rag/agent/ask.py", line 52, in ask
+    answer = generate_answer(answer_gen_client, evidence_pack)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/src/disclosure_rag/agent/answer_generator.py", line 47, in generate_answer
+    result = client.chat(messages, max_tokens=max_tokens, temperature=0.2)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+[19:19:50]   -> ERROR elapsed=2945.4s route=None grounded=None citation=None
+[19:19:53] [72/100] 와이지엔터테인먼트(엔터) / 복합추론_Closed: 와이지엔터테인먼트의 최근 기재정정 이력이 있어?
+2026-08-18 19:20:10 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='와이지엔터테인먼트의 최근 기재정정 이력이 있어?' 검산 실패로 재생성 시도 1/1: ['2024', '2026']
+2026-08-18 19:20:13 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='와이지엔터테인먼트의 최근 기재정정 이력이 있어?' [근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2023', '2024']
+2026-08-18 19:20:13 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='와이지엔터테인먼트의 최근 기재정정 이력이 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[19:20:13]   -> OK elapsed=20.0s route=correction_analysis grounded=False citation=True
+[19:21:24] [73/100] 크래프톤(게임) / 복합추론_Closed: 크래프톤가 최근 체결한 계약 중 해지되거나 정정된 게 있어?
+2026-08-18 19:36:34 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 1/7), 3.0s 후 재시도: HCX API 오류 400: {"status":{"code":"40000","message":"Bad request"},"result":null}
+2026-08-18 19:36:38 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 2/7), 6.0s 후 재시도: HCX API 오류 400: {"status":{"code":"40000","message":"Bad request"},"result":null}
+2026-08-18 19:36:45 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 3/7), 12.0s 후 재시도: HCX API 오류 400: {"status":{"code":"40000","message":"Bad request"},"result":null}
+2026-08-18 19:56:55 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 4/7), 24.0s 후 재시도: HCX API 오류 400: {"status":{"code":"40000","message":"Bad request"},"result":null}
+2026-08-18 20:03:41 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 5/7), 48.0s 후 재시도: HCX API 오류 400: {"status":{"code":"40000","message":"Bad request"},"result":null}
+2026-08-18 20:57:08 - disclosure_rag.agent.hcx_client - WARNING - hcx_client.py:132 - chat() - [HCX] chat 호출 실패(시도 6/7), 96.0s 후 재시도: HCX API 오류 400: {"status":{"code":"40000","message":"Bad request"},"result":null}
+[20:58:45]   !! 오류: HCXError: HCX API 오류 400: {"status":{"code":"40000","message":"Bad request"},"result":null}
+[20:58:45] Traceback (most recent call last):
+  File "/Users/isang-won/Desktop/공시 agent/results/generalization_check/100q_batch/run_100q_batch.py", line 58, in run_one
+    result = ask(
+             ^^^^
+  File "/Users/isang-won/Desktop/공시 agent/src/disclosure_rag/agent/ask.py", line 46, in ask
+    trace = run_agent_loop(
+            ^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/src/disclosure_rag/agent/agent_loop.py", line 106, in run_agent_loop
+    msg = client.chat(messages, tools=hcx_tools)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+disclosure_rag.agent.hcx_client.HCXError: HCX API 오류 400: {"status":{"code":"40000","message":"Bad request"},"result":null}
+
+[20:58:45]   -> ERROR elapsed=5841.4s route=None grounded=None citation=None
+[20:58:48] [74/100] 두산로보틱스(로봇) / 복합추론_Closed: 두산로보틱스의 최근 기재정정 이력이 있어?
+2026-08-18 20:59:00 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='두산로보틱스의 최근 기재정정 이력이 있어?' 검산 실패로 재생성 시도 1/1: ['2024']
+2026-08-18 20:59:05 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='두산로보틱스의 최근 기재정정 이력이 있어?' [근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2024']
+2026-08-18 20:59:05 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='두산로보틱스의 최근 기재정정 이력이 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[20:59:05]   -> OK elapsed=16.7s route=correction_analysis grounded=False citation=True
+[20:59:08] [75/100] 레인보우로보틱스(로봇) / 복합추론_Closed: 레인보우로보틱스가 최근 체결한 계약 중 해지되거나 정정된 게 있어?
+[20:59:32]   -> OK elapsed=23.5s route=event_analysis grounded=True citation=True
+[20:59:35] [76/100] 한화에어로스페이스(방산) / 복합추론_Closed: 한화에어로스페이스의 최근 기재정정 이력이 있어?
+2026-08-18 20:59:50 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='한화에어로스페이스의 최근 기재정정 이력이 있어?' 검산 실패로 재생성 시도 1/1: ['2024']
+2026-08-18 20:59:53 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='한화에어로스페이스의 최근 기재정정 이력이 있어?' [근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2024']
+2026-08-18 20:59:53 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='한화에어로스페이스의 최근 기재정정 이력이 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[20:59:53]   -> OK elapsed=18.7s route=correction_analysis grounded=False citation=True
+[20:59:56] [77/100] 한국항공우주(방산) / 복합추론_Closed: 한국항공우주가 최근 체결한 계약 중 해지되거나 정정된 게 있어?
+2026-08-18 21:00:17 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='한국항공우주가 최근 체결한 계약 중 해지되거나 정정된 게 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[21:00:17]   -> OK elapsed=20.3s route=event_analysis grounded=True citation=True
+[21:00:20] [78/100] 이마트(유통) / 복합추론_Closed: 이마트의 최근 기재정정 이력이 있어?
+2026-08-18 21:00:33 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='이마트의 최근 기재정정 이력이 있어?' 검산 실패로 재생성 시도 1/1: ['2024', '2025', '2026']
+2026-08-18 21:00:37 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='이마트의 최근 기재정정 이력이 있어?' [근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2024', '2025']
+2026-08-18 21:00:37 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='이마트의 최근 기재정정 이력이 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[21:00:37]   -> OK elapsed=17.1s route=correction_analysis grounded=False citation=True
+[21:00:40] [79/100] LG생활건강(화장품) / 복합추론_Closed: LG생활건강가 최근 체결한 계약 중 해지되거나 정정된 게 있어?
+2026-08-18 21:01:01 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='LG생활건강가 최근 체결한 계약 중 해지되거나 정정된 게 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[21:01:01]   -> OK elapsed=21.1s route=event_analysis grounded=True citation=True
+[21:01:04] [80/100] 아모레퍼시픽(화장품) / 복합추론_Closed: 아모레퍼시픽의 최근 기재정정 이력이 있어?
+2026-08-18 21:01:27 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='아모레퍼시픽의 최근 기재정정 이력이 있어?' 검산 실패로 재생성 시도 1/1: ['2024', '2025']
+2026-08-18 21:01:33 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='아모레퍼시픽의 최근 기재정정 이력이 있어?' [근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2024']
+2026-08-18 21:01:33 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='아모레퍼시픽의 최근 기재정정 이력이 있어?' 정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)
+[21:01:33]   -> OK elapsed=28.7s route=correction_analysis grounded=False citation=True
+[21:01:33] 체크포인트 저장: 80/100건
+[21:01:36] [81/100] POSCO홀딩스(철강) / 복합추론_Open: POSCO홀딩스의 최근 자사주 취득/처분 이력을 정리해줘
+2026-08-18 21:02:03 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='POSCO홀딩스의 최근 자사주 취득/처분 이력을 정리해줘' [참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'2003': '2009.10 / 100 * 100(%)', '2006': '2009.10 / 100 * 100(%)'}
+2026-08-18 21:02:03 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='POSCO홀딩스의 최근 자사주 취득/처분 이력을 정리해줘' 답변에 근거(report_id/chunk_id) 인용이 없음
+[21:02:03]   -> OK elapsed=27.6s route=ownership_analysis grounded=True citation=False
+[21:02:06] [82/100] 고려아연(비철금속) / 복합추론_Open: 고려아연의 계약 해지 이력을 시간순으로 정리해줘
+[21:02:29]   -> OK elapsed=23.0s route=event_analysis grounded=True citation=True
+[21:02:32] [83/100] HMM(해운) / 복합추론_Open: HMM의 최근 공시 이력을 종합해서 정리해줘
+[21:02:54]   -> OK elapsed=22.2s route=single_lookup grounded=True citation=True
+[21:02:57] [84/100] 현대글로비스(물류) / 복합추론_Open: 현대글로비스의 최근 자사주 취득/처분 이력을 정리해줘
+[21:03:14]   -> OK elapsed=17.0s route=ownership_analysis grounded=True citation=True
+[21:03:17] [85/100] 대우건설(건설) / 복합추론_Open: 대우건설의 계약 해지 이력을 시간순으로 정리해줘
+[21:03:38]   -> OK elapsed=20.6s route=event_analysis grounded=True citation=True
+[21:03:41] [86/100] 케이티(통신) / 복합추론_Open: 케이티의 최근 공시 이력을 종합해서 정리해줘
+[21:04:06]   -> OK elapsed=25.3s route=single_lookup grounded=True citation=True
+[21:04:09] [87/100] LG유플러스(통신) / 복합추론_Open: LG유플러스의 최근 자사주 취득/처분 이력을 정리해줘
+[21:04:35]   -> OK elapsed=25.6s route=ownership_analysis grounded=True citation=True
+[21:04:38] [88/100] 미래에셋증권(증권) / 복합추론_Open: 미래에셋증권의 계약 해지 이력을 시간순으로 정리해줘
+[21:04:55]   -> OK elapsed=16.7s route=event_analysis grounded=True citation=True
+[21:04:58] [89/100] 에코프로비엠(2차전지소재) / 복합추론_Open: 에코프로비엠의 최근 공시 이력을 종합해서 정리해줘
+2026-08-18 21:05:12 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='에코프로비엠의 최근 공시 이력을 종합해서 정리해줘' 검산 실패로 재생성 시도 1/1: ['2024', '2025', '2026']
+2026-08-18 21:05:18 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='에코프로비엠의 최근 공시 이력을 종합해서 정리해줘' [근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2026']
+[21:05:18]   -> OK elapsed=20.0s route=single_lookup grounded=False citation=True
+[21:05:21] [90/100] 현대모비스(자동차부품) / 복합추론_Open: 현대모비스의 최근 자사주 취득/처분 이력을 정리해줘
+2026-08-18 21:05:59 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='현대모비스의 최근 자사주 취득/처분 이력을 정리해줘' 답변에 근거(report_id/chunk_id) 인용이 없음
+[21:05:59]   -> OK elapsed=38.1s route=ownership_analysis grounded=True citation=False
+[21:05:59] 체크포인트 저장: 90/100건
+[21:06:02] [91/100] 삼성전기(전자부품) / 복합추론_Open: 삼성전기의 계약 해지 이력을 시간순으로 정리해줘
+[21:06:20]   -> OK elapsed=18.0s route=event_analysis grounded=True citation=True
+[21:06:23] [92/100] 삼성전자(IT/반도체) / 복합추론_Open: 삼성전자의 최근 공시 이력을 종합해서 정리해줘
+2026-08-18 21:06:39 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='삼성전자의 최근 공시 이력을 종합해서 정리해줘' 검산 실패로 재생성 시도 1/1: ['00028', '00730', '01062', '02181', '2025', '2026']
+[21:06:43]   -> OK elapsed=20.0s route=single_lookup grounded=True citation=True
+[21:06:46] [93/100] 삼성SDI(2차전지) / 복합추론_Open: 삼성SDI의 최근 자사주 취득/처분 이력을 정리해줘
+2026-08-18 21:07:07 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='삼성SDI의 최근 자사주 취득/처분 이력을 정리해줘' [참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'2004': '1996.05 / 100 * 100(%)', '2003': '1996.05 / 100 * 100(%)', '1996': '2014.06 - 23.01', '2016': '2014.06 / 100 * 100(%)', '2002': '1996.05 / 100 * 100(%)', '1995': '2014.06 - 23.01'}
+[21:07:07]   -> OK elapsed=21.2s route=ownership_analysis grounded=True citation=True
+[21:07:10] [94/100] LG에너지솔루션(2차전지) / 복합추론_Open: LG에너지솔루션의 계약 해지 이력을 시간순으로 정리해줘
+2026-08-18 21:07:31 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='LG에너지솔루션의 계약 해지 이력을 시간순으로 정리해줘' 답변에 근거(report_id/chunk_id) 인용이 없음
+[21:07:31]   -> OK elapsed=21.0s route=event_analysis grounded=True citation=False
+[21:07:34] [95/100] 한미반도체(반도체) / 복합추론_Open: 한미반도체의 최근 공시 이력을 종합해서 정리해줘
+2026-08-18 21:08:47 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='한미반도체의 최근 공시 이력을 종합해서 정리해줘' 검산 실패로 재생성 시도 1/1: ['2023', '2024', '2025', '2026']
+[21:52:48]   !! 오류: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[21:52:48] Traceback (most recent call last):
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connection.py", line 571, in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/requests/adapters.py", line 696, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/util/retry.py", line 498, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/isang-won/Desktop/공시 agent/results/generalization_check/100q_batch/run_100q_batch.py", line 58, in run_one
+    result = ask(
+             ^^^^
+  File "/Users/isang-won/Desktop/공시 agent/src/disclosure_rag/agent/ask.py", line 69, in ask
+    answer = generate_answer(answer_gen_client, evidence_pack, extra_instruction=correction)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/src/disclosure_rag/agent/answer_generator.py", line 47, in generate_answer
+    result = client.chat(messages, max_tokens=max_tokens, temperature=0.2)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+[21:52:48]   -> ERROR elapsed=2714.4s route=None grounded=None citation=None
+[21:52:51] [96/100] KB금융(금융) / 복합추론_Open: KB금융의 최근 자사주 취득/처분 이력을 정리해줘
+[22:43:53]   !! 오류: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[22:43:53] Traceback (most recent call last):
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connection.py", line 571, in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/requests/adapters.py", line 696, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/.venv/lib/python3.11/site-packages/urllib3/util/retry.py", line 498, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/isang-won/Desktop/공시 agent/results/generalization_check/100q_batch/run_100q_batch.py", line 58, in run_one
+    result = ask(
+             ^^^^
+  File "/Users/isang-won/Desktop/공시 agent/src/disclosure_rag/agent/ask.py", line 46, in ask
+    trace = run_agent_loop(
+            ^^^^^^^^^^^^^^^
+  File "/Users/isang-won/Desktop/공시 agent/src/disclosure_rag/agent/agent_loop.py", line 106, in run_agent_loop
+    msg = client.chat(messages, tools=hcx_tools)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+[22:43:53]   -> ERROR elapsed=3061.1s route=None grounded=None citation=None
+[22:43:56] [97/100] 알테오젠(바이오) / 복합추론_Open: 알테오젠의 계약 해지 이력을 시간순으로 정리해줘
+[22:44:16]   -> OK elapsed=20.8s route=event_analysis grounded=True citation=True
+[22:44:19] [98/100] HD현대중공업(조선) / 복합추론_Open: HD현대중공업의 최근 공시 이력을 종합해서 정리해줘
+2026-08-18 22:44:35 - disclosure_rag.agent.ask - WARNING - ask.py:67 - ask() - [VALIDATION] question='HD현대중공업의 최근 공시 이력을 종합해서 정리해줘' 검산 실패로 재생성 시도 1/1: ['2025', '2026']
+2026-08-18 22:44:38 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='HD현대중공업의 최근 공시 이력을 종합해서 정리해줘' [근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2025', '2026']
+[22:44:38]   -> OK elapsed=19.0s route=single_lookup grounded=False citation=True
+[22:44:41] [99/100] 현대자동차(자동차) / 복합추론_Open: 현대자동차의 최근 자사주 취득/처분 이력을 정리해줘
+2026-08-18 22:45:22 - disclosure_rag.agent.ask - WARNING - ask.py:75 - ask() - [VALIDATION] question='현대자동차의 최근 자사주 취득/처분 이력을 정리해줘' [참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'400692410000': '366848475000 + 33843935500'}
+[22:45:22]   -> OK elapsed=41.0s route=ownership_analysis grounded=True citation=True
+[22:45:25] [100/100] 현대건설(건설) / 복합추론_Open: 현대건설의 계약 해지 이력을 시간순으로 정리해줘
+[22:45:43]   -> OK elapsed=17.3s route=event_analysis grounded=True citation=True
+[22:45:43] 체크포인트 저장: 100/100건
+[22:45:46] 전체 완료. 최종 저장: 100/100건 -> /Users/isang-won/Desktop/공시 agent/results/generalization_check/100q_batch/results.json

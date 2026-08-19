@@ -162,6 +162,35 @@ def test_validator_ignores_approx_paren_restatement():
     assert result.numbers_grounded, f"괄호 안 재표기가 오탐됨: {result.ungrounded_numbers}"
 
 
+def test_validator_does_not_flag_year_that_is_literal_substring_of_dated_evidence():
+    """회귀(2026-08-19, 100문항 일반화 배치): correction_analysis 라우트 질문
+    9건 + single_lookup 2건에서 evidence 원문의 "(2023.12)" 같은 날짜 표기가
+    "2023.12"라는 하나의 토큰으로 추출되는 바람에, 답변이 같은 연도를
+    "2023년 3월 12일에 제출"처럼 점 없이 따로 쓰면 "2023"이 evidence_numbers
+    집합에 없어서 "근거 없는 숫자"로 오탐됐다(실측: 기아/NAVER/신한지주 등).
+    evidence 원문에 "2023"이 "2023.12"의 앞부분으로 문자 그대로 존재하므로
+    ungrounded 로 잡히면 안 된다."""
+    from disclosure_rag.agent.evidence import EvidencePack
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    pack = EvidencePack(
+        question="q",
+        prompt_text="[TOOL RESULT]\nget_correction_history: '[기재정정]사업보고서 (2023.12)'\n",
+        citations=[],
+        tool_results_summary=[{
+            "tool": "get_correction_history", "arguments": {},
+            "result": {"correction_groups": [{"chain": [{"doc_id": "periodic_20240312000909", "title": "[기재정정]사업보고서 (2023.12)"}]}]},
+        }],
+    )
+    answer = (
+        "가장 최근 기재정정은 '[기재정정]사업보고서 (2023.12)'이며, "
+        "이는 2023년 3월 12일에 제출되었습니다.\n근거: report_id(periodic_20240312000909)"
+    )
+    result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
+    assert result.numbers_grounded, f"evidence에 문자 그대로 있는 연도가 오탐됨: {result.ungrounded_numbers}"
+    assert "2023" not in result.ungrounded_numbers
+
+
 def test_validator_has_citation_from_correction_history_tool_result():
     """회귀(2026-08-16): get_correction_history 만 호출돼 evidence_pack.citations
     가 비어있는 경우(search_disclosures 를 안 씀), 답변이 tool 결과의 report_id
@@ -318,3 +347,69 @@ def test_agent_loop_skips_redundant_identical_tool_calls():
     assert len(trace.tool_calls) == 3, "호출 기록 자체는 투명하게 3번 다 남아야 함"
     assert call_count["n"] == 1, f"handler 가 {call_count['n']}번 실제 실행됨 — 중복 방지가 동작 안 함"
     assert "이미" in trace.tool_calls[1].result.get("note", ""), "2번째부터는 중복 안내가 붙어야 함"
+
+
+# ── 2026-08-18 100문항 배치 준비: agent(HCX-007)/answer(HCX-005) 모델 분리
+# (PROJECT_STATE §12 TODO). ask()에 answer_client 를 넘기면 agent loop 는
+# 여전히 client 로 돌아가고, generate_answer() 호출(최초 시도 + 재시도 루프)만
+# answer_client 로 넘어가야 한다 — 두 스텁을 별도로 추적해서 실제로 분리되는지
+# 검증한다.
+
+
+def test_ask_routes_answer_generation_to_separate_answer_client():
+    from disclosure_rag.agent.ask import ask
+    from disclosure_rag.agent.tools import ToolDef
+
+    dummy_tool = ToolDef(
+        name="dummy_tool", description="테스트용",
+        parameters={"type": "object", "properties": {"x": {"type": "integer"}}, "required": ["x"]},
+        handler=lambda x: {"value": x},
+    )
+    agent_responses = [
+        {"role": "assistant", "content": "", "toolCalls": [
+            {"id": "id1", "type": "function", "function": {"name": "dummy_tool", "arguments": {"x": 1}}},
+        ]},
+        {"role": "assistant", "content": "완료", "toolCalls": None},
+    ]
+    answer_responses = [
+        {"role": "assistant", "content": "answer-client 가 생성한 답변입니다.", "toolCalls": None},
+    ]
+    agent_client = _StubHCXClient(agent_responses)
+    answer_client = _StubHCXClient(answer_responses)
+    extractor = EntityExtractor(corpus_root=CORPUS_ROOT, metric_terms_path=CONFIG_ROOT / "metric_terms.txt")
+
+    result = ask(
+        agent_client, [dummy_tool], "테스트 질문", entity_extractor=extractor,
+        max_iterations=6, answer_client=answer_client,
+    )
+
+    assert result.answer == "answer-client 가 생성한 답변입니다.", "generate_answer 가 answer_client 를 쓰지 않음"
+    assert agent_client._responses == [], "agent_client 응답이 소진되지 않음(agent loop 호출 누락 의심)"
+    assert answer_client._responses == [], "answer_client 응답이 소진되지 않음(generate_answer 호출 누락 의심)"
+
+
+def test_ask_defaults_answer_generation_to_same_client_when_answer_client_omitted():
+    """하위호환: answer_client 를 안 넘기면 기존처럼 client 하나가 agent loop 와
+    generate_answer 양쪽에 다 쓰여야 한다."""
+    from disclosure_rag.agent.ask import ask
+    from disclosure_rag.agent.tools import ToolDef
+
+    dummy_tool = ToolDef(
+        name="dummy_tool", description="테스트용",
+        parameters={"type": "object", "properties": {"x": {"type": "integer"}}, "required": ["x"]},
+        handler=lambda x: {"value": x},
+    )
+    responses = [
+        {"role": "assistant", "content": "", "toolCalls": [
+            {"id": "id1", "type": "function", "function": {"name": "dummy_tool", "arguments": {"x": 1}}},
+        ]},
+        {"role": "assistant", "content": "완료", "toolCalls": None},
+        {"role": "assistant", "content": "단일 client 답변입니다.", "toolCalls": None},
+    ]
+    client = _StubHCXClient(responses)
+    extractor = EntityExtractor(corpus_root=CORPUS_ROOT, metric_terms_path=CONFIG_ROOT / "metric_terms.txt")
+
+    result = ask(client, [dummy_tool], "테스트 질문", entity_extractor=extractor, max_iterations=6)
+
+    assert result.answer == "단일 client 답변입니다."
+    assert client._responses == [], "client 응답이 전부 소진되지 않음"

@@ -1,0 +1,2298 @@
+[
+  {
+    "label": "삼성전자(IT/반도체)",
+    "category": "검색추출_Closed",
+    "query": "삼성전자의 2025년 매출액은 얼마인가?",
+    "companies": [
+      "삼성전자"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.777429172417803,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거에서 삼성전자의 2025년 매출액을 직접적으로 확인할 수 있습니다. [EVIDENCE 3]에 따르면, 2025년의 매출액은 **333,605,938**입니다.\n\n근거: report_id(chunk_id): periodic_20260310002820::consolidated_audit_report::P3::C83",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 25.120659112930298
+  },
+  {
+    "label": "삼성SDI(2차전지)",
+    "category": "검색추출_Closed",
+    "query": "삼성SDI의 2025년 영업이익은 얼마야?",
+    "companies": [
+      "삼성SDI"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7873617115142991,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거로는 삼성SDI의 2025년 영업이익에 대한 구체적인 정보를 찾을 수 없습니다. \n\n다만, 여러 공시에서 영업이익과 관련된 다양한 수치들이 확인되지만 이는 특정 기간별 데이터로, 직접적인 2025년도 전체 연간 영업이익을 나타내지는 않습니다. 예를 들어, 2025년 6월의 영업이익 관련 정보나 2025년 9월 말의 영업이익 정보가 포함되어 있으나, 이를 기반으로 2025년 전체의 영업이익을 산출하는 것은 적절치 않습니다.\n\n따라서 정확한 답변을 드리기 어렵습니다. 추가적인 자료나 공식 발표를 통해 확인해 보시는 것을 권장합니다.",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 19.274269819259644
+  },
+  {
+    "label": "LG에너지솔루션(2차전지)",
+    "category": "검색추출_Closed",
+    "query": "LG에너지솔루션의 최근 자기주식 취득 결정 규모는 얼마야?",
+    "companies": [
+      "LG에너지솔루션"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.7650186225473594,
+    "iterations": 3,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 근거로는 LG에너지솔루션의 최근 자기주식 취득 결정 규모에 대한 정보를 확인할 수 없습니다.\n\n근거: \n- report_id(holding_20230807000204), chunk_id(holding_20230807000204::main::P15::C1)\n- report_id(holding_20250521000058), chunk_id(holding_20250521000058::main::P15::C1)\n- report_id(periodic_20240314001110), chunk_id(periodic_20240314001110::main::P28::C2)\n- report_id(periodic_20231114001430), chunk_id(periodic_20231114001430::main::P28::C2)\n- report_id(holding_20230807000204), chunk_id(holding_20230807000204::main::P14::C1)\n- report_id(holding_20241030000275), chunk_id(holding_20241030000275::main::P11::C1)\n- report_id(holding_20230713000028), chunk_id(holding_20230713000028::main::P15::C1)\n- report_id(holding_20230713000028), chunk_id(holding_20230713000028::main::P14::C1)",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 25.957237005233765
+  },
+  {
+    "label": "한미반도체(반도체)",
+    "category": "검색추출_Closed",
+    "query": "한미반도체의 2025년 부채비율은 얼마야?",
+    "companies": [
+      "한미반도체"
+    ],
+    "route": "calculation",
+    "route_score": 0.7524351978623196,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "한미반도체의 2025년 부채비율은 **17.8**%입니다.\n\n근거: periodic_20260312001230::main::P25::C7",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 13.257707118988037
+  },
+  {
+    "label": "KB금융(금융)",
+    "category": "검색추출_Closed",
+    "query": "KB금융의 최근 체결한 단일판매·공급계약 금액은 얼마야?",
+    "companies": [
+      "KB금융"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.788385141956507,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거에는 KB금융이 최근에 체결한 단일판매·공급계약의 구체적인 금액 정보가 포함되어 있지 않습니다. 따라서 이에 대한 정확한 답변을 드릴 수 없습니다.\n\n근거: report_id(chunk_id): periodic_20260515002888::main::P46::C20, periodic_20250526000374::main::P10::C10, periodic_20231005000478::main::P41::C17, periodic_20240516002265::main::P33::C24, periodic_20241230000635::main::P41::C17",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 15.091268062591553
+  },
+  {
+    "label": "알테오젠(바이오)",
+    "category": "검색추출_Closed",
+    "query": "알테오젠의 2025년 매출액은 얼마인가?",
+    "companies": [
+      "알테오젠"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.777429172417803,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "알테오젠의 2025년 매출액은 **215,858,919,957원**입니다. \n\n이는 [EVIDENCE 4]에서 확인 가능합니다. 해당 문서에는 2025년도에 해당하는 금액들이 기재되어 있으며, 특히 '수익 합계' 항목에 215,858,918,957원으로 명시되어 있습니다. 따라서 이를 바탕으로 한 답변을 도출하였습니다.\n\n근거: report_id(periodic_20260323001596), chunk_id(periodic_20260323001596::main::P16::C4)",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {
+      "215858919957": "20250321 + 215858918957"
+    },
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "[참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'215858919957': '20250321 + 215858918957'}"
+    ],
+    "elapsed": 17.605370044708252
+  },
+  {
+    "label": "HD현대중공업(조선)",
+    "category": "검색추출_Closed",
+    "query": "HD현대중공업의 2025년 영업이익은 얼마야?",
+    "companies": [
+      "HD현대중공업"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7873617115142991,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거에 따르면 HD현대중공업의 2025년 영업이익은 **2,042,726백만원**입니다.\n\n근거: report_id(chunk_id):\n- periodic_20260320000859::main::P18::C6",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 13.470108032226562
+  },
+  {
+    "label": "현대자동차(자동차)",
+    "category": "검색추출_Closed",
+    "query": "현대자동차의 최근 자기주식 취득 결정 규모는 얼마야?",
+    "companies": [
+      "현대자동차"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.7650186225473594,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "현대자동차의 최근 자기주식 취득 결정 규모는 다음과 같습니다:\n\n- **취득예정주식**: 744,870주 (보통주식)\n- **취득예정금액**: 366,848,475,000원 (보통주식)\n\n이 정보는 2026년 1월 29일에 공시된 주요사항보고서(자기주식 취득 결정) 문서에 근거합니다.\n\n근거: report_id(chunk_id): major_20260129000336::main::C1",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 19.05900478363037
+  },
+  {
+    "label": "현대건설(건설)",
+    "category": "검색추출_Closed",
+    "query": "현대건설의 2025년 부채비율은 얼마야?",
+    "companies": [
+      "현대건설"
+    ],
+    "route": "calculation",
+    "route_score": 0.7524351978623196,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거에는 현대건설의 2025년 부채비율에 대한 정보가 포함되어 있지 않습니다. 따라서 해당 정보를 알 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 16.567179918289185
+  },
+  {
+    "label": "SK텔레콤(통신)",
+    "category": "검색추출_Closed",
+    "query": "SK텔레콤의 최근 체결한 단일판매·공급계약 금액은 얼마야?",
+    "companies": [
+      "SK텔레콤"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.788385141956507,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거에 따르면, SK텔레콤이 최근에 체결한 단일판매·공급계약의 금액은 **300,000,000,000원**입니다. 이는 공시된 자기주식취득 신탁계약의 계약금액으로 확인됩니다.\n\n근거: report_id(chunk_id): major_20230727000001::main::C1",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 13.341673135757446
+  },
+  {
+    "label": "기아(자동차)",
+    "category": "검색추출_Closed",
+    "query": "기아의 2025년 매출액은 얼마인가?",
+    "companies": [
+      "기아"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.777429172417803,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거에는 기아의 2025년 매출액에 대한 정보가 포함되어 있지 않습니다. 따라서 정확한 값을 알 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 15.642080068588257
+  },
+  {
+    "label": "SK하이닉스(반도체)",
+    "category": "검색추출_Closed",
+    "query": "SK하이닉스의 2025년 영업이익은 얼마야?",
+    "companies": [
+      "SK하이닉스"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7873617115142991,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거로는 확인할 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 13.716537237167358
+  },
+  {
+    "label": "NAVER(IT/플랫폼)",
+    "category": "검색추출_Closed",
+    "query": "NAVER의 최근 자기주식 취득 결정 규모는 얼마야?",
+    "companies": [
+      "NAVER"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.7650186225473594,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "NAVER의 최근 자기주식 취득 결정 규모는 **401,187,750,000원**입니다. 이는 공시일 2024년 9월 30일의 주요사항보고서에 기재되어 있으며, 취득예정 주식수는 2,347,500주로 나타나 있습니다.\n\n근거: major_20240930000001::main::C1",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 15.093593120574951
+  },
+  {
+    "label": "카카오(IT/플랫폼)",
+    "category": "검색추출_Closed",
+    "query": "카카오의 2025년 부채비율은 얼마야?",
+    "companies": [
+      "카카오"
+    ],
+    "route": "calculation",
+    "route_score": 0.7524351978623196,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거에 따르면 카카오의 2025년 부채비율은 **80.69**%입니다. 이는 '분기보고서' 문서의 '부채비율' 항목에서 확인할 수 있습니다.\n\n근거: periodic_20250514001239::main::P11::C2",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 19.268996000289917
+  },
+  {
+    "label": "신한지주(금융)",
+    "category": "검색추출_Closed",
+    "query": "신한지주의 최근 체결한 단일판매·공급계약 금액은 얼마야?",
+    "companies": [
+      "신한지주"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.788385141956507,
+    "iterations": 5,
+    "n_tool_calls": 4,
+    "n_citations": 35,
+    "answer": "제공된 근거에서 신한지주의 최근 체결한 단일판매·공급계약 금액에 대한 정보를 찾을 수 없습니다.\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 169.81894183158875
+  },
+  {
+    "label": "삼성바이오로직스(바이오)",
+    "category": "검색추출_Closed",
+    "query": "삼성바이오로직스의 2025년 매출액은 얼마인가?",
+    "companies": [
+      "삼성바이오로직스"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.777429172417803,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "삼성바이오로직스의 2025년 매출액은 **4조 5,570억 원**입니다.\n\n근거: periodic_20260515001658::main::P8::C2",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 14.15215802192688
+  },
+  {
+    "label": "셀트리온(바이오)",
+    "category": "검색추출_Closed",
+    "query": "셀트리온의 2025년 영업이익은 얼마야?",
+    "companies": [
+      "셀트리온"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7873617115142991,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거로는 셀트리온의 2025년 영업이익에 대한 정보를 확인할 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 41.33122801780701
+  },
+  {
+    "label": "하이브(엔터)",
+    "category": "검색추출_Closed",
+    "query": "하이브의 최근 자기주식 취득 결정 규모는 얼마야?",
+    "companies": [
+      "하이브"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.7650186225473594,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "하이브의 최근 자기주식 취득 결정 규모는 **546,120주**입니다.\n\n근거: report_id(chunk_id): major_20260212001232::main::C1",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 13.569042921066284
+  },
+  {
+    "label": "와이지엔터테인먼트(엔터)",
+    "category": "검색추출_Closed",
+    "query": "와이지엔터테인먼트의 2025년 부채비율은 얼마야?",
+    "companies": [
+      "와이지엔터테인먼트"
+    ],
+    "route": "calculation",
+    "route_score": 0.7524351978623196,
+    "iterations": 3,
+    "n_tool_calls": 2,
+    "n_citations": 5,
+    "answer": "제공된 근거에 따르면, 와이지엔터테인먼트의 2025년 부채비율은 **약 21.17**%입니다.\n\n근거:\n- [EVIDENCE 1]: 부채총계 및 자본총계 데이터 제공\n- [TOOL RESULT]: 입력값을 이용한 부채비율 계산 결과",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {
+      "21.17": "136466863977 / 646538789640 * 100(%)"
+    },
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "[참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'21.17': '136466863977 / 646538789640 * 100(%)'}"
+    ],
+    "elapsed": 22.20597767829895
+  },
+  {
+    "label": "크래프톤(게임)",
+    "category": "검색추출_Closed",
+    "query": "크래프톤의 최근 체결한 단일판매·공급계약 금액은 얼마야?",
+    "companies": [
+      "크래프톤"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.788385141956507,
+    "iterations": 5,
+    "n_tool_calls": 4,
+    "n_citations": 16,
+    "answer": "제공된 근거에는 크래프톤이 최근에 체결한 단일판매·공급계약에 대한 정보가 포함되어 있지 않습니다. 따라서 이에 대해 정확한 금액을 알 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 39.00686597824097
+  },
+  {
+    "label": "두산로보틱스(로봇)",
+    "category": "검색추출_Open",
+    "query": "두산로보틱스의 주요 사업부문 구성을 설명해줘",
+    "companies": [
+      "두산로보틱스"
+    ],
+    "route": "ownership_analysis",
+    "route_score": 0.7129901974824401,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "두산로보틱스는 주로 **단일 사업부문**으로 운영되며, 이 사업부문에는 협동로봇과 자동화 솔루션이 포함됩니다. 각 부문의 세부 사항은 다음과 같습니다:\n\n### 1. 협동로봇\n- **주요 제품**: 로봇 암(Robot Arm) 등\n- **최근 3년간 매출액 변화**\n  - 2023년(제9기): 53,038\n  - 2024년(제10기): 46,830\n  - 2025년(제11기): 30,715 ~ 64,559 (예상치 포함)\n\n### 2. 자동화 솔루션\n- **주요 제품**: EOL(End of Line) 솔루션, CMI(Custom Machine Integration) 등\n- **최근 3년간 매출액 변화**\n  - 2023년(제9기): 데이터 없음\n  - 2024년(제10기): 데이터 없음\n  - 2025년(제11기): 6,006\n\n또한, 두산로보틱스는 장기적으로 협동로봇 제조업체에 머무르지 않고 **로보틱스 플랫폼 제공자로서 시장**을 선도하려는 계획을 가지고 있습니다. 이를 위해 연구개발(R&D) 강화, 신제품 개발, 판매망 확충, 그리고 새로운 사업 분야로의 진출 등을 추진하고 있습니다. 특히, 기존의 로봇 팔 중심에서 벗어나 **AI, 사용자 소프트웨어, 로봇 암이 통합된 엔드 투 엔드(End-to-End) 지능형 로봇 솔루션을 제공하는 기업으로 변모**하고자 합니다.\n\n근거: report_id(chunk_id):\n- periodic_20250321001817::main::P13::C16\n- periodic_20260318001562::main::P13::C15\n- periodic_20240320001860::main::P13::C14\n- periodic_20250515003035::main::P13::C15\n- periodic_20250814004413::main::P13::C15",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 42.34865713119507
+  },
+  {
+    "label": "레인보우로보틱스(로봇)",
+    "category": "검색추출_Open",
+    "query": "레인보우로보틱스의 최근 투자 계획을 정리해줘",
+    "companies": [
+      "레인보우로보틱스"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.7859569923673804,
+    "iterations": 3,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "레인보우로보틱스의 최근 투자 계획을 정리하자면 다음과 같습니다:\n\n1. **정부의 투자 계획**\n   - 대한민국 정부는 2024년부터 2028년까지 3대 전략을 중심으로 강력한 민관협력 체제를 통해 **글로벌 로봇 시장을 선도하는 'K-로봇 경제' 실현**을 목표로 설정하고 있으며, 이를 위해 **민관 합동으로 3조 원 이상의 투자**를 계획하고 있습니다.\n   \n2. **레인보우로보틱스의 직접 투자 계획**\n   - 2025년 2월 5일에 발표된 내용에 따르면, 레인보우로보틱스는 **세종특별자치시 집현동 세종 테크밸리 복합 4-2-1 획지**에 **사업 확장에 따른 사옥 및 제조 시설 신축 공사**를 위해 **약 281,784백만 원**(이후 285,332백만 원으로 정정됨)을 투자하기로 하였으며, 이는 자기 자본 대비 **21.8**%에 해당합니다.\n   - 투자 기간은 **2024년 5월 16일부터 2026년 3월 31일까지**로 예정되었습니다.\n\n이와 같이 레인보우로보틱스는 정부의 지원과 더불어 자체적으로도 상당한 규모의 투자를 진행하며 사업을 확장하고 있음을 알 수 있습니다.\n\n근거:\n- report_id(periodic_20260515002401, chunk_id: P13::C1 & P13::C2)\n- report_id(exchange_20250205900405 & exchange_20251205900454)",
+    "grounded": false,
+    "numbers_grounded": false,
+    "ungrounded_numbers": [
+      "281784",
+      "285332"
+    ],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['281784', '285332']"
+    ],
+    "elapsed": 34.05638933181763
+  },
+  {
+    "label": "한화에어로스페이스(방산)",
+    "category": "검색추출_Open",
+    "query": "한화에어로스페이스의 주요 매출처를 정리해줘",
+    "companies": [
+      "한화에어로스페이스"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7337978824119363,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거에는 한화에어로스페이스의 구체적인 주요 매출처 정보가 포함되어 있지 않습니다. 따라서 정확한 주요 매출처를 정리해드릴 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 15.843115091323853
+  },
+  {
+    "label": "한국항공우주(방산)",
+    "category": "검색추출_Open",
+    "query": "한국항공우주의 주요 사업부문 구성을 설명해줘",
+    "companies": [
+      "한국항공우주"
+    ],
+    "route": "ownership_analysis",
+    "route_score": 0.7129901974824401,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "한국항공우주의 주요 사업부문 구성은 다음과 같습니다:\n\n1. **항공기 및 기체부품 생산**: 한국항공우주산업㈜이 주로 담당하며, 여기에는 고정익 부문(T-50 계열, FA-50, KF-21 등), 회전익 부문(KUH/LAH 계열) 그리고 기체 구조물 등이 포함됩니다.\n2. **항공기 부품 제조**:\n   - ㈜에비오시스 테크놀러지는 항공 부품 개발에 참여하며, 특히 KUH 및 LAH/LCH 사업의 국산화 작업에 기여하고 있습니다.\n   - 에스앤케이항공㈜ 역시 항공기 부품 제조에 관여합니다.\n3. **항공기 정비**: 한국항공서비스㈜가 항공기 정비 사업을 담당하며, 민간항공기 MRO 서비스부터 시작해 점차 영역을 확장하고 있습니다.\n4. **구매, 품질 지원 및 수출 지원**: Korea Aerospace F.W. Inc가 이러한 역할을 맡고 있습니다.\n\n또한 회사는 고정익, 회전익, 기체부문 외에도 위성, UAV, 훈련체계 등 기타 부문에서도 사업을 영위하고 있으며, 이를 통해 항공우주 산업 전반으로 사업 영역을 넓히고자 합니다. \n\n이러한 사업부문들은 한국항공우주가 항공기 제조 및 정비, 부품 제작 등을 포괄하는 종합 항공우주 기업으로서 자리매김하도록 돕습니다.",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": false,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "답변에 근거(report_id/chunk_id) 인용이 없음"
+    ],
+    "elapsed": 20.79703378677368
+  },
+  {
+    "label": "이마트(유통)",
+    "category": "검색추출_Open",
+    "query": "이마트의 최근 투자 계획을 정리해줘",
+    "companies": [
+      "이마트"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.7859569923673804,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "이마트의 최근 투자 계획을 정리하면 다음과 같습니다:\n\n1. **자기주식 관리**\n   - 2026년까지의 단기 계획에서는 직접 취득 방식으로 864주를 추가로 취득하고, 같은 수량을 임원 RSU 상여 보상 목적으로 처분할 계획입니다.\n   - 또한, ㈜신세계푸드와의 주식의 포괄적 교환을 통해 경영 효율화와 중복 상장 이슈 해소를 목표로 하고 있으며, 이에 따른 524,319주의 주식 처분이 계획되어 있습니다.\n   - 이와 동시에 보유한 자기주식 283,147주에 대해 전량 소각을 예정하고 있습니다.\n\n2. **온라인 중개 플랫폼 사업**\n   - 알리바바와의 합작투자계약을 통해 한국 내에서 온라인 중개 플랫폼 운영을 계획하고 있으며, 이는 2024년 12월에 발표되었습니다.\n   - 합작법인은 아폴로코리아㈜와 AliExpress International (Netherlands) B.V.가 각각 50:50의 지분율로 운영하며, 초기 현물출자 계약이 체결된 상황입니다.\n\n3. **물류 및 유통 인프라 확장**\n   - 2023년에는 신규점과 기존점의 보완, 물류센터 확충 등에 약 2,320억 원을 투자했습니다.\n   - 특히, ㈜에스에스지닷컴과 ㈜더블유컨셉코리아 등을 통해 물류 설비와 시스템을 강화하고, 글로벌 서비스를 위한 온라인 몰의 정체성을 구축하고자 합니다.\n\n이와 같이 이마트는 자기주식 관리를 통한 주주가치 제고와 더불어 국내외 시장에서의 경쟁력을 높이기 위한 다양한 투자 전략을 펼치고 있습니다. \n\n**근거:** report_id(chunk_id): periodic_20260318001024::main::P5::C5, periodic_20260318001024::main::P5::C4, periodic_20250814001869::main::P34::C2, periodic_20230515001577::main::P9::C5, periodic_20250318000688::main::P34::C2",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 25.463606119155884
+  },
+  {
+    "label": "LG생활건강(화장품)",
+    "category": "검색추출_Open",
+    "query": "LG생활건강의 주요 매출처를 정리해줘",
+    "companies": [
+      "LG생활건강"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7337978824119363,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "LG생활건강의 주요 매출처는 다음과 같습니다:\n\n1. **백화점**\n2. **면세점**\n3. **대형마트**\n\n또한, 각 사업 부문별로 살펴보면 다음과 같습니다:\n\n**Beauty 사업 부문**:\n- 국내 매출의 83.8%가 일반 영업을 통해 발생하며, 이는 백화점, 면세점, 유통점, 방문판매 등이 포함됩니다.\n\n**HDB (Home Care & Daily Beauty) 사업 부문**:\n- 국내 매출의 73.3%가 대리점, 대형마트, 온라인, 할인점, 체인 슈퍼, 편의점 등에서 발생합니다.\n\n**Refreshment 사업 부문**:\n- 음료 부문의 경우, 코카콜라 음료 주식회사는 국내 매출의 72.3%가 식품점, 도매상, 온라인 등을 통해 발생합니다.\n- 해태 에이치 티브이 주식회사는 국내 매출의 88.9%가 식품점, 도매상, 온라인 등에서 발생합니다.\n\n이와 같은 다양한 채널들을 통해 LG생활건강은 국내외에서 매출을 창출하고 있습니다. 추가적인 세부사항은 공시의 '(2) 판매경로 및 매출액 비중' 부분을 참조하시면 됩니다.\n\n근거: report_id(chunk_id): periodic_20230515001584::main::P10::C4, periodic_20231114001536::main::P10::C4, periodic_20260515001540::main::P10::C5, periodic_20230814001956::main::P10::C4, periodic_20260515001540::main::P10::C3",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 29.139086961746216
+  },
+  {
+    "label": "아모레퍼시픽(화장품)",
+    "category": "검색추출_Open",
+    "query": "아모레퍼시픽의 주요 사업부문 구성을 설명해줘",
+    "companies": [
+      "아모레퍼시픽"
+    ],
+    "route": "ownership_analysis",
+    "route_score": 0.7129901974824401,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "아모레퍼시픽의 주요 사업부문 구성은 다음과 같습니다:\n\n1. **화장품 사업부문**: \n   - 이 부문에는 설화수, 헤라, 라네즈, 아이오페, 에스트라, 코스알엑스와 같은 다양한 럭셔리 및 프리미엄 브랜드들이 포함되어 있습니다.\n   \n2. **DB (Daily Beauty) 사업부문** 또는 **헤어 & 뷰티(Hair & Beauty) 사업부문**:\n   - 이 부문에서는 려, 미쟝센, 해피바스 등의 생활용품 브랜드들을 다루며, 주로 일상적인 미용 제품을 제공합니다.\n\n또한, 판매 경로는 크게 세 가지로 나뉩니다:\n- 순수 국내 시장\n- 면세점 채널\n- 해외 법인 및 수출\n\n각 보고서에 따르면, 최근 몇 년간의 경로별 매출 비중은 다음과 같이 변화했습니다:\n- 2022년에는 순수 국내 48%, 면세 16%, 해외법인 및 수출 36%\n- 2024년~2026년에는 순수 국내 43%-48%, 면세 9%-10%, 해외법인 및 수출 45%-47%\n\n이와 같은 사업부문들은 아모레퍼시픽이 국내외 시장에서 다각화된 제품 포트폴리오를 통해 경쟁력을 유지하고 있음을 보여줍니다.\n\n근거: report_id(chunk_id): periodic_20241114001073::main::P2::C1, periodic_20231114001116::main::P2::C1, periodic_20260318000785::main::P2::C1, periodic_20260515001182::main::P2::C1, periodic_20250317000429::main::P2::C1",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 25.872843027114868
+  },
+  {
+    "label": "POSCO홀딩스(철강)",
+    "category": "검색추출_Open",
+    "query": "POSCO홀딩스의 최근 투자 계획을 정리해줘",
+    "companies": [
+      "POSCO홀딩스"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.7859569923673804,
+    "iterations": 3,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 POSCO홀딩스의 최근 투자 계획 정보는 다음과 같습니다:\n\n### POSCO홀딩스의 투자 계획\n**철강 부문**\n- **투자 기간**: 2020년 10월부터 2030년 2월까지\n- **투자 내용**: 포항 3기 코크스 갱웨이 등\n- **총 투자액**: 60,945억원\n- **기 투자액**: 17,480억원\n- **향후 투자액**: 43,465억원\n\n**인프라 부문**\n- **투자 기간**: 2022년 5월부터 2027년 6월까지\n- **투자 내용**: 광양 LNG 터미널 등\n- **총 투자액**: 20,039억원\n- **기 투자액**: 9,372억원\n- **향후 투자액**: 10,307억원\n\n**이차전지 소재 부문**\n- **투자 기간**: 2020년 3월부터 2027년 7월까지\n- **투자 내용**: 양/음극재, 리튬 상용화 공장 등\n- **총 투자액**: 70,477억원\n- **기 투자액**: 51,228억원\n- **향후 투자액**: 19,249억원\n\n또한, POSCO홀딩스는 공모자금의 일부를 사용하여 타법인증권 취득(유상증자) 및 시설자금 용도로 활용했으며, 일부 미사용 자금은 예·적금 상품에 운용하고 있습니다.\n\n이와 함께, POSCO홀딩스는 고배당 기업의 위상을 제고하고 주주 배당의 예측 가능성을 강화하기 위해 실적 연동형 중기(‘26~’28년) 주주환원 정책을 발표하였고, 조정 지배지분 순이익의 35~40%를 주주환원 목표로 설정하였습니다.\n\n이러한 투자와 재무 전략을 통해 POSCO홀딩스는 지속적인 성장을 도모하며 주주 가치를 극대화하려고 노력하고 있습니다.\n\n**근거:** \n- report_id(periodic_20260515000988), chunk_id(periodic_20260515000988::main::P9::C11, P21::C1, P21::C2, P19::C1)",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 34.294450998306274
+  },
+  {
+    "label": "고려아연(비철금속)",
+    "category": "검색추출_Open",
+    "query": "고려아연의 주요 매출처를 정리해줘",
+    "companies": [
+      "고려아연"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7337978824119363,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "고려아연의 주요 매출처는 다음과 같이 정리할 수 있습니다:\n\n1. **ZOCV** (Zinc Oxide Corporation Vietnam LLC):\n   - 스페인 및 기타 국가의 세라믹 업체: 약 60~80%\n   - 베트남 내수: 약 20~40%\n\n2. **Pedalpoint Holdings, LLC**:\n   - 고려아연㈜ 및 기타 고객\n\n3. **Steelcycle Co., Ltd**:\n   - 고려아연㈜ 및 SMC가 100%\n\n4. **Ark Energy Corporation Pty Ltd**:\n   - 신재생에너지 프로젝트 개발 및 태양광 발전을 통한 수익\n   - 호주 북부 지역의 태양광 발전소 포트폴리오 자산에서 발생하는 수익\n\n이러한 정보를 종합하면, 고려아연은 주로 스페인과 베트남 시장을 중심으로 매출을 올리고 있으며, 국내외 여러 고객들과의 계약을 통해 안정적인 매출 구조를 유지하고 있음을 알 수 있습니다. \n\n근거: report_id(chunk_id): periodic_20241113000731::main::P10::C7, periodic_20240514001401::main::P10::C7, periodic_20260515002132::main::P10::C6, periodic_20230811002242::main::P10::C6, periodic_20260601001725::main::P19::C48",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 22.7719087600708
+  },
+  {
+    "label": "HMM(해운)",
+    "category": "검색추출_Open",
+    "query": "HMM의 주요 사업부문 구성을 설명해줘",
+    "companies": [
+      "HMM"
+    ],
+    "route": "ownership_analysis",
+    "route_score": 0.7129901974824401,
+    "iterations": 3,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "HMM의 주요 사업부문 구성에 대해 말씀드리겠습니다.\n\nHMM은 **종합해운물류기업**으로서 다양한 종류의 화물을 취급하며, 주로 컨테이너, 벌크, 그리고 기타 사업부문을 운영하고 있습니다. 구체적으로 다음과 같은 사업 구조를 갖추고 있습니다:\n\n1. **컨테이너 부문**: \n   - 컨테이너 운송 서비스를 제공하며, 전체 매출의 약 **84.9**%를 차지합니다.\n   \n2. **벌크 부문**:\n   - 벌크화물 운송을 담당하며, 전체 매출의 약 **13.3**%를 차지합니다.\n   \n3. **기타 부문**:\n   - 주로 터미널 운영 등을 포함하며, 전체 매출의 약 **1.8**%를 차지합니다.\n\n또한, HMM은 국내외 영업조직을 통해 이러한 서비스를 제공하며, 2026년까지 누적 기준으로 컨테이너 585만 TEU 및 벌크 4,569만 MT의 생산능력을 보유하고 있습니다. 이를 통해 고객에게 최적화된 물류 솔루션을 제안하고 있습니다.\n\n이와 같은 다각화된 사업 구조 덕분에 HMM은 글로벌 시장에서 경쟁력을 유지하고 있습니다.",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": false,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "답변에 근거(report_id/chunk_id) 인용이 없음"
+    ],
+    "elapsed": 23.174072980880737
+  },
+  {
+    "label": "현대글로비스(물류)",
+    "category": "검색추출_Open",
+    "query": "현대글로비스의 최근 투자 계획을 정리해줘",
+    "companies": [
+      "현대글로비스"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.7859569923673804,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "현대글로비스의 최근 투자 계획을 정리하면 다음과 같습니다:\n\n1. **'30년까지 총 투자 계획**: 약 7,840억원이 소요될 것으로 예상됩니다. 이에는 폐차장 네트워크 확보, 기술 투자, 글로벌 전처리 거점 설립 등이 포함됩니다.\n\n2. **해외 법인 투자**:\n   - **2023년 반기**: 토지 및 건물 10,928억원, 기계장치 외 59,732억원으로 합계 70,660억원을 기록했습니다.\n   - **향후 계획 (2024년부터)**:\n     - 토지 및 건물: 2024년에 25,530억원 추가 투자 예정입니다.\n     - 기계장치 외: 151,756억원까지 추가 투자할 계획입니다.\n   - **2024년 반기 이후**: 토지 및 건물 20,242억원, 기계장치 외 93,541억원으로 합계 113,783억원을 기록했으며, 이는 이전 반기와 비교해 증가한 수치입니다.\n\n3. **기타 계획**:\n   - **파트너십 구축**: 사용 후 배터리 전 생애 주기 내에서 글로비스 사업 수행에 필요한 협업사를 대상으로 MOU 체결 등을 추진하고 있습니다.\n   - **인허가 및 거점 설립**: 국내외 재활용 사업 전략 구체화와 함께 필요한 인허가를 취득하고 거점을 설립하는 과정을 진행 중입니다.\n   - **인력 확보**: 해외 권역에서 필요한 인력을 확보하여 본격적인 사업 추진을 준비하고 있습니다.\n\n이와 같은 투자 계획들은 현대차그룹의 전동화 전환 및 ESG 경쟁력 확보 전략에 맞추어 배터리 재활용 Closed Loop 전략을 구현하기 위한 것입니다.\n\n근거: \n- report_id(periodic_20250317001025, chunk_id P6::C7/P6::C8),\n- report_id(periodic_20230814001423, chunk_id P9::C2),\n- report_id(periodic_20240516002002, chunk_id P9::C2),\n- report_id(periodic_20240826000294, chunk_id P10::C2).",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 37.85174202919006
+  },
+  {
+    "label": "대우건설(건설)",
+    "category": "검색추출_Open",
+    "query": "대우건설의 주요 매출처를 정리해줘",
+    "companies": [
+      "대우건설"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7337978824119363,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "대우건설의 주요 매출처를 정리하면 다음과 같습니다:\n\n**2025년 2분기**\n- GCPI\n- NLNG\n- ㈜엠디엠플러스\n- LTA\n- 원영디앤씨㈜\n- 가야피에프브이㈜\n- 태유디앤피㈜\n- JR22 VINA SINGCO PTE. LTD\n- 경서도시개발㈜\n- ㈜남동타운피에프브이\n\n**2025년 1분기**\n- GCPI\n- NLNG\n- ㈜엠디엠플러스\n- LTA\n- 경서도시개발㈜\n- 원영디앤씨㈜\n- JR22 VINA SINGCO PTE. LTD\n- INDORAMA FERTILIZER FZE\n- ㈜골드랜드제이앤제이\n- 맥서브컨소시엄㈜\n\n**2025년 3분기**\n- GCPI\n- NLNG\n- (주)엠디엠플러스\n- LTA\n- 가야피에프브이(주)\n- JR22 VINA SINGCO PTE. LTD\n- INDORAMA FERTILIZER FZE\n- (주)신영대농개발\n- (주)골드랜드제이앤제이\n- 경서도시개발(주)\n\n**2026년 1분기**\n- NLNG\n- (주)남동타운피에프브이\n- GCPI\n- JR22 VINA SINGCO PTE. LTD\n- 장위6구역주택재개발정비사업조합\n- LTA\n- 한국서부발전(주)\n- 원영디앤씨(주)\n- (주)대한씨앤디\n- INDORAMA FERTILIZER FZE\n\n**2024년 1분기**\n- GCPI\n- 둔촌주공아파트재건축정비사업조합\n- NLNG\n- 디에스네트웍스㈜\n- WARRI REFINING  PETROCHEMICAL COMPANY\n- 주식회사 어반웰스\n- (주)엠디엠플러스\n- LTA\n- 에스지레일주식회사\n- (주)성은개발\n\n각 분기의 주요 매출처들은 약간의 변동이 있지만, 일부 업체들은 지속적으로 상위 매출처 목록에 포함되어 있음을 알 수 있습니다.\n\n근거: report_id(chunk_id):\n- 20250813001556\n- 20250515002566\n- 20251114001603\n- 20260515001883\n- 20240516001391",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 27.35997223854065
+  },
+  {
+    "label": "케이티(통신)",
+    "category": "검색추출_Open",
+    "query": "케이티의 주요 사업부문 구성을 설명해줘",
+    "companies": [
+      "케이티"
+    ],
+    "route": "ownership_analysis",
+    "route_score": 0.7129901974824401,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "케이티(KT)의 주요 사업부문 구성은 다음과 같습니다:\n\n1. **ICT**: 정보통신기술(ICT) 사업은 유무선 통신 및 컨버전스 사업을 포함하며, 가장 큰 비중을 차지하는 핵심 사업부문입니다. 2024년도 3분기의 ICT 사업 매출액은 14,008,107백만원이며, 전체 매출에서 차지하는 비중은 59.3%입니다.\n\n2. **금융사업**: 신용카드 사업을 주로 담당하며, 2024년도 3분기에는 2,640,662백만원의 매출액을 기록했습니다.\n\n3. **위성방송서비스사업**: 위성 방송을 통한 서비스 제공을 하며, 2024년도 3분기에 531,432백만원의 매출을 올렸습니다.\n\n4. **부동산사업**: 부동산 자산 활용을 통한 수익 창출을 목표로 하고 있으며, 2024년도 3분기에 431,539백만원의 매출을 달성하였습니다.\n\n5. **기타사업**: 콘텐츠 제작, 정보기술, 글로벌 사업 등 다양한 부가 사업을 포함하며, 2024년도 3분기에 6,017,508백만원의 매출을 기록했습니다.\n\n또한, ㈜케이티클라우드를 포함한 클라우드 서비스 부문은 직접 판매와 파트너사를 통한 간접 판매 방식으로 운영되며, 클라우드 서비스의 판매 방법으로는 기본 표준 요금제와 프로모션을 통한 할인이 적용되고 있습니다. 데이터 센터 상품은 코로케이션, DCx, Managed Service, Connectivity 등으로 구성되어 있으며, 고객의 요구에 맞춘 다양한 상품을 제공하고 있습니다.\n\n이러한 사업부문을 통해 케이티는 ICT 중심의 비즈니스 모델을 유지하면서도 금융, 방송, 부동산, 기타 사업 등 다각화된 포트폴리오를 구축하고 있음을 알 수 있습니다.\n\n**근거:** report_id(chunk_id): periodic_20250321001834::main::P7::C1, periodic_20241114001752::main::P7::C1, periodic_20250814003695::main::P10::C10, periodic_20250321001834::main::P10::C10",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 25.185813188552856
+  },
+  {
+    "label": "LG유플러스(통신)",
+    "category": "검색추출_Open",
+    "query": "LG유플러스의 최근 투자 계획을 정리해줘",
+    "companies": [
+      "LG유플러스"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.7859569923673804,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "LG유플러스의 최근 투자 계획에 대해 정리하면 다음과 같습니다:\n\n1. **투자 계획**\n   - LG유플러스는 신규사업에 대한 투자 및 예상 자금 소요액을 내부 영업 현금 흐름을 통해 확보할 계획이며, 구체적인 금액을 명기하기 어려운 상황입니다.\n   - 주로 통신 데이터와 금융 마이데이터를 활용한 개인 맞춤형 신규 서비스 개발에 초점을 맞추고 있었으나, 현재는 이러한 금융 마이데이터 사업을 종료하기로 결정했습니다.\n\n2. **CAPEX(Capital Expenditures) 계획**\n   - 2025년 별도 기준 연간 CAPEX는 전년 대비 0.2조 원 감소한 **1.7조 원**으로 예상됩니다.\n   - 2026년에는 네트워크 품질 향상을 위한 유·무선 투자 및 AIDC, 신사업 등에 대한 투자가 집행될 예정입니다.\n\n3. **연구개발 활동 및 서비스 개발**\n   - 금융 마이데이터 서비스는 2023년 6월에 베타 버전이 출시되었고 같은 해 7월에는 정식 서비스가 오픈되었습니다.\n   - 그러나 이후 사업 구조 개편 정책에 따라 2025년 2월 이사회 의결을 거쳐 금융감독원과 금융위원회에 사업 종료를 신고하였으며, 2025년 5월 30일에 최종 수리되어 폐업하였습니다.\n\n이와 같이 LG유플러스는 내부 자금을 통한 투자를 지속하며, 특히 네트워크 품질 향상과 신사업 분야에 집중하려는 계획을 가지고 있습니다. 또한 과거 추진했던 금융 마이데이터 사업은 종료되었음을 알 수 있습니다.\n\n**근거:** \n- report_id(periodic_20260313000442, chunk_id: P7/C4, P26/C14, P39/C1, P6/C8)",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 25.468151092529297
+  },
+  {
+    "label": "미래에셋증권(증권)",
+    "category": "검색추출_Open",
+    "query": "미래에셋증권의 주요 매출처를 정리해줘",
+    "companies": [
+      "미래에셋증권"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7337978824119363,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거에는 미래에셋증권의 주요 매출처에 대한 정보가 포함되어 있지 않습니다. 따라서 이에 대해 답변드릴 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 23.25789189338684
+  },
+  {
+    "label": "기아+현대자동차(자동차+자동차)",
+    "category": "비교연산_Closed",
+    "query": "기아와 현대자동차의 2025년 매출액을 비교해줘",
+    "companies": [
+      "기아",
+      "현대자동차"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.8057947882768716,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 근거에는 기아와 현대자동차의 2025년 매출액 비교 정보가 포함되어 있지 않습니다. 따라서 이에 대한 답변을 제공할 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 24.49132204055786
+  },
+  {
+    "label": "SK하이닉스+삼성전자(반도체+IT/반도체)",
+    "category": "비교연산_Closed",
+    "query": "SK하이닉스와 삼성전자의 2025년 설비투자 규모를 비교해줘",
+    "companies": [
+      "SK하이닉스",
+      "삼성전자"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.7419423685107497,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 자료에 따르면, SK하이닉스와 삼성전자의 2025년 설비투자 규모를 비교하면 다음과 같습니다:\n\n- **SK하이닉스**: 2025년까지 누적 투자액은 **30,173십억 원**입니다.\n- **삼성전자**: 2025년까지 DS 부문 및 SDC 등의 첨단 공정 증설·전환과 인프라 투자로 **52.7조 원**(527,000십억 원) 규모의 투자가 이루어졌습니다.\n\n따라서, 2025년 설비투자는 삼성이 약 **22배** 더 큰 규모임을 알 수 있습니다.\n\n근거:\n- SK하이닉스의 경우, 사업보고서와 여러 분기별 보고서를 통해 확인한 결과, 2025년의 전체 투자 계획이 30,173십억 원으로 집계되었습니다.\n- 삼성전자의 경우, 사업보고서에 기재된 내용에 따르면, 2025년 동안 DS 부문 및 SDC 등에 대해 총 52.7조 원의 시설 투자가 이루어졌다고 명시되어 있습니다. 이를 십억 원 단위로 환산하면 527,000십억 원입니다.",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {
+      "527000": "2025.12 + 526511"
+    },
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "[참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'527000': '2025.12 + 526511'}"
+    ],
+    "elapsed": 24.336869716644287
+  },
+  {
+    "label": "NAVER+카카오(IT/플랫폼+IT/플랫폼)",
+    "category": "비교연산_Closed",
+    "query": "NAVER와 카카오의 2025년 영업이익을 비교해줘",
+    "companies": [
+      "NAVER",
+      "카카오"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.8085457258211569,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 근거에서 NAVER와 카카오의 2025년 영업이익 정보를 확인해 보겠습니다.\n\n- **NAVER**의 경우 다음과 같은 정보가 있습니다.\n  - 2025년 9월 말 기준: 1,513,208백만 원 (반기 보고서)\n  - 2025년 6월 말 기준: 973,587백만 원 (반기 보고서)\n  - 2025년 3월 말 기준: 483,287백만 원 (분기 보고서)\n\n- **카카오**는 다음과 같습니다.\n  - 2025년 12월 말 기준: 440,242,465,351원 (감사보고서)\n\n따라서, NAVER의 2025년 각 시점별 영업이익은 다음과 같이 변화하고 있으며, 카카오의 해당 기간 동안 영업이익은 일정하게 유지되고 있음을 알 수 있습니다.\n\n근거:\n- NAVER: periodic_20251114001436, periodic_20250814002281, periodic_20250515001302, periodic_20260515001511\n- 카카오: periodic_20260318001423, periodic_20260318001423::separate_audit_report::P2::C6, periodic_20260318001423::consolidated_audit_report::P2::C7, periodic_20260318001423::consolidated_audit_report::P2::C8, periodic_20251114002572",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 45.53176021575928
+  },
+  {
+    "label": "신한지주+KB금융(금융+금융)",
+    "category": "비교연산_Closed",
+    "query": "신한지주와 KB금융의 2025년 영업수익을 비교해줘",
+    "companies": [
+      "신한지주",
+      "KB금융"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.8079269519845553,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 근거로는 신한지주와 KB금융의 2025년 영업수익을 직접적으로 비교할 수 있는 정보가 없습니다. \n\n- 신한지주의 경우 여러 부문에서의 수익을 보여주고 있지만, 전체 영업수익에 대한 구체적인 금액 정보는 명시되어 있지 않습니다.\n- KB금융 역시 일부 영업수익 항목들이 나타나 있으나, 이를 종합한 총 영업수익 금액은 확인하기 어렵습니다.\n\n따라서 현재 제공된 자료들만으로는 두 회사의 2025년 영업수익을 비교하는 것이 불가능합니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 41.846596002578735
+  },
+  {
+    "label": "삼성SDI+LG에너지솔루션(2차전지+2차전지)",
+    "category": "비교연산_Closed",
+    "query": "삼성SDI와 LG에너지솔루션의 2025년 매출액을 비교해줘",
+    "companies": [
+      "삼성SDI",
+      "LG에너지솔루션"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.8057947882768716,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 근거에 따르면, 삼성SDI와 LG에너지솔루션의 2025년 매출액은 다음과 같습니다:\n\n- **삼성SDI**: 여러 보고서에서 확인된 2025년 매출액은 약 11,455,691백만원에서 16,592,249백만원 사이입니다.\n- **LG에너지솔루션**: 사업보고서와 분기보고서를 통해 확인된 2025년 매출액은 7,661,584백만원에서 23,671,759백만원 사이입니다.\n\n두 회사의 매출액 범위가 겹치는 부분이 없으므로 정확한 비교는 어렵지만, 대체로 LG에너지솔루션의 매출액이 더 높은 것을 알 수 있습니다. 다만, 이는 공시된 다양한 보고서들의 수치 범위만을 바탕으로 한 것이며, 실제 최종적인 수치는 다를 수 있음을 유의해야 합니다.\n\n근거:\n- 삼성SDI 사업보고서(periodic_20260310002954): 11,455,691백만원\n- 삼성SDI 분기보고서(periodic_20251114002598): 8,211,623백만원\n- 삼성SDI 사업보고서(periodic_20250311001275): 16,592,249백만원\n- LG에너지솔루션 사업보고서(periodic_20260312000217): 7,661,584백만원\n- LG에너지솔루션 분기보고서(periodic_20251114000625): 17,530,276백만원\n- LG에너지솔루션 사업보고서(periodic_20260312000217): 23,671,759백만원",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 27.40669274330139
+  },
+  {
+    "label": "삼성바이오로직스+셀트리온(바이오+바이오)",
+    "category": "비교연산_Closed",
+    "query": "삼성바이오로직스와 셀트리온의 2025년 매출액을 비교해줘",
+    "companies": [
+      "삼성바이오로직스",
+      "셀트리온"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.8057947882768716,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 근거에 따르면, 삼성바이오로직스의 2025년 매출액은 **4조 5,570억 원**이고, 셀트리온의 2025년 매출액은 **4,162,495백만 원**(약 4조 1,624억 9,500만 원)입니다.\n\n따라서, 삼성바이오로직스가 셀트리온보다 더 높은 매출액을 기록했습니다.\n\n근거:\n- 삼성바이오로직스: report_id(periodic_20260515001658), chunk_id(main::P8::C2)\n- 셀트리온: report_id(periodic_20260316001415), chunk_id(consolidated_audit_report::P3::C14)",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 28.011301040649414
+  },
+  {
+    "label": "하이브+와이지엔터테인먼트(엔터+엔터)",
+    "category": "비교연산_Closed",
+    "query": "하이브와 와이지엔터테인먼트의 2025년 영업이익을 비교해줘",
+    "companies": [
+      "하이브",
+      "와이지엔터테인먼트"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.8085457258211569,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 근거로는 하이브와 와이지엔터테인먼트의 2025년 영업이익을 직접적으로 비교할 수 없습니다.\n\n하이브의 경우, 2025년의 영업이익은 **49,318,276천 원**으로 나타나 있지만, 이는 전체 연결회사의 영업이익이며 각 회사의 세부적인 영업이익은 포함되어 있지 않습니다.\n\n와이지엔터테인먼트의 경우도 마찬가지로, 2025년의 구체적인 영업이익 수치가 아닌 포괄적인 재무정보만이 제공되어 있어 정확한 비교가 어렵습니다.\n\n따라서, 현재로서는 두 회사의 2025년 영업이익을 정확히 비교하기 위해서는 추가적인 상세 재무 정보가 필요합니다.",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 25.25731897354126
+  },
+  {
+    "label": "두산로보틱스+레인보우로보틱스(로봇+로봇)",
+    "category": "비교연산_Closed",
+    "query": "두산로보틱스와 레인보우로보틱스의 2025년 매출액을 비교해줘",
+    "companies": [
+      "두산로보틱스",
+      "레인보우로보틱스"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.8057947882768716,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 근거에 따르면, 두산로보틱스와 레인보우로보틱스의 2025년 매출액을 비교하면 다음과 같습니다:\n\n- **두산로보틱스**:\n  - 2025년 전체 합계 매출액: 32,978백만원 (사업보고서 기준)\n  - 2025년 3분기 합계 매출액: 19,977백만원 (분기보고서 기준)\n\n- **레인보우로보틱스**:\n  - 2025년 전체 합계 매출액: 34,123,111원 (사업보고서 기준)\n\n따라서, 두 회사의 2025년 예상 매출액을 단순 비교했을 때, 레인보우로보틱스가 더 높은 매출을 기록할 것으로 보입니다. 그러나 두 보고서의 공시 시점과 세부 항목별 차이가 있을 수 있으므로 주의 깊게 살펴볼 필요가 있습니다.\n\n근거:\n- 두산로보틱스 사업보고서 (periodic_20260318001562): 합계 매출액 정보\n- 두산로보틱스 분기보고서 (periodic_20251114001619): 3분기 합계 매출액 정보\n- 레인보우로보틱스 사업보고서 (periodic_20260320000803): 전체 합계 매출액 정보",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 38.927194118499756
+  },
+  {
+    "label": "한화에어로스페이스+한국항공우주(방산+방산)",
+    "category": "비교연산_Closed",
+    "query": "한화에어로스페이스와 한국항공우주의 2025년 매출액을 비교해줘",
+    "companies": [
+      "한화에어로스페이스",
+      "한국항공우주"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.8057947882768716,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 근거에 따르면, 한화에어로스페이스의 2025년 매출액은 약 4조 870억 원을 목표로 하고 있다고 합니다. 반면, 한국항공우주는 2025년에 연결기준 매출액이 3조 6,964억 원을 기록했다고 공시했습니다. 따라서, 목표치와 실제 결과 간의 차이를 고려하더라도 한화에어로스페이스가 한국항공우주보다 더 높은 매출액을 기록한 것을 알 수 있습니다.\n\n근거:\n- 한화에어로스페이스: 사업보고서(20250318), Section: IV. 이사의 경영진단 및 분석의견\n- 한국항공우주: 사업보고서(20260318), Section: IV. 이사의 경영진단 및 분석의견",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 26.82391095161438
+  },
+  {
+    "label": "LG생활건강+아모레퍼시픽(화장품+화장품)",
+    "category": "비교연산_Closed",
+    "query": "LG생활건강와 아모레퍼시픽의 2025년 영업이익을 비교해줘",
+    "companies": [
+      "LG생활건강",
+      "아모레퍼시픽"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.8085457258211569,
+    "iterations": 5,
+    "n_tool_calls": 5,
+    "n_citations": 5,
+    "answer": "제공된 근거로는 확인할 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 29.45048999786377
+  },
+  {
+    "label": "POSCO홀딩스+고려아연(철강+비철금속)",
+    "category": "비교연산_Closed",
+    "query": "POSCO홀딩스와 고려아연의 2025년 매출액을 비교해줘",
+    "companies": [
+      "POSCO홀딩스",
+      "고려아연"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.8057947882768716,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 근거에 따르면, POSCO홀딩스의 2025년 예상 매출액은 **43,559,136**백만원이고, 고려아연의 2025년 예상 매출액은 **289,705**백만원입니다.\n\n따라서 POSCO홀딩스가 고려아연보다 훨씬 더 높은 매출액을 기록할 것으로 예상됩니다.",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 22.03093409538269
+  },
+  {
+    "label": "HMM+현대글로비스(해운+물류)",
+    "category": "비교연산_Closed",
+    "query": "HMM와 현대글로비스의 2025년 매출액을 비교해줘",
+    "companies": [
+      "HMM",
+      "현대글로비스"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.8057947882768716,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 근거로는 HMM과 현대글로비스의 2025년 매출액을 직접 비교할 수 없습니다. HMM의 공시에는 2025년의 다양한 시점별 매출액이 나타나 있지만, 현대글로비스의 경우 구체적인 2025년도 전체 매출액보다는 이전 연도의 데이터들이 주로 제시되어 있습니다.\n\nHMM의 2025년 매출액은 다음과 같은 범위로 나타납니다:\n- 2025년 반기 기준: 5,477,429백만원\n- 2025년 3분기 기준: 8,183,821백만원\n- 2025년 말 기준: 10,891,443백만원\n\n각각의 수치는 반기, 3분기, 연말 기준이므로 단순 비교는 어렵습니다.\n\n현대글로비스의 경우, 2025년에 해당하는 정보는 다음과 같습니다:\n- 2025년 3분기까지의 누적 매출액: 22,094,411,557,954백만원\n- 2025년 말의 매출액: 28,407,374,301,315백만원\n\n따라서, HMM과 현대글로비스의 2025년 매출액을 정확하게 비교하기 위해서는 더 많은 정보가 필요합니다. 현재 제공된 정보만으로는 정확한 비교가 어려우니 참고 부탁드립니다.\n\n근거:\n- HMM 반기보고서 (periodic_20250813000957)\n- HMM 분기보고서 (periodic_20251113000451)\n- HMM 사업보고서 (periodic_20260318001444)\n- 현대글로비스 사업보고서 (periodic_20260318001205)\n- 현대글로비스 분기보고서 (periodic_20251114001360)",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 30.56946587562561
+  },
+  {
+    "label": "현대건설+대우건설(건설+건설)",
+    "category": "비교연산_Closed",
+    "query": "현대건설와 대우건설의 2025년 매출액을 비교해줘",
+    "companies": [
+      "현대건설",
+      "대우건설"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.8057947882768716,
+    "iterations": 4,
+    "n_tool_calls": 6,
+    "n_citations": 30,
+    "answer": "제공된 근거로는 현대건설의 2025년 매출액만 확인할 수 있고, 대우건설의 2025년 매출액 정보는 확인되지 않습니다. 따라서 현대건설과 대우건설의 2025년 매출액 비교를 할 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 36.59183597564697
+  },
+  {
+    "label": "SK텔레콤+케이티(통신+통신)",
+    "category": "비교연산_Closed",
+    "query": "SK텔레콤와 케이티의 2025년 영업이익을 비교해줘",
+    "companies": [
+      "SK텔레콤",
+      "케이티"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.8085457258211569,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 근거에 따르면, SK텔레콤의 2025년 영업이익은 **1조 732억원**이고, 케이티(KT)의 2025년 영업이익은 **2조 4,691억원**입니다.\n\n따라서, 케이티(KT)의 2025년 영업이익이 SK텔레콤보다 더 높습니다.\n\n근거:\n- SK텔레콤: report_id(periodic_20260318000532), chunk_id(periodic_20260318000532::main::P24::C1)\n- 케이티(KT): report_id(periodic_20260323001553), chunk_id(periodic_20260323001553::main::P30::C2)",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 35.88757085800171
+  },
+  {
+    "label": "현대모비스+삼성전기(자동차부품+전자부품)",
+    "category": "비교연산_Closed",
+    "query": "현대모비스와 삼성전기의 2025년 매출액을 비교해줘",
+    "companies": [
+      "현대모비스",
+      "삼성전기"
+    ],
+    "route": "multi_compare",
+    "route_score": 0.8057947882768716,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "제공된 근거로는 현대모비스와 삼성전기의 2025년 매출액을 직접적으로 비교하기 어렵습니다.\n\n현대모비스의 경우 여러 보고서에서 다양한 사업 부문의 매출 실적을 언급하고 있지만, 이를 종합한 전체 매출액 수치나 구체적인 비교 수치는 확인되지 않습니다. 예를 들어, 특정 분기와 연말 기준의 국내 및 해외 매출액 정보 등은 제공되었으나, 이를 기반으로 한 총합 매출액이 명시적으로 주어지지 않았습니다.\n\n삼성전기에 관해서는 사업보고서와 분기별 보고서를 통해 2025년의 매출액 정보를 확인할 수 있습니다. 특히 사업보고서에 따르면, 삼성전기의 2025년도 전체 매출액은 **11조 3,145억 원**으로 나타나 있습니다.\n\n따라서 현재 제공된 자료만을 토대로 두 회사의 2025년 매출액을 직접 비교하기는 어렵습니다. 추가 정보가 필요하며, 정확한 비교를 위해서는 더 많은 데이터가 필요합니다.\n\n근거:\n- 현대모비스: periodic_20250311001180::main::P13::C12, periodic_20250515001982::main::P13::C12, periodic_20260309001878::main::P10::C1, periodic_20250814004056::main::P13::C13, periodic_20251114002729::main::P10::C1\n- 삼성전기: periodic_20260310003071::main::P8::C1, periodic_20250814004371::main::P8::C1, periodic_20251114002848::main::P8::C1, periodic_20260310003071::main::P25::C2, periodic_20250515002323::main::P8::C1",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 33.606046199798584
+  },
+  {
+    "label": "에코프로비엠(2차전지소재)",
+    "category": "비교연산_Open",
+    "query": "에코프로비엠의 당기 대비 전기 영업이익 변화를 정리해줘",
+    "companies": [
+      "에코프로비엠"
+    ],
+    "error": "ReadTimeout: HTTPSConnectionPool(host='clovastudio.stream.ntruss.com', port=443): Read timed out. (read timeout=60.0)",
+    "elapsed": 4794.722080945969
+  },
+  {
+    "label": "현대모비스(자동차부품)",
+    "category": "비교연산_Open",
+    "query": "현대모비스의 최근 자금조달 내역을 유형별로 정리해줘",
+    "companies": [
+      "현대모비스"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7150962714066909,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "현대모비스의 최근 자금조달 내역을 유형별로 정리하면 다음과 같습니다:\n\n**유형**: 녹색 채권 (회사채)\n- **발행 회차**: 144-1, 144-2, 144-3\n- **납입일**: 2021년 7월 9일\n- **자금 사용 계획**\n  - 시설자금: 각 회차별 110,000백만 원, 80,000백만 원, 40,000백만 원\n  - 타 법인 취득: 각 회차별 40,000백만 원, 60,000백만 원, 20,000백만 원\n- **실제 자금 사용 내역**: 각 회차별 150,000백만 원, 140,000백만 원, 60,000백만 원\n- **특징**: 이 채권은 ESG 채권으로 전동화 사업 관련 시설 자금 목적이며, 모든 자금이 투자 계획에 따라 전액 집행 완료되었습니다.\n\n모든 공시에서 동일한 내용이 반복되고 있으며, 이는 해당 기간 동안 추가적인 자금 조달이나 변경사항이 없음을 나타냅니다. \n\n근거: report_id(chunk_id): periodic_20230515001771::main::P21::C1, periodic_20231114002284::main::P21::C1, periodic_20230814001996::main::P21::C1, periodic_20250515001982::main::P21::C1, periodic_20250311001180::main::P21::C1",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 23.97414994239807
+  },
+  {
+    "label": "삼성전기(전자부품)",
+    "category": "비교연산_Open",
+    "query": "삼성전기의 당기 대비 전기 영업이익 변화를 정리해줘",
+    "companies": [
+      "삼성전기"
+    ],
+    "route": "calculation",
+    "route_score": 0.7511946678810802,
+    "iterations": 4,
+    "n_tool_calls": 4,
+    "n_citations": 10,
+    "answer": "삼성전기의 당기 대비 전기 영업이익 변화는 다음과 같습니다:\n\n- **전기 영업이익**: -1,250,894천원 (손실)\n- **당기 영업이익**: 560,484천원\n\n따라서 영업이익은 **1,811,378천원** 증가했으며, 이는 약 **144.81%** 증가한 수치입니다.\n\n근거: report_id(periodic_20260515002842), report_id(periodic_20260310003071)",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {
+      "144.81": "4159378 / 2881532 * 100(%)",
+      "1811378": "548806 + 1261578"
+    },
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "[참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'144.81': '4159378 / 2881532 * 100(%)', '1811378': '548806 + 1261578'}"
+    ],
+    "elapsed": 26.190648078918457
+  },
+  {
+    "label": "삼성전자(IT/반도체)",
+    "category": "비교연산_Open",
+    "query": "삼성전자의 최근 자금조달 내역을 유형별로 정리해줘",
+    "companies": [
+      "삼성전자"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7150962714066909,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거에 따르면, 삼성전자는 다음과 같은 기간 동안 증권의 발행을 통한 자금조달 실적이 없음을 공시하였습니다:\n\n1. **2026년 3분기**: 해당 기간 동안 자금조달 실적이 없습니다.\n2. **2023년 6월반기**: 해당 기간 동안 자금조달 실적이 없습니다.\n3. **2023년 9월분기**: 해당 기간 동안 자금조달 실적이 없습니다.\n4. **2025년 3분기**: 해당 기간 동안 자금조달 실적이 없습니다.\n5. **2024년 9월분기**: 해당 기간 동안 자금조달 실적이 없습니다.\n\n따라서 이 기간들에서 삼성전자의 자금조달 내역은 존재하지 않습니다.\n\n근거: \n- report_id(periodic_20260515002181), chunk_id(periodic_20260515002181::main::P21::C1)\n- report_id(periodic_20230814002534), chunk_id(periodic_20230814002534::main::P21::C1)\n- report_id(periodic_20231114002109), chunk_id(periodic_20231114002109::main::P21::C1)\n- report_id(periodic_20250515001922), chunk_id(periodic_20250515001922::main::P21::C1)\n- report_id(periodic_20241114002642), chunk_id(periodic_20241114002642::main::P21::C1)",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 16.02324891090393
+  },
+  {
+    "label": "삼성SDI(2차전지)",
+    "category": "비교연산_Open",
+    "query": "삼성SDI의 당기 대비 전기 영업이익 변화를 정리해줘",
+    "companies": [
+      "삼성SDI"
+    ],
+    "route": "calculation",
+    "route_score": 0.7511946678810802,
+    "iterations": 4,
+    "n_tool_calls": 3,
+    "n_citations": 5,
+    "answer": "삼성SDI의 당기 대비 전기 영업이익 변화는 다음과 같습니다:\n\n- **전기 영업이익**: -2,321,029천 원 (제56기 1분기)\n- **당기 영업이익**: -490,396천 원 (제57기 1분기)\n- **변화량**: 2317163천 원 (약 100% 증가)\n\n따라서, 삼성SDI의 이번 분기의 영업이익 적자는 직전 분기에 비해 크게 감소했습니다.\n\n근거: report_id(periodic_20260515002408), chunk_id: P14::C7, P16::C38, P18::C40, P15::C3, P17::C4",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {
+      "2317163": "129858875491 / 5620842 * 100(%)"
+    },
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "[참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'2317163': '129858875491 / 5620842 * 100(%)'}"
+    ],
+    "elapsed": 23.416874885559082
+  },
+  {
+    "label": "LG에너지솔루션(2차전지)",
+    "category": "비교연산_Open",
+    "query": "LG에너지솔루션의 최근 자금조달 내역을 유형별로 정리해줘",
+    "companies": [
+      "LG에너지솔루션"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7150962714066909,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "LG에너지솔루션의 최근 자금조달 내역을 유형별로 정리하면 다음과 같습니다:\n\n### 해외조달\n- **금융 기관**: \n  - 기초 잔액: 7,153,975 (2025년 12월 기준)\n  - 신규 조달: 2,595,916\n  - 기말 잔액: 9,749,891\n\n- **기타**:\n  - 기초 잔액: 274,288\n  - 신규 조달: -\n  - 상환 등 감소: 33,386\n  - 기말 잔액: 240,902\n\n#### 총계\n  - 총 기초 잔액: 7,428,263\n  - 총 신규 조달: 2,595,916\n  - 총 기말 잔액: 9,990,793\n\n### 공모자금 사용 내역 (2023년 09월 30일 기준)\n1. **기업공개 (유가증권시장 상장)**:\n    - 시설자금: 645,054 → 509,593 (차이 발생)\n    - 운영자금(연구개발 및 경상투자 목적): 1,604,273 → 1,422,635 (차이 발생)\n    - 타법인증권취득자금: 7,875,085 → 7,875,085 (완료)\n\n2. **회사채 (녹색 채권)**:\n    - 제2-1회 무보증 사채:\n        - 운영자금: 50,000 → 50,000 (완료)\n        - 타법인증권취득자금: 75,000 → 75,000 (완료)\n    - 제2-2회 무보증 사채:\n        - 운영자금: 50,000 → 50,000 (완료)\n        - 타법인증권취득자금: 320,000 → 176,549 (진행 중)\n    - 제2-3회 무보증 사채:\n        - 타법인증권취득자금: 505,000 → - (미사용)\n\n### 공모자금 사용 내역 (2023년 12월 31일 기준)\n1. **기업공개 (유가증권시장 상장)**:\n    - 시설자금: 645,054 → 645,054 (완료)\n    - 운영자금(연구개발 및 경상투자 목적): 1,604,273 → 1,604,273 (완료)\n    - 타법인증권취득자금: 7,875,085 → 7,875,085 (완료)\n\n2. **회사채 (녹색 채권)**:\n    - 제2-1회 무보증 사채:\n        - 운영자금: 50,000 → 50,000 (완료)\n        - 타법인증권취득자금: 75,000 → 75,000 (완료)\n    - 제2-2회 무보증 사채:\n        - 운영자금: 50,000 → 50,000 (완료)\n        - 타법인증권취득자금: 320,000 → 176,549 (진행 중)\n    - 제2-3회 무보증 사채:\n        - 타법인증권취득자금: 505,000 → - (미사용)\n\n### 공모자금 사용 내역 (2024년 12월 31일 기준)\n1. **회사채 (녹색 채권)**:\n    - 제2-1회 무보증 사채:\n        - 운영자금: 50,000 → 50,000 (완료)\n        - 타법인증권취득자금: 75,000 → 75,000 (완료)\n    - 제2-2회 무보증 사",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": false,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "답변에 근거(report_id/chunk_id) 인용이 없음"
+    ],
+    "elapsed": 55.05414867401123
+  },
+  {
+    "label": "한미반도체(반도체)",
+    "category": "비교연산_Open",
+    "query": "한미반도체의 당기 대비 전기 영업이익 변화를 정리해줘",
+    "companies": [
+      "한미반도체"
+    ],
+    "route": "calculation",
+    "route_score": 0.7511946678810802,
+    "iterations": 3,
+    "n_tool_calls": 2,
+    "n_citations": 5,
+    "answer": "한미반도체의 당기(2026년 1분기) 대비 전기(2025년 1분기) 영업이익 변화는 다음과 같습니다:\n\n- 당기 영업이익: 8,456백만원\n- 전기 영업이익: 69,008백만원\n\n따라서 당기 영업이익은 전기 영업이익보다 **60,552백만원 감소**했습니다.\n\n근거: report_id(periodic_20260515001572), chunk_id: P14::C3 and P14::C6",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {
+      "2025": "8456257107 / 419047350 * 100(%)",
+      "69008": "15722604093 / 22682853 * 100(%)",
+      "60552": "147391786 / 242364 * 100(%)"
+    },
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "[참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'2025': '8456257107 / 419047350 * 100(%)', '69008': '15722604093 / 22682853 * 100(%)', '60552': '147391786 / 242364 * 100(%)'}"
+    ],
+    "elapsed": 20.463145971298218
+  },
+  {
+    "label": "KB금융(금융)",
+    "category": "비교연산_Open",
+    "query": "KB금융의 최근 자금조달 내역을 유형별로 정리해줘",
+    "companies": [
+      "KB금융"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7150962714066909,
+    "iterations": 6,
+    "n_tool_calls": 6,
+    "n_citations": 15,
+    "answer": "KB금융의 최근 자금조달 내역을 유형별로 정리하면 다음과 같습니다:\n\n### 원화자금\n- **예수금**: 평균잔액은 2023년 9월 기준 333,078,280백만원에서 2024년 말에는 337,478,959백만원까지 증가했으며, 이자율은 1.27%에서 2.53% 사이였습니다.\n- **CD**: 5,511,822백만원(이자율 2.35%)에서 10,417,992백만원(이자율 4.07%)으로 증가.\n- **차입금**: 31,064,028백만원(이자율 1.91%)에서 32,807,456백만원(이자율 3.38%)으로 증가.\n- **원화콜머니**: 1,314,525백만원(이자율 2.02%)에서 1,384,033백만원(이자율 3.52%)으로 증가.\n- **사채**: 58,290,290백만원(이자율 2.39%)에서 56,245,329백만원(이자율 3.34%)으로 감소.\n- **기타**: 20,866,612백만원(2.34%)에서 21,767,083백만원(4.49%)으로 증가.\n\n### 외화자금\n- **외화예수금**: 34,076,754백만원(2.09%)에서 35,675,306백만원(3.97%)으로 증가.\n- **외화차입금**: 22,970,783백만원(1.90%)에서 21,094,988백만원(4.30%)으로 감소.\n- **외화콜머니**: 1,572,913백만원(1.87%)에서 1,348,423백만원(4.76%)으로 변동.\n- **외화사채**: 11,978,139백만원(2.09%)에서 12,884,157백만원(3.31%)으로 증가.\n- **기타**: 1,685,165백만원(1.46%)에서 1,067,253백만원(3.51%)으로 감소.\n\n### 기타\n- **자본총계**: 67,612,953백만원(9.72%)에서 56,740,649백만원(8.16%)으로 감소.\n- **충당금**: 1,128,687백만원(0.16%)에서 1,055,315백만원(0.15%)으로 감소.\n- **기타**: 104,628,576백만원(15.04%)에서 73,011,147백만원(11.10%)으로 감소.\n\n이러한 데이터는 각 시기별 자금조달 실적 변화를 보여주며, 특히 예수금과 같은 주요 항목에서의 변동이 두드러집니다. 전반적으로 원화자금과 외화자금 모두 증가세를 보였으며, 특정 항목에서는 큰 폭의 변화가 관찰되었습니다.\n\n**근거:** \n- report_id(chunk_id): periodic_20241230000635::main::P9::C2,\n- periodic_20260324000822::main::P9::C2,\n- periodic_20260515002888::main::P8::C132,\n- periodic_20250526000374::main::P9::C122,\n- periodic_20240326000894::main::P9::C120,\n- periodic_20260515002888::main::P8::C132,\n- periodic_20240314001585::main::P8::C120,\n- periodic_20240326000894::main::P9::C120,\n- periodic_20260515002408::main::P21::C1",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 35.6156051158905
+  },
+  {
+    "label": "알테오젠(바이오)",
+    "category": "비교연산_Open",
+    "query": "알테오젠의 당기 대비 전기 영업이익 변화를 정리해줘",
+    "companies": [
+      "알테오젠"
+    ],
+    "route": "calculation",
+    "route_score": 0.7511946678810802,
+    "iterations": 3,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "알테오젠의 당기(2026년도 1분기) 대비 전기(2025년도) 영업이익 변화는 다음과 같습니다:\n\n- 당기 영업이익: 41,029,532,343원\n- 전기 영업이익: 114,531,644,175원\n\n따라서, 알테오젠의 영업이익은 전기에서 당기로 넘어가며 **73,502,111,832원** 감소했습니다.\n\n근거: report_id(periodic_20260515001517), chunk_id(periodic_20260515001517::main::P14::C5)",
+    "grounded": false,
+    "numbers_grounded": false,
+    "ungrounded_numbers": [
+      "73502111832"
+    ],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['73502111832']"
+    ],
+    "elapsed": 21.53979802131653
+  },
+  {
+    "label": "HD현대중공업(조선)",
+    "category": "비교연산_Open",
+    "query": "HD현대중공업의 최근 자금조달 내역을 유형별로 정리해줘",
+    "companies": [
+      "HD현대중공업"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7150962714066909,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "HD현대중공업의 최근 자금조달 내역을 유형별로 정리하면 다음과 같습니다:\n\n### 공모자금의 사용내역\n1. **회사채(녹색채권)**\n   - **4-1회차**: 60,000백만원 (운영자금)\n   - **4-2회차**: 240,000백만원 (운영자금)\n   - **외화사채** (2022.03.28): 441,000백만원 (운영자금, 친환경 선박건조 등)\n\n2. **유가증권시장 상장**\n   - **운영자금**: 122,345백만원\n   - **채무상환자금**: 189,805백만원\n   - **기타(연구개발자금)**: 767,850백만원 → 454,581백만원 ('21-'25년 연속투자 반영)\n\n3. **회사채**\n   - **5-1회차**: 102,000백만원 (운영자금, 선박건조 등)\n   - **5-2회차**: 60,000백만원 (운영자금, 선박건조 등)\n   - **5-3회차**: 38,000백만원 (운영자금, 선박건조 등)\n   - **7-1회차**: 73,000백만원 (운영자금, 선박건조 등)\n   - **7-1회차 추가**: 103,000백만원 (운영자금, 선박건조 등)\n   - **8-1회차**: 77,000백만원 (채무상환)\n   - **8-2회차**: 65,000백만원 (채무상환)\n   - **8-3회차**: 58,000백만원 (채무상환)\n\n### 사모자금의 사용내역\n1. **회사채**\n   - **-**: 268,960백만원 (채무상환자금)\n   - **6회차**: 50,000백만원 (운영자금)\n\n### 미사용자금의 운용내역\n- 예·적금: 415,247백만원 (수시입출정기예금 등)\n\n각 공시마다 약간의 변동이 있지만 대체로 유사한 패턴을 유지하고 있습니다. 특히 녹색채권과 유가증권시장 상장 등을 통해 다양한 목적으로 자금을 조달하고 있음을 알 수 있습니다. 또한 최근에는 운영자금 외에도 채무상환 목적의 자금조달이 눈에 띕니다.\n\n근거:\n- report_id(chunk_id): periodic_20230515002433::main::P21::C1,\n  periodic_20231114001059::main::P21::C1,\n  periodic_20260515001837::main::P21::C1,\n  periodic_20230814002529::main::P21::C1,\n  periodic_20250318000897::main::P21::C1",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 30.531686305999756
+  },
+  {
+    "label": "현대자동차(자동차)",
+    "category": "복합추론_Closed",
+    "query": "현대자동차가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "현대자동차"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.8612803569177256,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 0,
+    "answer": "제공된 근거로는 현대자동차가 최근에 체결한 계약 중에서 해지되거나 정정된 내용을 확인할 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 7.473138809204102
+  },
+  {
+    "label": "현대건설(건설)",
+    "category": "복합추론_Closed",
+    "query": "현대건설의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "현대건설"
+    ],
+    "route": "correction_analysis",
+    "route_score": 0.8473094979490607,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 0,
+    "answer": "현대건설의 최근 기재정정 이력은 다음과 같습니다:\n\n- **2023년 12월 사업보고서**: 처음 보고서는 2023년 3월 13일에 제출되었으며, 이후 2023년 4월 14일과 4월 29일에 두 번의 기재정정이 이루어졌습니다.\n- **2024년 12월 사업보고서**: 처음 보고서는 2024년 5월 10일에 제출되었고, 2024년 10월 17일에 한 번의 기재정정이 있었습니다.\n- **기타 공시들**: 여러 자율공시와 주요 경영사항 공시가 있었으며, 이들 중 일부는 기재정정을 거쳤습니다.\n\n이와 같이 현대건설은 다양한 보고서 및 공시를 통해 정보를 제공하고 있으며, 필요에 따라 이를 수정하고 있습니다. 이러한 과정은 정보의 정확성을 높이고 투자자들에게 신뢰할 만한 데이터를 제공하기 위한 것입니다.\n\n근거: report_id(chunk_id): periodic_20240313001698, periodic_20240314001734, periodic_20240329003141, periodic_20251017000151 등.",
+    "grounded": false,
+    "numbers_grounded": false,
+    "ungrounded_numbers": [
+      "2023",
+      "2024"
+    ],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2023', '2024']",
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 19.01918911933899
+  },
+  {
+    "label": "SK텔레콤(통신)",
+    "category": "복합추론_Closed",
+    "query": "SK텔레콤가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "SK텔레콤"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.8612803569177256,
+    "iterations": 3,
+    "n_tool_calls": 5,
+    "n_citations": 20,
+    "answer": "제공된 정보에 따르면, SK텔레콤이 최근에 체결한 계약 중에서 해지되거나 정정된 사례는 다음과 같습니다:\n\n1. **자기주식취득 신탁계약 해지 결정**\n   - 공시일: 2024년 1월 26일\n   - 내용: SK텔레콤은 2023년 7월 27일부터 2024년 1월 26일까지의 자기주식취득 신탁계약을 해지하였으며, 이로 인해 60억 원 상당의 자기주식이 해지되었습니다. 해지된 주식은 계약 해지 후 회사 법인계좌에 입고되어 보유될 예정입니다.\n\n2. **해외 증권시장 주권등 상장폐지 결정**\n   - 공시일: 2023년 6월 23일\n   - 내용: SK텔레콤은 런던증권거래소에 상장된 주식예탁증서(DR)의 거래량이 미미하여 상장폐지를 신청하였고, 이는 2023년 7월 31일에 완료되었습니다. 다행히 뉴욕증권거래소 상장은 유지되며, 런던증권거래소를 통한 DR 주주들은 뉴욕증권거래소로 거래를 옮길 수 있게 되었습니다.\n\n이 외에도 다수의 주요사항 보고서와 대량보유 상황 보고서가 있지만, 이들은 주로 계약의 체결이나 변동 사항을 다루고 있으며 해지와 관련된 내용은 포함하고 있지 않습니다. 따라서, 현재까지 확인된 바로는 위의 두 가지 사례가 SK텔레콤의 최근 계약 해지 혹은 정정 사례로 볼 수 있습니다.\n\n근거: report_id(major_20240126000018, major_20230623000001, major_20230731000343)",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 30.019683122634888
+  },
+  {
+    "label": "기아(자동차)",
+    "category": "복합추론_Closed",
+    "query": "기아의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "기아"
+    ],
+    "route": "correction_analysis",
+    "route_score": 0.8473094979490607,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 0,
+    "answer": "네, 기아에는 최근 기재정정이 있었습니다. 가장 최근에 기재정정을 한 문서는 '사업보고서 (2024.12)'로, 해당 문서의 정정본은 '[기재정정]사업보고서 (2023.12)'이며, 이는 2023년 3월 12일에 제출되었습니다.\n\n근거: report_id(chunk_id): periodic_20240312000909, periodic_20240307000911",
+    "grounded": false,
+    "numbers_grounded": false,
+    "ungrounded_numbers": [
+      "2023"
+    ],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2023']",
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 15.05649471282959
+  },
+  {
+    "label": "SK하이닉스(반도체)",
+    "category": "복합추론_Closed",
+    "query": "SK하이닉스가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "SK하이닉스"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.8612803569177256,
+    "iterations": 3,
+    "n_tool_calls": 2,
+    "n_citations": 5,
+    "answer": "제공된 정보에 따르면, SK하이닉스가 최근에 체결한 계약 중에서 해지되거나 정정된 건들은 다음과 같습니다:\n\n1. **영업양수 결정**\n   - 공시일: 2025년 3월 17일 및 2025년 3월 28일\n   - 정정 상태: 정정본 (최신)\n   - 내용: 양수기준일이 2025년 3월 15일에서 2025년 3월 31일로 정정됨.\n\n2. **주요사항보고서(교환사채권 발행결정)**\n   - 공시일: 2023년 4월 4일\n   - 정정 상태: 정정본 (최신)\n   - 내용: 교환대상 주식수가 20,126,911주로 정정되었고, 교환청구기간이 2023년 5월 22일부터 2030년 4월 1일까지로 설정됨.\n\n3. **주요사항보고서(자기주식 처분 결정)**\n   - 공시일: 2023년 4월 4일\n   - 정정 상태: 정정본 (최신)\n   - 내용: 처분예정주식 수가 17,759,040주에서 20,126,911주로, 그리고 처분예정금액이 1,974,450,000,000원에서 2,237,710,000,000원으로 정정됨.\n\n이와 같이 일부 계약들이 해지되거나 중요한 내용이 수정되었음을 알 수 있습니다. 이러한 정보는 주로 회사의 재무적 의사결정과 관련된 것으로 보입니다.",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": false,
+    "correction_evidence_complete": true,
+    "warnings": [
+      "답변에 근거(report_id/chunk_id) 인용이 없음"
+    ],
+    "elapsed": 25.464624166488647
+  },
+  {
+    "label": "NAVER(IT/플랫폼)",
+    "category": "복합추론_Closed",
+    "query": "NAVER의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "NAVER"
+    ],
+    "route": "correction_analysis",
+    "route_score": 0.8473094979490607,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 0,
+    "answer": "네이버의 최근 기재정정 이력은 다음과 같습니다:\n\n1. **주요사항보고서(자기주식처분결정)** - 2023년 6월 23일에 기재정정이 이루어졌으며, 이후에도 여러 번의 주요사항보고서에 대해 기재정정이 있었습니다.\n2. **투자판단관련주요경영사항** - 2025년 9월 30일과 2026년 1월 30일에 기재정정이 있었습니다.\n\n이러한 이력들은 DART 시스템에서 확인한 정보로, 가장 최근의 기재정정은 2026년 1월 30일입니다.\n\n근거: get_correction_history, report_id(major_20260323001243, major_20260323001224, exchange_20260130800888)",
+    "grounded": false,
+    "numbers_grounded": false,
+    "ungrounded_numbers": [
+      "2023",
+      "2025",
+      "2026"
+    ],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2023', '2025', '2026']",
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 13.7972092628479
+  },
+  {
+    "label": "카카오(IT/플랫폼)",
+    "category": "복합추론_Closed",
+    "query": "카카오가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "카카오"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.8612803569177256,
+    "iterations": 6,
+    "n_tool_calls": 5,
+    "n_citations": 15,
+    "answer": "제공된 근거에 따르면, 카카오가 최근에 체결한 계약 중에서 해지되거나 정정된 것에 대한 정보는 확인되지 않습니다.\n\n근거: get_correction_history, major_20240422000499, major_20230810000781, major_20250523000639, major_20250527000422, major_20260211001133, major_20260326001343, major_20260320001182, major_20241213000201, major_20240725000389, major_20231026000330",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": true,
+    "warnings": [],
+    "elapsed": 32.513571977615356
+  },
+  {
+    "label": "신한지주(금융)",
+    "category": "복합추론_Closed",
+    "query": "신한지주의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "신한지주"
+    ],
+    "route": "correction_analysis",
+    "route_score": 0.8473094979490607,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 0,
+    "answer": "네, 신한지주의 최근 기재정정 이력이 있습니다. 가장 최근에 기재정정이 이루어진 문서는 '**[기재정정] 사업보고서 (2023.12)**'로, 최초 제출일은 **2024년 5월 2일**이며, 이후 **2024년 5월 21일**에 최종 수정되었습니다.\n\n근거: report_id(periodic_20240318000635), report_id(periodic_20240502000081)",
+    "grounded": false,
+    "numbers_grounded": false,
+    "ungrounded_numbers": [
+      "2024"
+    ],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2024']",
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 58.22817516326904
+  },
+  {
+    "label": "삼성바이오로직스(바이오)",
+    "category": "복합추론_Closed",
+    "query": "삼성바이오로직스가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "삼성바이오로직스"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.8612803569177256,
+    "iterations": 3,
+    "n_tool_calls": 2,
+    "n_citations": 0,
+    "answer": "제공된 근거에 따르면 삼성바이오로직스가 최근에 체결한 계약 중에서 해지되거나 정정된 계약에 대한 정보는 확인되지 않습니다. 가장 최근의 보고서인 '단일판매ㆍ공급계약체결' (문서 ID: exchange_20260313800095, 접수일: 20260313)에는 이러한 내용이 포함되어 있지 않습니다.\n\n근거: report_id(exchange_20260313800095)",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 12.553441047668457
+  },
+  {
+    "label": "셀트리온(바이오)",
+    "category": "복합추론_Closed",
+    "query": "셀트리온의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "셀트리온"
+    ],
+    "route": "correction_analysis",
+    "route_score": 0.8473094979490607,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 0,
+    "answer": "제공된 정보에 따르면 셀트리온의 최근 기재정정 이력은 다음과 같습니다:\n\n1. **2025년 5월 28일** - '[기재정정] 주요사항보고서(자기주식취득결정)' (doc_id: major_20250528000403)\n2. **2025년 5월 28일** - '[기재정정] 주요사항보고서(무상증자결정)' (doc_id: major_20250528000411)\n\n이 두 개의 문서가 가장 최근에 기재정정이 이루어진 사례입니다. 근거는 각각의 문서 ID와 제출 날짜로 확인됩니다.\n\n근거: report_id(major_20250528000403, major_20250528000411)",
+    "grounded": false,
+    "numbers_grounded": false,
+    "ungrounded_numbers": [
+      "2025"
+    ],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2025']",
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 43.169145822525024
+  },
+  {
+    "label": "하이브(엔터)",
+    "category": "복합추론_Closed",
+    "query": "하이브가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "하이브"
+    ],
+    "error": "ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "elapsed": 2945.4426879882812
+  },
+  {
+    "label": "와이지엔터테인먼트(엔터)",
+    "category": "복합추론_Closed",
+    "query": "와이지엔터테인먼트의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "와이지엔터테인먼트"
+    ],
+    "route": "correction_analysis",
+    "route_score": 0.8473094979490607,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 0,
+    "answer": "네, 와이지엔터테인먼트(YG Entertainment)는 최근 기재 정정을 한 이력이 있습니다. 가장 최근에 기재 정정이 이루어진 문서는 \"사업보고서 (2023.12)\"로, 최초 보고서는 2023년 12월에 제출되었으며, 이후 2024년 4월 3일에 수정된 정정본이 제출되었습니다.\n\n근거: report_id(periodic_20240321000506, periodic_20240403000827)",
+    "grounded": false,
+    "numbers_grounded": false,
+    "ungrounded_numbers": [
+      "2023",
+      "2024"
+    ],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2023', '2024']",
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 20.010490894317627
+  },
+  {
+    "label": "크래프톤(게임)",
+    "category": "복합추론_Closed",
+    "query": "크래프톤가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "크래프톤"
+    ],
+    "error": "HCXError: HCX API 오류 400: {\"status\":{\"code\":\"40000\",\"message\":\"Bad request\"},\"result\":null}",
+    "elapsed": 5841.382643938065
+  },
+  {
+    "label": "두산로보틱스(로봇)",
+    "category": "복합추론_Closed",
+    "query": "두산로보틱스의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "두산로보틱스"
+    ],
+    "route": "correction_analysis",
+    "route_score": 0.8473094979490607,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 0,
+    "answer": "네, 두산로보틱스에는 최근 기재정정 이력이 있습니다. 가장 최근의 기재정정은 다음과 같습니다:\n\n- **수정 유형**: 주요사항보고서의 회사합병결정과 타법인주식및출자증권양수결정\n- **수정 일자**: 2024년 12월 10일\n\n이러한 수정 내역들은 DART 시스템에서 확인 가능합니다. 근거: get_correction_history, major_20240715000355, major_20240715000360, major_20240829001245, major_20240829001275, major_20240910000533, major_20240925000579, major_20241021000160, major_20241021000168, major_20241022000252, major_20241108000494, major_20241210000312, major_20241210000378",
+    "grounded": false,
+    "numbers_grounded": false,
+    "ungrounded_numbers": [
+      "2024"
+    ],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2024']",
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 16.665602922439575
+  },
+  {
+    "label": "레인보우로보틱스(로봇)",
+    "category": "복합추론_Closed",
+    "query": "레인보우로보틱스가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "레인보우로보틱스"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.8612803569177256,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거에 따르면, 레인보우로보틱스가 최근 체결한 계약 중에서 해지되거나 정정된 건에 대해 다음과 같이 정리할 수 있습니다:\n\n1. **KF-21 공정자동화를 위한 협동로봇 드릴링 머신 솔루션 납품 계약**\n   - **정정 여부**: 정정이 있었습니다.\n   - **변경 내용**:\n     - 계약 금액: 4,150,000,000원에서 4,250,000,000원으로 변경.\n     - 매출액 대비 비율: 30.5%에서 31.2%로 변경.\n     - 계약 기간: 원래 계약 종료일이 없었으나, 정정 후에는 2025년 5월 30일로 설정됨.\n     - 주요 계약 조건: 선급금이 29%, 잔금은 여러 단계별로 지급 조건이 명시됨.\n\n2. **중·고궤도 광학감시시스템 개발 계약**\n   - **정정 여부**: 제공된 정보에는 이 계약의 해지에 관한 내용이 포함되어 있지 않습니다.\n   - 현재까지 진행 상황은 '장기 2차 계약 완료 및 수행 중'이며, '장기 3차, 4차 계약 진행 예정'이라고 보고되었습니다.\n\n따라서, 일부 계약들은 금액이나 조건 등의 수정이 있었음을 알 수 있지만, 완전히 해지된 계약에 대한 정보는 확인되지 않습니다.\n\n근거: report_id(chunk_id):\n- periodic_20260515002401::main::P39::C1\n- periodic_20260320000803::main::P39::C1\n- periodic_20250814002961::main::P35::C1\n- exchange_20240902900360::main::C1\n- exchange_20241205900548::main::C1",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": true,
+    "warnings": [],
+    "elapsed": 23.522052764892578
+  },
+  {
+    "label": "한화에어로스페이스(방산)",
+    "category": "복합추론_Closed",
+    "query": "한화에어로스페이스의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "한화에어로스페이스"
+    ],
+    "route": "correction_analysis",
+    "route_score": 0.8473094979490607,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 0,
+    "answer": "네, 한화 에어로스페이스의 최근 기재정정 이력이 있습니다. 가장 최근의 기재정정은 **2024년 3월**에 이루어진 것으로, 사업보고서(2023.12)의 기재 내용을 수정한 것입니다. 해당 문서들은 다음과 같습니다:\n\n1. 원본: 사업보고서 (2023.12), 제출일: 2024.03.18\n2. 정정본: [기재정정]사업보고서 (2023.12), 제출일: 2024.03.29\n\n이 외에도 주요 사항 보고서 및 단일 판매·공급 계약 체결 등의 다양한 공시 문서에 대한 기재 정정이 있었습니다. \n\n근거: report_id(chunk_id): periodic_20240318000952, periodic_20240329000902",
+    "grounded": false,
+    "numbers_grounded": false,
+    "ungrounded_numbers": [
+      "2024"
+    ],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2024']",
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 18.719988107681274
+  },
+  {
+    "label": "한국항공우주(방산)",
+    "category": "복합추론_Closed",
+    "query": "한국항공우주가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "한국항공우주"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.8612803569177256,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 0,
+    "answer": "제공된 정보에 따르면 한국항공우주에서 최근에 체결한 계약 중에서 해지되거나 정정된 계약이 있는지 직접적인 언급은 없습니다. 그러나 몇 가지 주목할 만한 사항은 다음과 같습니다:\n\n1. **정정된 문서들**: 몇몇 보고서들이 '[기재정정]'이라는 명칭으로 다시 제출되었음을 알 수 있습니다. 예를 들어, '사업보고서 (2023.12)'는 처음 제출된 후 '사업보고서 (2023.12)[기정정]'으로 수정되었습니다. 또한 여러 단일판매·공급계약 체결 보고서가 정정되어 재제출된 사례가 다수 확인됩니다.\n\n2. **해지된 계약**: 특정한 단일판매 공급계약이 해지된 사례도 존재합니다. 예를 들어, '단일판매ㆍ공급계약해지'라는 제목의 문서가 있으며 이는 특정 계약이 해지되었음을 나타냅니다.\n\n이러한 정보는 한국항공우주의 계약 관리 상황을 반영하며, 일부 계약들은 변경되거나 해지될 수 있음을 시사합니다. 다만, 구체적인 계약의 세부 사항이나 해지 및 정정의 이유는 제공된 데이터 내에서 확인할 수 없습니다.\n\n근거: exchange_20230926800443, periodic_20240320001527, periodic_20240326000812, major_20260205000384, exchange_20230224800251, exchange_20230228800391, exchange_20230518800104, exchange_20230530800252, exchange_20230704800340, exchange_20230914800073, exchange_20231123800382, exchange_20231130800362, exchange_20231208800073, exchange_20231220800225, exchange_20231227800229, exchange_20231228800546, exchange_20240111800001, exchange_20240213800744, exchange_20240326800001, exchange_20240326800003, exchange_20240415800153, exchange_20240502800572, exchange_20240625800059, exchange_20241129800455, exchange_20241209800032, exchange_20241210800085, exchange_20241223800707, exchange_20241227800522, exchange_20250312801108, exchange_20250312801192, exchange_20250326800989, exchange_20250326802089, exchange_20250604800028, exchange_20250625800263, exchange_20250626800313, exchange_20250627800228, exchange_20250716800365, exchange_20250828800020, exchange_20250911800254, exchange_20250915800632, exchange_20250929800523, exchange_20251016800131, exchange_20251016800133, exchange_20251120800099, exchange_20251125800192, exchange_20251218800301, exchange_20251222800106, exchange_20251223800187, exchange_20251226800113, exchange_20251226800326, exchange_20251226800759, exchange_20260112800001, exchange_20260206800170, exchange_20260316800297, holding_20230414001181, holding_20230425000418, holding_20230516000244, holding_20230612000173, holding_20230621000428, holding_20230629000073, holding_20230801000323, holding_20230803000149, holding_20231110000478, holding_20231211000373, holding_20240109000154, holding_20240208000529, holding_20240305000559, holding_20240507000470, holding_20240607000069, holding_20240729000276, holding_20240927000633, holding_20241226000160,",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 20.319679975509644
+  },
+  {
+    "label": "이마트(유통)",
+    "category": "복합추론_Closed",
+    "query": "이마트의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "이마트"
+    ],
+    "route": "correction_analysis",
+    "route_score": 0.8473094979490607,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 0,
+    "answer": "이마트의 최근 기재정정 이력은 다음과 같습니다:\n\n1. **2024년 4월 16일**: 주요사항보고서(회사합병결정)\n2. **2025년 1월 20일**: 주요사항보고서(자기주식취득결정) 및 주요사항보고서(자기주식처분결정)\n\n위 내용은 DART 시스템에서 확인한 가장 최근의 기재정정 내역이며, 해당 문서들은 이미 정정된 상태로 공시되었습니다.\n\n근거: get_correction_history, major_20240416000200, major_20250120000327, major_20250120000339",
+    "grounded": false,
+    "numbers_grounded": false,
+    "ungrounded_numbers": [
+      "2024",
+      "2025"
+    ],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2024', '2025']",
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 17.062312364578247
+  },
+  {
+    "label": "LG생활건강(화장품)",
+    "category": "복합추론_Closed",
+    "query": "LG생활건강가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "LG생활건강"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.8612803569177256,
+    "iterations": 3,
+    "n_tool_calls": 2,
+    "n_citations": 5,
+    "answer": "제공된 근거에는 LG생활건강이 최근에 체결한 계약 중에서 해지되거나 정정된 건에 대한 정보가 포함되어 있지 않습니다. 따라서 이에 대해 확인할 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 21.07438898086548
+  },
+  {
+    "label": "아모레퍼시픽(화장품)",
+    "category": "복합추론_Closed",
+    "query": "아모레퍼시픽의 최근 기재정정 이력이 있어?",
+    "companies": [
+      "아모레퍼시픽"
+    ],
+    "route": "correction_analysis",
+    "route_score": 0.8473094979490607,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 0,
+    "answer": "아모레퍼시픽의 최근 기재정정 이력은 다음과 같습니다:\n\n1. **2024년 5월 30일** - 주요사항보고서(타법인주식및출자증권양수결정)\n   - 문서 ID: major_20231031000001\n   - 정정 사유: 타법인 주식 및 출자 증권 양수 결정에 대한 정보 수정\n\n2. **2024년 8월 1일** - 주요사항보고서(자기주식처분결정)\n   - 문서 ID: major_20250801000278\n   - 해당 문서는 자기주식 처분에 관한 결정을 다루며, 정정 기록 없이 원본 상태를 유지하고 있습니다.\n\n이와 같이 아모레퍼시픽은 특정 중요 사항 보고서에 대해 기재 정정을 진행한 바 있으며, 이는 주로 투자자와 이해관계자들에게 중요한 영향을 미칠 수 있는 사안들입니다. \n\n근거: get_correction_history, document details from DART",
+    "grounded": false,
+    "numbers_grounded": false,
+    "ungrounded_numbers": [
+      "2024"
+    ],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": false,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2024']",
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ],
+    "elapsed": 28.689284086227417
+  },
+  {
+    "label": "POSCO홀딩스(철강)",
+    "category": "복합추론_Open",
+    "query": "POSCO홀딩스의 최근 자사주 취득/처분 이력을 정리해줘",
+    "companies": [
+      "POSCO홀딩스"
+    ],
+    "route": "ownership_analysis",
+    "route_score": 0.7879242755134797,
+    "iterations": 3,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "최근 몇 년간의 POSCO홀딩스의 자사주 취득 및 처분 이력은 다음과 같습니다:\n\n**자사주 취득**\n1. **2025년 (제58기)**:\n    - 2003년 7월 22일부터 2003년 10월 25일까지 자사주 매입·소각을 통해 이익을 주주에게 환원하는 목적으로 1,815,640주의 보통주를 취득했습니다.\n    - 2005년 7월 18일부터 2005년 10월 14일까지 해외증권(ADR) 발행용으로 3,500,000주의 보통주를 추가로 취득했습니다.\n    - 2006년 4월 28일부터 2006년 8월 1일까지 주가 안정 관리 및 주주가치 제고를 위해 1,743,735주의 보통주를 더 취득했습니다.\n2. **2024년 (제57기)**:\n    - 2003년 7월 22일부터 2003년 10월 25일까지 동일한 이유로 1,815,640주의 보통주를 다시 취득했습니다.\n    - 2005년 7월 18일부터 2005년 10월 14일까지 같은 목적으로 3,500,000주의 보통주를 추가로 취득했습니다.\n3. **2023년 (반기)**:\n    - 위와 동일한 내역으로 1,815,640주와 3,500,000주의 보통주를 취득했습니다.\n\n**자사주 처분**\n1. **2023년**:\n    - 2023년 3월 20일부터 2023년 4월 14일까지 임원들에 대한 주식 보상 지급을 위해 27,030주의 보통주를 처분하였습니다.\n2. **2022년**:\n    - 2022년 2월 25일 우리사주조합 출연을 위해 223,605주를 처분하였습니다.\n3. **2021년**:\n    - 2021년 9월 1일 외화 해외교환사채와 관련하여 교환 대상 주식인 자기주식 2,932,480주를 처분하였습니다.\n\n이와 같이 POSCO홀딩스는 주로 주가 안정 및 주주 가치 제고를 위해 자사주를 취득하며, 특정 목적을 위해 자사주를 처분하는 경향을 보입니다.",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {
+      "2003": "2009.10 / 100 * 100(%)",
+      "2006": "2009.10 / 100 * 100(%)"
+    },
+    "citation": false,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "[참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'2003': '2009.10 / 100 * 100(%)', '2006': '2009.10 / 100 * 100(%)'}",
+      "답변에 근거(report_id/chunk_id) 인용이 없음"
+    ],
+    "elapsed": 27.55522608757019
+  },
+  {
+    "label": "고려아연(비철금속)",
+    "category": "복합추론_Open",
+    "query": "고려아연의 계약 해지 이력을 시간순으로 정리해줘",
+    "companies": [
+      "고려아연"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.751554337044405,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "고려아연의 계약 해지 이력을 시간 순서대로 정리하면 다음과 같습니다:\n\n1. **2024년 11월 8일**\n   - 계약 금액: 150,000,000,000원\n   - 해지 전 계약 기간: 2024년 05월 08일부터 2024년 11월 08일까지\n   - 해지 기관: 한국투자증권\n   - 해지 목적: 신탁계약기간 만료에 따른 해지\n   - 해지 예정 주식: 289,703주\n   \n2. **2024년 5월 8일**\n   - 계약 금액: 100,000,000,000원\n   - 해지 전 계약 기간: 2023년 11월 09일부터 2024년 05월 08일까지\n   - 해지 기관: 한국투자증권\n   - 해지 목적: 신탁계약기간 만료에 따른 해지\n   - 해지 예정 주식: 205,305주 (소각 완료)\n\n3. **2025년 5월 7일**\n   - 계약 금액: 400,000,000,000원\n   - 해지 전 계약 기간: 2024년 08월 07일부터 2025년 05월 07일까지\n   - 해지 기관: 한국투자증권\n   - 해지 목적: 신탁계약기간 만료에 따른 해지\n   - 해지 예정 주식: 209,993주\n\n위의 정보는 각 공시문서의 내용을 바탕으로 작성되었으며, 모든 계약들은 신탁계약기간 만료로 인한 것이었고, 각각의 계약 금액과 해지 예정 주식 수는 상이합니다. \n\n근거: report_id(chunk_id): major_20241108000518::main::C1, major_20240508000305::main::C1, major_20250507000438::main::C1, major_20250507000438::main::C2",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 23.00720500946045
+  },
+  {
+    "label": "HMM(해운)",
+    "category": "복합추론_Open",
+    "query": "HMM의 최근 공시 이력을 종합해서 정리해줘",
+    "companies": [
+      "HMM"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7665695495365148,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "최근 HMM의 공시 이력은 다음과 같이 정리됩니다:\n\n**반기보고서**\n- **2025년 8월 13일**: 2025년 6월까지의 내용을 포함하고 있으며, 다양한 특수관계자 목록 및 그들의 세부 사항을 포함합니다.\n- **2024년 8월 13일**: 2024년 6월까지의 내용을 포함하며, 차입금, 사채, 리스부채 등 재무 항목별 금액 정보와 함께 특수관계자 명단을 제공합니다.\n\n**분기보고서**\n- **2024년 11월 13일**: 2024년 9월의 데이터를 기반으로 하며, 특수관계자에 대한 상세 정보를 포함합니다.\n\n**사업보고서**\n- **2025년 3월 18일**: 2024년 12월까지의 내용을 다루며, 역시 특수관계자와 관련된 상세 정보가 포함되어 있습니다.\n\n각 공시는 주로 특수관계자들의 명칭과 재무 상태를 다루고 있으며, 이를 통해 HMM의 복잡한 글로벌 네트워크와 재정 구조를 엿볼 수 있습니다. 모든 문서에서 공통적으로 언급되는 특수관계자들은 한국산업은행, 한국해양진흥공사 등의 주요 주주와 에이치엠엠오션서비스㈜, 에이치엠엠퍼시픽㈜ 같은 다수의 자회사와 해외 법인들입니다.\n\n근거:\n- report_id(chunk_id): periodic_20250813000957::main::P18::C18,\n  periodic_20240813000872::main::P18::C19,\n  periodic_20230810000859::main::P18::C18,\n  periodic_20241113000353::main::P18::C20,\n  periodic_20250318000828::main::P19::C47",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 22.23118019104004
+  },
+  {
+    "label": "현대글로비스(물류)",
+    "category": "복합추론_Open",
+    "query": "현대글로비스의 최근 자사주 취득/처분 이력을 정리해줘",
+    "companies": [
+      "현대글로비스"
+    ],
+    "route": "ownership_analysis",
+    "route_score": 0.7879242755134797,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "현대글로비스의 최근 자사주 취득/처분 이력은 다음과 같습니다:\n\n1. **2025년 8월 21일**\n   - 국민연금기금이 현대글로비스의 의결권 있는 주식 160,009주를 추가 취득하여 총 보유량이 7,410,468주에서 7,570,477주로 변경되었습니다.\n\n2. **2024년 12월 19일**\n   - 국민연금기금이 현대글로비스의 의결권 있는 주식 4,080,920주를 추가로 매입하여 총 보유량을 3,329,548주에서 7,410,468주로 늘렸습니다.\n\n이 정보는 공시된 내용을 바탕으로 한 것이며, 추가적인 정보가 필요하시면 더 자세한 공시 내용을 확인하시기 바랍니다.\n\n근거:\n- report_id(holding_20250827000418), chunk_id(holding_20250827000418::main::P10::C1)\n- report_id(holding_20250106000234), chunk_id(holding_20250106000234::main::P11::C1)",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 17.026721000671387
+  },
+  {
+    "label": "대우건설(건설)",
+    "category": "복합추론_Open",
+    "query": "대우건설의 계약 해지 이력을 시간순으로 정리해줘",
+    "companies": [
+      "대우건설"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.751554337044405,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "대우건설의 계약 해지 이력을 시간순으로 정리하면 다음과 같습니다:\n\n1. **광주 경안2지구 도시개발사업**\n   - 해지일자: 2024-11-14\n   - 해지금액: 362,307,038,000원\n   - 최근 매출액 대비 비율: 3.11%\n   - 주요 사유: 상호 합의에 의한 도급계약 해지\n\n2. **대전 도안 2-2지구 공동주택 신축공사**\n   - 해지일자: 2023-12-13\n   - 해지금액: 1,147,665,603,998원\n   - 최근 매출액 대비 비율: 11.01%\n   - 주요 사유: 발주처의 공사도급계약 해제 통보\n\n3. **천안역전지구 도시개발사업 사업협약**\n   - 해지일자: 2024-04-04\n   - 해지 사유: 법률 개정(「도시개발법」 일부개정)으로 인한 사업협약 해지 및 민간사업자 재공모\n   - 공사금액(당사분): 약 3,505억 원\n\n위 정보는 제공된 공시 자료를 바탕으로 작성되었으며, 각 사건의 해지 일자 순으로 정렬되어 있습니다. \n\n근거: report_id(chunk_id):\n- exchange_20241115800529::main::C1\n- exchange_20231214801332::main::C1\n- exchange_20240404800695::main::C1",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 20.607279062271118
+  },
+  {
+    "label": "케이티(통신)",
+    "category": "복합추론_Open",
+    "query": "케이티의 최근 공시 이력을 종합해서 정리해줘",
+    "companies": [
+      "케이티"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7665695495365148,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "케이티의 최근 공시 이력을 종합하면 다음과 같습니다:\n\n1. **사업보고서 (20250321)**:\n   - **법인 신설**: 2024년 11월 4일에 ㈜케이티넷코어와 ㈜케이티피앤엠을 신설하여 네트워크 안정성과 전문성을 강화함.\n   - **전략적 파트너십 체결**: 2024년 9월 27일, 마이크로소프트와 AI/클라우드/IT 분야에서 협력.\n   - **회사 합병**: 2024년 12월 26일, ㈜케이티넥스알을 흡수합병하여 경영 효율성을 높임.\n   - **특수관계인에 대한 자산양도**: 2024년 12월 26일, ㈜케이티클라우드에 유무형자산을 양도.\n\n2. **분기보고서 (20250515)**:\n   - 위 내용과 동일하게 법인 신설, 전략적 파트너십 체결, 회사 합병, 특수관계인에 대한 자산양도 내용을 포함합니다.\n\n3. **반기보고서 (20250814)**:\n   - **상호의 변경**: 여러 자회사들의 상호 변경 사항을 보고하며, 특히 ㈜케이티넥스알과의 소규모 합병과 관련된 상세 정보를 제공합니다.\n   - **기타 사항**: ㈜케이티의 주요 변화들을 요약하여 보여줍니다.\n\n4. **사업보고서 (20260323)**:\n   - **연혁**: 브이피㈜, ㈜스마트로, ㈜케이티스튜디오지니, ㈜케이티클라우드 등에 관한 다양한 변화를 기록합니다.\n\n이러한 공시를 통해 케이티는 지속적으로 조직 구조조정과 전략적 제휴를 통해 사업 역량을 강화하고 있음을 알 수 있습니다.\n\n**근거:** periodic_20250321001834, periodic_20250515002428, periodic_20241114001752, periodic_20250814003695, periodic_20260323001553",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 25.31312918663025
+  },
+  {
+    "label": "LG유플러스(통신)",
+    "category": "복합추론_Open",
+    "query": "LG유플러스의 최근 자사주 취득/처분 이력을 정리해줘",
+    "companies": [
+      "LG유플러스"
+    ],
+    "route": "ownership_analysis",
+    "route_score": 0.7879242755134797,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "LG유플러스의 최근 자사주 취득 및 처분 이력은 다음과 같습니다:\n\n1. **2021년 6월 8일**: 이사회에서 주가 안정 및 주주가치 제고를 위해 자기주식 1천억 원 취득을 결정하였고, 이에 따라 6,783,006주의 자기주식을 취득했습니다.\n\n2. **2025년 7월 21일**: 기취득 자사주 6,783,006주(취득가액 약 1천억 원)를 2025년 8월 5일 소각하기로 결정하였습니다.\n\n3. **2025년 7월 21일**: 주주가치 제고를 목적으로 800억 원 규모의 자사주 취득 신탁계약을 체결하기로 의결하였으며, 계약 기간은 2025년 8월 4일부터 2026년 8월 3일까지이고, 취득 예정 수량은 5,336,891주입니다.\n\n4. **2026년 2월 10일**: 자기주식 취득 완료에 따른 중도 해지를 이유로 자기주식 취득 신탁계약을 해지하였습니다.\n\n이러한 이력으로 볼 때, LG유플러스는 주주가치 제고를 위해 지속적으로 자사주를 취득하고 필요에 따라 소각하는 전략을 취하고 있음을 알 수 있습니다.\n\n**근거:** periodic_20250317000701, periodic_20240313001130, periodic_20251114002117, periodic_20260515000666, periodic_20250814001643, major_20260210000941, periodic_20260313000442, periodic_20250814001643, periodic_20260515000666",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 25.56365418434143
+  },
+  {
+    "label": "미래에셋증권(증권)",
+    "category": "복합추론_Open",
+    "query": "미래에셋증권의 계약 해지 이력을 시간순으로 정리해줘",
+    "companies": [
+      "미래에셋증권"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.751554337044405,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거에는 미래에셋증권의 계약 해지 이력에 대한 정보가 포함되어 있지 않습니다. 따라서 계약 해지 이력을 시간 순서로 정리할 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 16.701183080673218
+  },
+  {
+    "label": "에코프로비엠(2차전지소재)",
+    "category": "복합추론_Open",
+    "query": "에코프로비엠의 최근 공시 이력을 종합해서 정리해줘",
+    "companies": [
+      "에코프로비엠"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7665695495365148,
+    "iterations": 2,
+    "n_tool_calls": 4,
+    "n_citations": 0,
+    "answer": "에코프로비엠의 최근 공시 이력은 다음과 같습니다:\n\n1. **분기보고서 (2026.03)** - 2026년 3월 분기의 재무 및 운영 현황을 보고하는 문서입니다. (정정 상태: 원본)\n   \n2. **주요사항보고서(자기주식처분결정)** - 회사가 보유한 자기 주식의 처분에 관한 주요 사항을 보고한 문서입니다. (정정 상태: 원본)\n\n3. **[기재정정] 신규시설투자 등** - 회사의 신규 시설 투자 계획을 수정하여 다시 공시한 문서이며, 이는 정정본입니다.\n\n4. **주식등의 대량보유상황 보고서(일반)** - 특정 주식 등의 대량 보유 상황을 보고하는 일반적 형태의 문서입니다. \n\n각 문서는 해당 일자에 공시되었으며, 이를 통해 기업의 주요 활동 및 변동사항을 파악할 수 있습니다.\n\n근거: report_id(chunk_id): periodic_20260515001109, major_20251118000105, exchange_20241022900223, holding_20260330000167",
+    "grounded": false,
+    "numbers_grounded": false,
+    "ungrounded_numbers": [
+      "2026"
+    ],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2026']"
+    ],
+    "elapsed": 20.011188983917236
+  },
+  {
+    "label": "현대모비스(자동차부품)",
+    "category": "복합추론_Open",
+    "query": "현대모비스의 최근 자사주 취득/처분 이력을 정리해줘",
+    "companies": [
+      "현대모비스"
+    ],
+    "route": "ownership_analysis",
+    "route_score": 0.7879242755134797,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "현대모비스의 최근 자사주 취득 및 처분 이력은 다음과 같이 정리됩니다:\n\n**자사주 취득**\n1. **2026년 4월 24일**: 보통주 1,129,943주를 5,000억원에 취득하기로 결정했으며, 목적은 주주가치 제고입니다. 기간은 2026년 4월 27일부터 7월 24일까지이며, 위탁투자중개업자는 현대차증권입니다.\n2. **2025년 7월 25일**: 보통주 371,621주를 110,000,000,000원에 취득하기로 하였으며, 같은 목적을 가지고 있습니다. 기간은 2025년 7월 28일부터 10월 24일까지이고, 위탁투자중개업자는 현대차증권입니다.\n3. **2024년 2월 16일**: 보통주 660,000주를 149,820,000,000원에 취득하며, 기간은 2024년 2월 19일부터 5월 14일까지입니다.\n4. **2023년 7월 26일**: 보통주 630,000주를 151,830,000,000원에 취득합니다.\n\n**자사주 처분**\n1. **2026년 2월 10일**: 보통주 3,800주를 임원 대상으로 처분하며, 목적 역시 임원 대상 성과급 자기주식 지급입니다.\n2. **2023년 10월 26일**: 보통주 200,039주를 44,208,619,000원에 처분하였습니다.\n3. **2024년 12월 13일**, **2025년 10월 31일**: 임금 및 단체협약 합의에 따라 경영성과금 및 리워드 지급을 위해 자사주를 처분할 예정입니다.\n\n이와 같은 정보는 각 공시문서를 통해 확인할 수 있으며, 특히 한국거래소 공시 홈페이지에서도 일자별 현황을 조회할 수 있습니다.",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": false,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "답변에 근거(report_id/chunk_id) 인용이 없음"
+    ],
+    "elapsed": 38.077150106430054
+  },
+  {
+    "label": "삼성전기(전자부품)",
+    "category": "복합추론_Open",
+    "query": "삼성전기의 계약 해지 이력을 시간순으로 정리해줘",
+    "companies": [
+      "삼성전기"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.751554337044405,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거에는 삼성전기의 계약 해지 이력에 대한 정보가 포함되어 있지 않습니다. 따라서 답변을 제공할 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 18.04871892929077
+  },
+  {
+    "label": "삼성전자(IT/반도체)",
+    "category": "복합추론_Open",
+    "query": "삼성전자의 최근 공시 이력을 종합해서 정리해줘",
+    "companies": [
+      "삼성전자"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7665695495365148,
+    "iterations": 3,
+    "n_tool_calls": 4,
+    "n_citations": 0,
+    "answer": "최근 삼성전자의 공시 이력은 다음과 같습니다:\n\n1. **분기보고서 (2026.03)** - 20260515\n2. **주요사항보고서(자기주식취득결정)** - 20260318\n3. **[기재정정] 단일판매ㆍ공급계약체결** - 20250731 (정정본)\n4. **주식등의 대량보유상황 보고서(일반)** - 20260130\n\n각 공시는 분기 실적 보고, 자기 주식 취득 결정, 공급 계약 체결 및 대량 보유 상황 보고 등 다양한 주제를 다루고 있습니다.\n\n근거: report_id(chunk_id): periodic_20260515, major_20260318, exchange_20250731, holding_20260130",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 20.030906915664673
+  },
+  {
+    "label": "삼성SDI(2차전지)",
+    "category": "복합추론_Open",
+    "query": "삼성SDI의 최근 자사주 취득/처분 이력을 정리해줘",
+    "companies": [
+      "삼성SDI"
+    ],
+    "route": "ownership_analysis",
+    "route_score": 0.7879242755134797,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "최근 몇 년간 삼성SDI의 자사주 취득 및 처분에 대해 정리하면 다음과 같습니다:\n\n1. **2023년부터 2025년까지**:\n   - 해당 기간 동안 자기주식 취득 및 처분 내역이 없었습니다.\n   - 다만, 주주가치 제고 및 주가 안정화를 목적으로 보통주 3,331,391주와 우선주 178,400주를 보유하고 있으며, 이는 발행주식총수의 1% 이상을 차지합니다.\n\n2. **과거 주요 취득 내역**:\n   - **1995년**: 보통주 315,470주, 우선주 39,930주\n   - **1996년**: 보통주 445,730주, 우선주 29,230주\n   - **2002년**: 보통주 1,000,000주, 우선주 36,000주\n   - **2003년**: 보통주 1,500,000주\n   - **2004년**: 보통주 930,000주, 우선주 30,000주\n   - **2016년**: 보통주 3,300,000주, 우선주 70,000주\n\n이와 같이 삼성SDI는 주로 주가 안정화 및 주주가치 제고를 위해 다양한 시점에 걸쳐 자사주를 취득해왔으나, 2023년부터 2025년까지는 신규 취득이나 처분이 없었음을 알 수 있습니다.\n\n근거:\n- report_id(periodic_20260310002954), chunk_id(periodic_20260310002954::main::P5::C3)\n- report_id(periodic_20260310002954), chunk_id(periodic_20260310002954::main::P5::C2)\n- report_id(periodic_20250311001275), chunk_id(periodic_20250311001275::main::P5::C2)",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {
+      "2004": "1996.05 / 100 * 100(%)",
+      "2003": "1996.05 / 100 * 100(%)",
+      "1996": "2014.06 - 23.01",
+      "2016": "2014.06 / 100 * 100(%)",
+      "2002": "1996.05 / 100 * 100(%)",
+      "1995": "2014.06 - 23.01"
+    },
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "[참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'2004': '1996.05 / 100 * 100(%)', '2003': '1996.05 / 100 * 100(%)', '1996': '2014.06 - 23.01', '2016': '2014.06 / 100 * 100(%)', '2002': '1996.05 / 100 * 100(%)', '1995': '2014.06 - 23.01'}"
+    ],
+    "elapsed": 21.164330005645752
+  },
+  {
+    "label": "LG에너지솔루션(2차전지)",
+    "category": "복합추론_Open",
+    "query": "LG에너지솔루션의 계약 해지 이력을 시간순으로 정리해줘",
+    "companies": [
+      "LG에너지솔루션"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.751554337044405,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "LG에너지솔루션의 계약 해지 이력을 시간순으로 정리하면 다음과 같습니다:\n\n1. **Ford Motor Company와의 전기차 배터리 공급계약 해지**\n   - **해지일자**: 2025-12-17\n   - **계약기간**: 2027-01-01 ~ 2032-12-31\n   - **해지금액**: 9,603,075,000,000원 (최근 매출액 대비 28.5%)\n   - **해지 사유**: 거래 상대방의 계약 해지 통보\n   \n2. **Freudenberg Battery Power Systems, LLC와의 전기차 배터리 공급계약 해지**\n   - **해지일자**: 2025-12-26\n   - **계약기간**: 2024-04-01 ~ 2031-12-31\n   - **해지금액**: 3,921,711,000,000원 (최근 매출액 대비 11.6%)\n   - **해지 사유**: 계약상대의 배터리 사업 철수에 따른 상호 합의\n\n위 정보는 제공된 공시 자료를 기반으로 작성되었으며, 추가적인 계약 해지 이력이 있을 수 있습니다.",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": false,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "답변에 근거(report_id/chunk_id) 인용이 없음"
+    ],
+    "elapsed": 21.013668060302734
+  },
+  {
+    "label": "한미반도체(반도체)",
+    "category": "복합추론_Open",
+    "query": "한미반도체의 최근 공시 이력을 종합해서 정리해줘",
+    "companies": [
+      "한미반도체"
+    ],
+    "error": "ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "elapsed": 2714.3542141914368
+  },
+  {
+    "label": "KB금융(금융)",
+    "category": "복합추론_Open",
+    "query": "KB금융의 최근 자사주 취득/처분 이력을 정리해줘",
+    "companies": [
+      "KB금융"
+    ],
+    "error": "ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "elapsed": 3061.0713698863983
+  },
+  {
+    "label": "알테오젠(바이오)",
+    "category": "복합추론_Open",
+    "query": "알테오젠의 계약 해지 이력을 시간순으로 정리해줘",
+    "companies": [
+      "알테오젠"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.751554337044405,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "알테오젠의 계약 해지 이력을 시간순으로 정리하면 다음과 같습니다:\n\n1. **2022년 12월 29일**: 알테오젠은 Sandoz AG와 인간 히알루로니다제 원천 기술(ALT-B4) 라이선스 계약을 체결했습니다.\n2. **2024년 7월 30일**: 알테오젠과 Sandoz AG는 해당 계약을 해지하고 권리를 반환하기로 합의했습니다. 이는 서로 다른 히알루로니다제 공동개발 전략을 따르기 위한 것으로, 이와 동시에 새로운 공동개발 및 라이선스 계약을 체결하였습니다.\n\n제공된 근거로는 이전에 다른 계약 해지에 대한 정보를 찾을 수 없으므로, 위의 내용이 알테오젠의 계약 해지 이력의 전부입니다.\n\n근거: report_id(chunk_id):\n- exchange_20240730900138::main::C1\n- periodic_20240814000309::main::P18::C36\n- periodic_20250321000557::main::P12::C1\n- periodic_20240814000309::main::P12::C1\n- periodic_20250813001141::main::P12::C1",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 20.805301904678345
+  },
+  {
+    "label": "HD현대중공업(조선)",
+    "category": "복합추론_Open",
+    "query": "HD현대중공업의 최근 공시 이력을 종합해서 정리해줘",
+    "companies": [
+      "HD현대중공업"
+    ],
+    "route": "single_lookup",
+    "route_score": 0.7665695495365148,
+    "iterations": 4,
+    "n_tool_calls": 3,
+    "n_citations": 0,
+    "answer": "HD현대중공업의 최근 공시 이력은 다음과 같습니다:\n\n1. **분기보고서 (2026.03)** - 2026년 5월 15일 제출됨\n2. **주요사항보고서(회사합병결정)** - 2025년 8월 27일 제출됨\n3. **주식등의대량보유상황보고서(일반)** - 2025년 12월 8일 제출됨\n\n위 내용은 가장 최근에 제출된 세 가지 주요 공시를 요약한 것입니다.\n\n근거: report_id(chunk_id), doc_id: periodic_20260515001837, major_20250827000423, holding_20251208000185",
+    "grounded": false,
+    "numbers_grounded": false,
+    "ungrounded_numbers": [
+      "2025",
+      "2026"
+    ],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: ['2025', '2026']"
+    ],
+    "elapsed": 18.987641096115112
+  },
+  {
+    "label": "현대자동차(자동차)",
+    "category": "복합추론_Open",
+    "query": "현대자동차의 최근 자사주 취득/처분 이력을 정리해줘",
+    "companies": [
+      "현대자동차"
+    ],
+    "route": "ownership_analysis",
+    "route_score": 0.7879242755134797,
+    "iterations": 2,
+    "n_tool_calls": 2,
+    "n_citations": 10,
+    "answer": "현대자동차의 최근 자사주 취득 및 처분 이력은 다음과 같습니다:\n\n### 자사주 취득\n1. **2024년 11월 27일**\n   - 약 7,000억원: 주주가치 제고 목적\n   - 약 3,000억원: 주식기준보상 목적\n   - 총 1조원 규모\n   \n2. **2026년 1월 29일**\n   - 보통주식: 744,870주\n   - 기타주식: 125,054주\n   - 총 취득예정금액: 366,848,475,000원 + 33,843,935,500원 = **400,692,410,000원**\n\n### 자사주 처분\n1. **2023년 10월 26일**\n   - 보통주식: 963,630주\n   - 처분대상 주식가격: 182,000원\n   - 처분예정금액: 175,380,660,000원\n   - 처분목적: 2023년 단체교섭에 따른 회사주식 지급\n\n2. **2025년 10월 30일**\n   - 보통주식: 1,102,878주 (격려금 지급 목적)\n   - 우선주: 1,254,420주\n   - 처분대상 주식가격: 보통주 258,000원, 우선주 193,700원\n   - 처분예정금액: 해당 데이터는 주가 변동에 따라 변동 가능\n\n3. **2026년 3월 26일**\n   - 보통주식: 50,458주\n   - 처분대상 주식가격: 501,000원\n   - 처분예정금액: 25,279,458,000원\n   - 처분목적: 임원 대상 자기주식 지급\n\n이와 같은 이력들을 통해 현대자동차는 주주가치 제고와 임직원 보상 등을 위해 꾸준히 자사주를 매입하고 있으며, 필요에 따라 이를 처분하기도 한다는 것을 알 수 있습니다.\n\n**근거:** report_id(chunk_id):\n- 20241127000199::main::C2, C1\n- 20260129000336::main::C1, C2\n- periodic_20260318001394::main::P5::C6\n- major_20241127000199::main::C1, C2\n- major_20260326001343::main::C4, C2\n- major_20251030000466::main::C4, C6\n- major_20231026000201::main::C2",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {
+      "400692410000": "366848475000 + 33843935500"
+    },
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [
+      "[참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {'400692410000': '366848475000 + 33843935500'}"
+    ],
+    "elapsed": 41.042075872421265
+  },
+  {
+    "label": "현대건설(건설)",
+    "category": "복합추론_Open",
+    "query": "현대건설의 계약 해지 이력을 시간순으로 정리해줘",
+    "companies": [
+      "현대건설"
+    ],
+    "route": "event_analysis",
+    "route_score": 0.751554337044405,
+    "iterations": 2,
+    "n_tool_calls": 1,
+    "n_citations": 5,
+    "answer": "제공된 근거에서 현대건설의 계약 해지 이력을 시간순으로 정리하면 다음과 같습니다:\n\n1. **NEOM 터널 프로젝트**\n   - 계약 해지 일자: 2026-03-12\n   - 계약 기간: 2022-06-12 ~ 2026-03-12\n   - 해지 사유: 발주처의 사업 재편에 따른 계약 해지 요청\n   - 관련 공시: 2022-06-14 단일판매·공급계약체결, 2022-07-29 단일판매·공급계약체결\n\n이 정보는 가장 최근에 공시된 내용을 기반으로 하며, 이전의 다른 계약 해지 이력에 대한 구체적인 내용은 제공된 자료에서 확인되지 않습니다. 따라서, 제공된 자료를 토대로 한 현대건설의 주요 계약 해지 이력은 위와 같습니다.\n\n근거: \n- report_id(exchange_20260313801644::main::C1)\n- report_id(periodic_20230515001656::main::P35::C3)\n- report_id(periodic_20231114002527::main::P35::C5)",
+    "grounded": true,
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "verified_derived_numbers": {},
+    "citation": true,
+    "correction_evidence_complete": null,
+    "warnings": [],
+    "elapsed": 17.26211905479431
+  }
+]

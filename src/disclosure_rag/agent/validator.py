@@ -81,6 +81,18 @@ def _extract_numbers(text: str, *, min_digits: int = 3) -> set[str]:
         digits_only = norm.replace(".", "")
         if len(digits_only) >= min_digits:
             out.add(norm)
+        # 회귀 발견(2026-08-19, 100문항 배치): "[기재정정]사업보고서 (2023.12)"처럼
+        # 날짜가 "YYYY.MM" 형태로 붙어 있으면 _NUMBER_PAT이 "2023.12"를 하나의
+        # 토큰으로 통째로 묶는다. 그런데 답변이 같은 연도를 "2023년 3월"처럼 점
+        # 없이 따로 쓰면 "2023"이 evidence_numbers 안에 별도 항목으로 없어서
+        # "근거 없는 숫자"로 오탐됐다(correction_analysis 라우트 10건, single_lookup
+        # 2건 실측). 실제로는 evidence 원문에 "2023"이 "2023.12"의 앞부분으로
+        # 문자 그대로 존재하므로, 소수점으로 이어붙은 토큰은 "."로 쪼갠 부분도
+        # 함께 등록해 grounding 판정에서 놓치지 않게 한다.
+        if "." in norm:
+            for part in norm.split("."):
+                if len(part) >= min_digits:
+                    out.add(part)
     return out
 
 

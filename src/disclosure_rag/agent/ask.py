@@ -37,13 +37,19 @@ def ask(
     router: Router | None = None,
     max_iterations: int = 6,
     max_answer_retries: int = 1,
+    answer_client: HCXClient | None = None,
 ) -> AskResult:
+    """`answer_client`: §12 TODO — agent(tool-calling)와 답변 생성에 서로 다른
+    HCX 모델을 쓸 수 있게 하는 하위호환 파라미터(Stage 10/12 ablation 최종
+    결론: agent=HCX-007, answer=HCX-005 가 각각 최선). None(기본값)이면 기존과
+    동일하게 `client` 하나를 agent loop 와 답변 생성 양쪽에 그대로 재사용한다."""
     trace = run_agent_loop(
         client, tools, question,
         entity_extractor=entity_extractor, router=router, max_iterations=max_iterations,
     )
     evidence_pack = build_evidence_pack(trace)
-    answer = generate_answer(client, evidence_pack)
+    answer_gen_client = answer_client if answer_client is not None else client
+    answer = generate_answer(answer_gen_client, evidence_pack)
     validation = validate_answer(answer, evidence_pack, trace.entities)
 
     # 2026-08-18: 답변 모델이 tool 없이 evidence 숫자를 암산해서 검산도 안 되는
@@ -60,7 +66,7 @@ def ask(
         )
         logger.warning("[VALIDATION] question=%r 검산 실패로 재생성 시도 %d/%d: %s",
                         question, retries + 1, max_answer_retries, sorted(validation.ungrounded_numbers))
-        answer = generate_answer(client, evidence_pack, extra_instruction=correction)
+        answer = generate_answer(answer_gen_client, evidence_pack, extra_instruction=correction)
         validation = validate_answer(answer, evidence_pack, trace.entities)
         retries += 1
 

@@ -1,7 +1,8 @@
 # PROJECT_STATE.md — 금융공시 Agentic RAG 시스템
 
 > 새 Claude 세션은 이 파일만 읽고 바로 이어서 작업할 수 있어야 한다.
-> 최종 갱신: 2026-08-16 (파싱 버그 수정 + 재검증 완료, 커밋 직전)
+> 최종 갱신: 2026-08-19 (100문항 일반화 배치 분석+validator 버그 수정 완료,
+> 커밋 직전 — §5-0/§9~10/§12 참고)
 
 ---
 
@@ -76,13 +77,16 @@ Stage 1(Chunking)/2(BM25)/3(Embedding)/4(Fusion)/5(Reranker)/8(Entity)/
 failure_cases/summary/failure_analysis 전부 저장. 최종 요약:
 `results/FINAL_SUMMARY.md` + Artifact 대시보드. 상세 수치는 §8.
 
-### 4-C. 회사 일반화 검증 (진행 중, Stage 체계와 별개 트랙)
+### 4-C. 회사 일반화 검증 (완료, Stage 체계와 별개 트랙)
 `results/generalization_check/` — 대회가 제시한 "검색추출/비교연산/복합추론
 × Closed/Open" 6개 카테고리를 좌표축으로 회사×카테고리 매트릭스(`matrix.csv`)
-를 채워가며 실제 production 파이프라인으로 라이브 검증. 12개사 조합, 72칸 중
-36칸(50%) 커버. 발견/수정한 버그는 §10 참고 — **이 트랙에서 Stage 1~14의
-정량 지표로는 못 잡았던 진짜 버그 여러 건을 발견**(TOC chunk 오염, 카운팅
-오분류, validator 오탐 2건, **파싱 단계 대량 문서유실**).
+를 채워가며 실제 production 파이프라인으로 라이브 검증. 초기 12개사 수동
+매트릭스(36/72칸)에 이어 **100문항 자동 배치**(38개사×6카테고리×6route,
+§5-0)까지 완료돼 `matrix.csv`는 총 138행(헤더 제외 137). 발견/수정한 버그는
+§10 참고 — **이 트랙에서 Stage 1~14의 정량 지표로는 못 잡았던 진짜 버그
+여러 건을 발견**(TOC chunk 오염, 카운팅 오분류, validator 오탐(연도 숫자
+포함 3건), **파싱 단계 대량 문서유실**, **"확인할 수 없음"이 실제로는
+검색 실패인 경우 11건**).
 
 ### 4-D. 부가 산출물
 - `results/qualitative_50q/`: Stage 체계 이전 BM25-only Agent 50문항 정성평가
@@ -176,15 +180,47 @@ cagr`)는 원래부터 "계산은 LLM이 아니라 deterministic Python으로" �
 통합테스트(`test_agent_correction_analysis_uses_both_versions_and_two_
 plus_turns`)로 프롬프트 길이 변경이 tool-calling을 안 깨는지도 재확인.
 
-### 5-0. [진행 중, 최우선] 100문항 일반화 테스트 — 준비만 끝남, 실행 전
-사용자 요청("질문 100개 생성해서 잘 파악하는지 확인해봐")으로 시작한 작업.
-**상세 진행상황/다음 단계는 `results/generalization_check/100q_batch/
-README.md`를 반드시 먼저 읽을 것.** 요약: 38개사(기존 10 + 신규 28, 업종
-다양화) 선정 완료 → GPU 임베딩에서 스트리밍 필터링 완료(237,212 chunks,
-`build_100q_embedding_cache.py`, 재실행 22초) → 질문 100개 생성 완료
-(`questions.json`, 6개 카테고리 균형 배분). **아직 실제 `ask()` 파이프라인
-실행은 시작 안 함** — 다음 세션이 바로 이어서 100건을 백그라운드로 돌리고
-결과를 집계/샘플검증/matrix.csv 반영/커밋까지 하면 된다.
+### 5-0. [완료] 100문항 일반화 테스트
+사용자 요청("질문 100개 생성해서 잘 파악하는지 확인해봐")으로 시작. 38개사
+(기존 10 + 신규 28, 업종 다양화) × 6개 카테고리 × 6개 route 100문항을 실제
+`ask()` 파이프라인으로 백그라운드 실행 완료(`results/generalization_check/
+100q_batch/results.json`, 2026-08-18 22:45:46 종료) → 결과 분석/원문대조/
+validator 버그 수정/matrix.csv 반영/summary.md 작성까지 전부 완료
+(2026-08-19). 상세: `results/generalization_check/100q_batch/summary.md`.
+
+**최종 수치**: 100건 중 API 완전 실패 5건(5.0%, 전부 수십분~97분 hang 후
+ConnectionError/ReadTimeout/HCXError 400 — 4건 네트워크 계열, 1건은 400
+Bad Request로 성격이 다름). 성공 95건 중 grounded=True 81→**93건(97.9%,
+validator 버그 수정 반영)**, citation=True 88건(92.6%, 불변).
+
+**핵심 발견 1 — validator 오탐 수정**: `correction_analysis`/`single_lookup`
+12건에서 evidence 원문의 "(2023.12)" 같은 날짜 표기가 "2023.12" 한 토큰으로
+추출되는 바람에, 답변이 같은 연도를 점 없이("2023년 3월 12일") 따로 쓰면
+"근거 없는 숫자"로 오탐됐다. `get_correction_history` 실측 데이터로 재현
+확인 후 `validator.py`의 `_extract_numbers()`에 소수점 하위토큰 등록 로직을
+추가해 수정, 회귀 테스트 1건 추가, fast suite 97개 전부 통과. §9-A/§10 참고.
+
+**핵심 발견 2 — "확인할 수 없음"이 실제로는 검색 실패인 경우 11건 (신규,
+미수정, 최우선 후속 조사 대상)**: "OO의 2025년 매출액/영업이익/부채비율"류
+질문 11건이 "제공된 근거로는 확인할 수 없습니다"라고 답했는데, 원문 대조
+결과 **전부 FY2025 사업보고서가 코퍼스에 이미 존재하고 원하는 숫자도 원문에
+명확히 있었다**(예: SK하이닉스 "2025년 연결 기준... 영업이익은 47.2조원"이
+본문에 그대로 있음, 기아/현대자동차/셀트리온/삼성SDI 등도 동일). grounded/
+citation 자동 지표로는 전혀 안 걸린다(숫자를 안 쓰니 검산할 게 없고 "근거:"
+문구는 있어서 citation도 통과). `search_disclosures`의 period 필터 완화
+재시도 로직으로는 설명 안 되는 retrieval relevance 문제로 추정되나 근본
+원인 미확정(HCX 재호출 없이는 tool-call 트레이스 재현 불가) — 다음 세션
+최우선 조사 대상. 상세: summary.md §4-D.
+
+**기타 발견(미수정)**: (a) 알테오젠 calculation 1건 — 뺄셈이 정확한데도
+ungrounded로 남음, `_verify_derived_number()`의 O(n²) 안전장치
+(`_MAX_VERIFY_NUMBERS=200`)가 숫자 밀집 evidence에서 검산 자체를 건너뛰는
+것으로 추정. (b) 레인보우로보틱스 investment 1건 — validator 오탐이 아니라
+**실제 10배 단위 오류**(281,784백만원이라 썼는데 원문은 28,178백만원) 재현,
+알테오젠 10배오류와 동일 계열의 새 사례, validator가 정확히 잡아냄. (c)
+citation=False 7건 — 전부 답변 자체는 맞는데 "근거:" 인용 문구를 안 붙인
+형식 누락. (d) `has_citation`의 `"근거" in answer` 폴백이 매우 느슨해서
+report_id 실제 일치 여부와 무관하게 통과시키는 기존 약점 재확인.
 
 ---
 
@@ -440,6 +476,47 @@ BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
   베이스라인에서도 동일하게 실패함을 확인(2026-08-16) — 회귀 아님, 원래도
   brittle 했던 테스트. 고치려면 assertion을 "R&D"도 인정하도록 완화.
 
+### 100문항 일반화 배치 트랙 (2026-08-19, §5-0 참고)
+
+- **[수정됨, 회귀테스트 추가]** Validator 오탐 — evidence 원문의 "(2023.12)"
+  같은 "YYYY.MM" 날짜 표기가 `_extract_numbers()`의 정규식에 의해 "2023.12"
+  한 토큰으로 통째로 추출되는 바람에, 답변이 같은 연도를 점 없이 따로 쓰면
+  ("2023년 3월 12일") "근거 없는 숫자"로 오탐(correction_analysis 10건 +
+  single_lookup 2건, 총 12건). `get_correction_history` 실측 데이터로 재현
+  확인 후 `validator.py`의 `_extract_numbers()`에 소수점 하위토큰 등록 로직
+  추가로 수정. `tests/test_agent.py::test_validator_does_not_flag_year_
+  that_is_literal_substring_of_dated_evidence` 추가.
+- **[신규 발견, 미수정, 최우선 후속조사]** "OO의 2025년 매출액/영업이익/
+  부채비율"류 질문 11건이 "확인할 수 없습니다"라고 답했는데, 원문 대조 결과
+  전부 FY2025 사업보고서가 코퍼스에 이미 존재하고 원하는 숫자도 원문에 명확히
+  있었다(기아/현대자동차/SK하이닉스/셀트리온/삼성SDI/현대건설 등). grounded/
+  citation 자동 지표로는 전혀 안 걸린다(숫자 없는 "정보없음" 답변이라 검산할
+  게 없고 "근거:" 문구는 있어 citation도 통과). `search_disclosures`의
+  period 필터 완화 재시도로는 설명 안 되는 retrieval relevance 문제로
+  추정되나 근본 원인 미확정 — HCX 재호출 없이는 tool-call 트레이스 재현이
+  안 돼 이번 세션에서 못 끝냄. 상세: `results/generalization_check/
+  100q_batch/summary.md` §4-D.
+- **[미수정, 확인만]** `_verify_derived_number()`의 O(n²) 안전장치
+  (`_MAX_VERIFY_NUMBERS=200`)가 evidence 숫자가 많은(재무제표 등) 청크에서
+  검산 자체를 건너뛰어 정확한 계산도 ungrounded로 남을 수 있음(알테오젠
+  당기/전기 영업이익 뺄셈 사례로 확인 — 원문 대조 결과 세 숫자와 계산 모두
+  정확했는데도 ungrounded 유지). O(n) 알고리즘으로 재작성하면 해소 가능하나
+  이번 세션에서는 미수정.
+- **[재확인, 새 회사에서 재현]** 다중행 표 요약 시 답변 모델이 숫자를
+  잘못 읽는 10배 단위 오류가 알테오젠 외 **레인보우로보틱스에서도 재현**
+  (투자금액 28,178백만원을 281,784백만원으로 10배 부풀림, 정정본도 동일
+  오류) — validator가 정확히 잡아냄(오탐 아님). 회사를 넓혀도 사라지지
+  않는 근본적 취약점임을 재확인.
+- **[재확인]** `has_citation` 판정의 `"근거" in answer` OR 폴백이 매우
+  느슨해서, evidence가 하나라도 있으면 답변에 "근거"라는 글자만 있어도
+  report_id 실제 일치 여부와 무관하게 citation=True로 통과시킨다 — citation
+  =True 92.6%는 "인용 형식을 갖췄는가"에 가깝고 "인용이 실제로 정확한가"의
+  보증은 약함. citation=False 7건은 전부 "근거:" 문구 자체가 아예 빠진
+  경우였음(형식 누락, 오탐 아님).
+- **[진단 정정]** API 에러 5건 중 4건은 ConnectionError/ReadTimeout(네트워크
+  계열)이지만 크래프톤 1건은 `HCXError 400 Bad Request`로 성격이 다름 —
+  "전부 커넥션에러/타임아웃"이라던 이전 진단은 부정확했음.
+
 ### 이전 발견/수정 (Phase 개발~Stage 1~14)
 - HCX-007 `thinking`/`maxCompletionTokens` 파라미터 자동분기 (`hcx_client.py`)
 - CrossEncoderReranker `max_length` 미지정 시 outlier chunk에서 처리시간 폭증
@@ -490,11 +567,31 @@ BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
 - Router 파인튜닝 데이터 1,200건까지 확대(현재 149건, `results/router_tuning/`)
   — CLOVA Studio 콘솔에서 라벨 형식(언더스코어 포함 route 이름 허용여부),
   분류 태스크 권장 모델(HCX-DASH-001?) 재확인 먼저 필요.
-- `ask.py`에 answer 전용 모델(HCX-005) 분리 적용
+- **[완료 2026-08-18, 100문항 배치에서 실사용 확인]** ~~`ask.py`에 answer
+  전용 모델(HCX-005) 분리 적용~~ — `ask()`가 `answer_client` 파라미터를
+  이미 지원하고(agent=HCX-007, answer=HCX-005), 100문항 배치도 이 설정으로
+  실행됨(`results/generalization_check/100q_batch/assemble_pipeline.py`
+  확인). CascadingRouter는 아직 미배선 상태 유지(위 항목 참고).
 - char_2gram BM25 토크나이저 재검토
 - Stage 14 test set 표본 확대(n=10 한계 보완)
 - TOC 버그가 Stage 1~14 지표에 준 영향 재검증(선택적, 비용 큼)
 - `test_dense_retriever.py`의 brittle assertion 완화(§10 참고, 급하지 않음)
+
+### 100문항 배치에서 새로 나온 후보 (2026-08-19, 우선순위순)
+- **[최우선]** "2025년 재무지표 검색누락" 원인 규명 — 11건이 실제로 존재하는
+  FY2025 데이터를 "확인할 수 없음"으로 잘못 답함(§10, summary.md §4-D).
+  `search_disclosures`의 period 필터 완화 재시도로는 설명 안 되는 retrieval
+  relevance 문제로 추정 — 실제 agent tool-call 트레이스(HCX 재호출 필요)로
+  재현해서 top_k 확대/쿼리 재작성/전용 필터링 중 어느 게 원인인지 특정 필요.
+- `validator._verify_derived_number()`의 O(n²) 안전장치(`_MAX_VERIFY_
+  NUMBERS=200`)를 O(n) 알고리즘으로 재작성 — 숫자 밀집 evidence(재무제표)에서
+  정확한 계산도 검산을 건너뛰어 ungrounded로 남는 문제(알테오젠 사례) 해소.
+- `has_citation`의 `"근거" in answer` 느슨한 폴백을 report_id/chunk_id 실제
+  일치 요구로 강화 — 지금은 인용 형식만 있으면 내용 일치와 무관하게 통과.
+- citation=False 7건처럼 답변이 "근거:" 인용 문구 자체를 빠뜨리는 경우를
+  줄이기 위해 `ANSWER_SYSTEM_PROMPT`에 문구 보강 검토(재현 빈도 7/95=7.4%).
+- API 타임아웃 정책 재검토 — 지금은 실패까지 45~97분 hang(5건 실측). 실사용
+  환경이면 60~120초 수준으로 짧게 잡고 재시도/폴백하는 게 맞음.
 
 ### 로컬 임시 리소스 (git 미포함)
 - `gpu_embeddings/`(2.8GB, 전체 70개사 467,043 chunk) — 로컬 영구 보관,
