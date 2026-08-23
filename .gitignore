@@ -18,3 +18,10 @@ corpus/universe.xlsx
 # 전체 70개사 GPU 임베딩 결과(2.8GB, 로컬 전용) — 코드 저장소에는 넣지 않는다.
 gpu_embeddings/
 gpu_embeddings.tar.gz
+
+# Phase 13 재청킹/재임베딩 결과물(로컬 전용, 수 GB) — 코드 저장소에는 넣지 않는다.
+chunks_v2/
+gpu_embeddings_v2/
+*.log
+chunks_v2_build.log
+gpu_embeddings_v2_stdout.log

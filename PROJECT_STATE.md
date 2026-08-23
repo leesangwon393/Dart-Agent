@@ -634,6 +634,31 @@ BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
 - TOC 버그가 Stage 1~14 지표에 준 영향 재검증(선택적, 비용 큼)
 - `test_dense_retriever.py`의 brittle assertion 완화(§10 참고, 급하지 않음)
 
+### 재임베딩(로컬 MPS) 중 발견 — 극단적으로 큰 표 chunk (2026-08-24, pre-existing, 이번 수정과 무관)
+- **[발견, 미수정 — 이번 세션 범위 밖]** 전체 코퍼스 재임베딩(§7 참고) 첫
+  시도에서 MPS `Insufficient Memory (kIOGPUCommandBufferCallbackErrorOut
+  OfMemory)` 크래시. 원인: 표 셀 하나에 긴 각주성 텍스트가 통째로 들어간
+  chunk 가 소수 존재(최대 153,345자 — 신한지주 `periodic_20260318000826`
+  "관계기업투자주식 현황" 각주, POSCO홀딩스/미래에셋증권/NAVER 등에서도
+  유사 사례, 텍스트 4,000자 초과 chunk 430,925개 중 7,426개=1.7%).
+  **이번 표 semantic block chunking 수정 때문에 생긴 게 아님** — 옛
+  `gpu_embeddings/` 샤드(예전 로직)에도 이미 동일 크기의 outlier가 있음을
+  확인(60,000건 샘플 중 >10,000자 48건, 최대 30,013자). 원인은 표의 한
+  행(row) 안 셀(cell) 자체가 원래 매우 크다는 것 — `render_table_node`
+  계열은 옛 로직/새 로직 둘 다 row 단위로만 나눠서 한 행 안의 셀 내용
+  자체를 더 쪼갤 수 없다(§Phase6 KeyValueNode 긴 value 케이스와 같은
+  성격의 문제, TableNode 판에서도 존재).
+  **임시 대응(임베딩 스크립트에만 적용, chunking 로직은 안 건드림)**:
+  `scripts/embed_full_corpus_mps.py`가 임베딩 입력만 6,000자로 clip하고
+  (저장되는 ChunkSchema.text/raw_text 원본은 그대로), batch_size=8로
+  낮추고, 그래도 실패하면 배치를 절반씩 재귀 분할 재시도, 개별 chunk가
+  끝까지 실패하면 zero-vector로 대체 후 `failed_chunk_ids.jsonl`에 기록.
+  **다음에 제대로 고치려면**: `render_table_node_fragments`가 "행 단위"
+  가 아니라 "셀 내용이 비정상적으로 큰 경우 그 셀 자체를 문단 단위로
+  재분할"하는 로직을 추가로 넣어야 한다(TableCell.text 안에 이미 "\n\n"
+  구분자가 남아있는 경우가 많아 문단 분리가 가능해 보임) — 범위가 커서
+  이번엔 손대지 않음.
+
 ### 표 semantic block chunking 후속 TODO (2026-08-24)
 - **KeyValueNode 긴 value semantic subdivision** — exchange_20241220800005
   의 "2. 주요내용" 처럼 KeyValueNode 하나의 value 문자열 안에 "1. 투자
