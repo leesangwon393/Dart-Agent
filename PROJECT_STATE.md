@@ -476,6 +476,63 @@ BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
   베이스라인에서도 동일하게 실패함을 확인(2026-08-16) — 회귀 아님, 원래도
   brittle 했던 테스트. 고치려면 assertion을 "R&D"도 인정하도록 완화.
 
+### 표 semantic block chunking 회귀 수정 (2026-08-24, 무인 야간 작업)
+
+- **[수정됨, 회귀테스트 14건 추가]** 표 청킹이 "1. 매출액"류 상위항목+하위행
+  묶음(semantic block)을 무시하고 `max_rows_per_chunk`(20)/`max_tokens_
+  per_chunk`(1000) 같은 순수 행count/토큰 기준으로만 잘라, 의미적으로 붙어
+  있어야 할 항목이 서로 다른 chunk 로 갈라지는 버그. **실제 재현**:
+  SK하이닉스 사업보고서(`periodic_20260317000635`, 지역별 매출/영업이익
+  표, "192,972,588" 검색)에서 "1. 매출액"의 계(192,972,588백만원) 바로
+  다음에 오는 "2. 영업이익"의 계(47,206,319백만원, "2025년 영업이익은
+  얼마야?" 질문의 정답)가 옛 알고리즘(46행짜리 표를 20행 단위로 자름)
+  에서는 서로 다른 chunk 로 분리됐다 — 단일 chunk 검색으로는 정답을 찾을
+  수 없었다(100문항 배치 §5-0/§10 "2025년 재무지표 검색누락" 11건 중
+  SK하이닉스 영업이익 사례가 여기 해당, 다른 회사 사례는 별개 원인일 수
+  있어 전부 이걸로 설명되진 않음 — 후속 확인 필요).
+  - **Detector**: `table_parser.detect_semantic_blocks()` — 번호/계층
+    표기("1." "1)" "(1)" "가." "(가)" "I." 유니코드 로마숫자 "Ⅰ." 포함) +
+    셀 들여쓰기(`TableCell.indent`, `dart_xml_parser._cell_indent()`가
+    strip 전 원본에서 계산) + rowspan 확장 시 동일 origin_id 반복
+    (`TableCell.origin_id`) 3가지 deterministic 신호를 조합해 semantic
+    block 경계를 찾는다. 신호가 전혀 없는 평평한 표는 기존처럼 행 단위
+    그대로 유지(정규식 하나로 다 해결하려 하지 않음).
+  - **Packer**: `chunk_schema.render_table_node_fragments()` — 우선순위
+    1순위 semantic block 보존 > 2순위 max_tokens 예산 > 3순위(구조 없는
+    표만) max_rows fallback. 하나의 block 이 그 자체로 예산을 넘으면만
+    내부적으로 추가 분할하고, 분할된 모든 조각에 title_hint/unit_hint/
+    header/`"[block라벨 i/n]"` 을 반복 삽입("계"만 남은 마지막 조각도
+    어느 항목 합계인지 독립적으로 식별 가능). 기존 `render_table_node()`
+    는 텍스트만 필요한 호출부(`chunking_variants.py`) 하위호환용 wrapper
+    로 유지.
+  - **Metadata**: `ChunkSchema`/`PackedUnit`에 `table_id`/`semantic_groups`/
+    `metric_hints`/`table_chunk_index`/`table_chunk_count`/`prev_table_
+    chunk_id`/`next_table_chunk_id` 추가(전부 기본값 있어 하위호환 유지,
+    기존 필드는 이름/위치 그대로 보존).
+  - **Sibling expansion**: `tools.make_search_disclosures_tool`에
+    `expand_table_siblings=True`(기본), `max_table_sibling_expansion=1`
+    옵션 추가 — 검색된 chunk 가 table_id 를 가지면 같은 표의 다른 chunk
+    (query 와 metric_hint 가 겹치는 것 우선, 그 다음 표 안 거리순)를
+    evidence 후보에 추가한다. BM25/Dense/Fusion 스코어링 로직 자체는
+    건드리지 않음(§12 TODO 에 score boost 후보로 기록) — sibling 은
+    score=None 으로 추가됨.
+  - 수정 파일: `common/doc_tree.py`, `parsing/table_parser.py`,
+    `parsing/dart_xml_parser.py`, `chunking/chunk_schema.py`,
+    `chunking/packer.py`, `chunking/chunkers.py`, `agent/tools.py`.
+  - 회귀 테스트: `tests/test_table_semantic_chunking.py`(신규 14건 —
+    detector 단위테스트, packer 우선순위, oversized block 분할, 실제
+    XML 4개(`exchange/SK하이닉스/{20240424800596,20240726800615,
+    20241220800005,20260225801974}`) + SK하이닉스 사업보고서 regression,
+    sibling expansion on/off) + `tests/test_chunkers.py`에 KeyValueNode
+    긴 value characterization 1건 추가. 기존 97건 전부 그대로 PASS(회귀
+    없음), 전체 112건 PASS.
+  - **실제 XML 조사로 밝혀진 사실**: 사용자가 예상한 "17×4 TableNode 3개 +
+    9×3 KeyValueNode 1개" 구조는 원본 HTML 의 raw expand_grid 크기
+    기준으로는 맞았지만(실측: 17×4 3건, 9×3 1건), colspan 확장 셀이
+    RLE 로 축약되면서 4번째 열이 3번째 열의 중복이라 전부 3열 이하로
+    줄어들어 **4개 파일 전부 KeyValueNode 로 분류됨(TableNode 0개)** —
+    기존 `classify_grid()`의 의도된 동작이고 버그 아님.
+
 ### 100문항 일반화 배치 트랙 (2026-08-19, §5-0 참고)
 
 - **[수정됨, 회귀테스트 추가]** Validator 오탐 — evidence 원문의 "(2023.12)"
@@ -576,6 +633,30 @@ BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
 - Stage 14 test set 표본 확대(n=10 한계 보완)
 - TOC 버그가 Stage 1~14 지표에 준 영향 재검증(선택적, 비용 큼)
 - `test_dense_retriever.py`의 brittle assertion 완화(§10 참고, 급하지 않음)
+
+### 표 semantic block chunking 후속 TODO (2026-08-24)
+- **KeyValueNode 긴 value semantic subdivision** — exchange_20241220800005
+  의 "2. 주요내용" 처럼 KeyValueNode 하나의 value 문자열 안에 "1. 투자
+  목적/2. 투자 금액/3. 투자 기간/4. 투자 방법" 같은 여러 의미 항목이
+  통째로 이어붙어 있는 경우가 있음(약 300토큰). 이번 작업은 TableNode
+  경로만 손댔고 KeyValueNode 내부는 그대로 — 정보 손실은 없음(characterization
+  테스트로 고정, `tests/test_chunkers.py::test_keyvalue_node_long_value_
+  characterization`)이지만, 개별 항목 단위 검색(예: "투자 기간만" 질의)이
+  필요해지면 이 value 를 detect_semantic_blocks 와 유사한 규칙으로
+  쪼개는 작업이 필요.
+- **metric_hint 기반 sibling score boost 미구현** — `tools.py`의
+  sibling expansion 은 evidence 후보 "추가"만 하고 BM25/Dense/Fusion
+  스코어링 로직 자체는 건드리지 않았다(score=None 으로 추가됨, 최종 응답
+  순서/가중치에 영향 없음). Fusion 단계에서 "직접 검색된 chunk" > "metric_
+  hint 일치 sibling" > "단순 prev/next sibling" 우선순위를 실제 점수에도
+  반영하려면 `fusion.py`/`hybrid_retriever.py`를 건드려야 하는데, 이번
+  작업 범위(§12 원칙: scoring 로직 불변)에서 의도적으로 제외함.
+- **표가 여러 chunk 로 나뉠 때 buffer 병합 케이스의 table_id 병합 단순화**
+  — `packer.py`에서 여러 개의 서로 다른 작은 표가 우연히 같은 병합 buffer
+  에 섞이면 `table_id`/`semantic_groups`가 "마지막 표 기준으로 덮어쓰기"
+  된다(주석에 명시). 실제로는 이 경우 표들이 전부 `table_chunk_count=1`
+  (형제 없음)이라 sibling expansion 기능에 영향은 없지만, metadata 정확성
+  자체를 완벽히 하려면 PackedUnit 을 표 단위로 분리 추적하도록 확장 가능.
 
 ### 100문항 배치에서 새로 나온 후보 (2026-08-19, 우선순위순)
 - **[최우선]** "2025년 재무지표 검색누락" 원인 규명 — 11건이 실제로 존재하는

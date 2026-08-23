@@ -84,6 +84,17 @@ def _title_of(section_el) -> str:
     return ""
 
 
+def _cell_indent(cell_el) -> int:
+    """셀 텍스트의 leading whitespace 폭 (semantic block 들여쓰기 판단용, Phase 1).
+
+    _text_of() 는 이미 strip() 을 하므로 들여쓰기가 소실된다 — 여기서는 별도로
+    strip 하지 않은 원본 텍스트에서 leading space 길이만 잰다. 실측(SK하이닉스
+    사업보고서 20260317000635.xml)으로 원본 XML 이 "    연결조정"처럼 일반
+    ASCII 공백 4칸을 들여쓰기로 그대로 쓰는 것을 확인했다."""
+    raw_text = "".join(cell_el.itertext())
+    return len(raw_text) - len(raw_text.lstrip(" 　"))
+
+
 def _cell_to_raw(cell_el) -> RawCell:
     tag = cell_el.tag
     return RawCell(
@@ -94,6 +105,7 @@ def _cell_to_raw(cell_el) -> RawCell:
         field_code=cell_el.get("ACODE") if tag == "TE" else None,
         unit_code=cell_el.get("AUNIT") if tag == "TU" else None,
         unit_value=cell_el.get("AUNITVALUE") if tag == "TU" else None,
+        indent=_cell_indent(cell_el),
     )
 
 

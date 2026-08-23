@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -53,7 +54,93 @@ def _evidence_dict(chunk: ChunkSchema, score: float | None = None) -> dict:
     return d
 
 
-def make_search_disclosures_tool(retriever, *, default_k: int = 5) -> ToolDef:
+_METRIC_TERM_RE = re.compile(r"[가-힣A-Za-z0-9]+")
+
+
+def _extract_query_terms(query: str) -> set[str]:
+    """LLM 을 semantic boundary/매칭 판단에 쓰지 않는다(§12 원칙 9) — 아주 단순한
+    부분문자열 키워드 집합만 뽑는다. metric_hint sibling 우선순위 결정에만 쓰인다."""
+    return {w for w in _METRIC_TERM_RE.findall(query) if len(w) >= 2}
+
+
+def _table_sibling_index(retriever) -> dict[str, list[ChunkSchema]]:
+    """table_id -> 같은 표에서 나온 chunk 목록(표 안 순서대로 정렬). 첫 호출 때만
+    전체 chunk 를 훑어 만들고, retriever 인스턴스에 캐시해 재사용한다(§12 원칙:
+    BM25/Dense/Fusion scoring 로직 자체는 건드리지 않는다 — 이건 그 바깥, evidence
+    후보 구성 단계에서만 쓰는 별도 인덱스)."""
+    cached = getattr(retriever, "_table_sibling_index_cache", None)
+    if cached is not None:
+        return cached
+    chunks_by_id = getattr(retriever, "chunks_by_id", None)
+    if chunks_by_id is None:
+        chunks_by_id = getattr(getattr(retriever, "bm25", None), "chunks_by_id", None) or {}
+    index: dict[str, list[ChunkSchema]] = {}
+    for c in chunks_by_id.values():
+        if c.table_id:
+            index.setdefault(c.table_id, []).append(c)
+    for group in index.values():
+        group.sort(key=lambda c: (c.table_chunk_index or 0))
+    try:
+        retriever._table_sibling_index_cache = index
+    except Exception:  # noqa: BLE001 — 캐시 실패해도 기능엔 지장 없음(매번 재계산)
+        pass
+    return index
+
+
+def _expand_table_siblings(
+    retriever, results: list[tuple[ChunkSchema, float]], query: str, max_table_sibling_expansion: int,
+) -> list[tuple[ChunkSchema, float | None]]:
+    """검색된 chunk 가 table_id(Phase 4)를 가지면, 같은 table_id 의 다른 chunk(형제)
+    를 evidence 후보에 추가한다 (Phase 5, "매출액/영업이익이 서로 다른 chunk 로
+    갈라져 하나만 검색됐을 때" 대비).
+
+    우선순위: 직접 검색된 chunk > metric_hint 가 query 와 겹치는 sibling >
+    prev/next(표 안에서 가까운) sibling. score boost 는 하지 않는다 — BM25/Dense/
+    Fusion 스코어링 로직은 이번 작업 범위 밖이라 건드리지 않는다(§TODO, PROJECT_STATE
+    §12 후보로 기록). 여기서 추가되는 sibling 은 score=None 으로 표시한다.
+    """
+    if max_table_sibling_expansion <= 0:
+        return results
+    index = _table_sibling_index(retriever)
+    if not index:
+        return results
+
+    query_terms = _extract_query_terms(query)
+    seen = {c.chunk_id for c, _ in results}
+    expanded: list[tuple[ChunkSchema, float | None]] = list(results)
+
+    for chunk, _score in list(results):
+        if not chunk.table_id or chunk.table_id not in index:
+            continue
+        group = index[chunk.table_id]
+        positions = {c.chunk_id: i for i, c in enumerate(group)}
+        pos = positions.get(chunk.chunk_id)
+        if pos is None:
+            continue
+
+        candidates = []
+        for other in group:
+            if other.chunk_id == chunk.chunk_id or other.chunk_id in seen:
+                continue
+            metric_match = bool(query_terms) and any(
+                term in hint for term in query_terms for hint in other.metric_hints
+            )
+            distance = abs(positions[other.chunk_id] - pos)
+            # metric_match 인 sibling 을 최우선(0), 그 다음 표 안 거리순으로 정렬.
+            candidates.append((0 if metric_match else 1, distance, other))
+        candidates.sort(key=lambda t: (t[0], t[1]))
+
+        for _prio, _dist, other in candidates[:max_table_sibling_expansion]:
+            expanded.append((other, None))
+            seen.add(other.chunk_id)
+
+    return expanded
+
+
+def make_search_disclosures_tool(
+    retriever, *, default_k: int = 5,
+    expand_table_siblings: bool = True, max_table_sibling_expansion: int = 1,
+) -> ToolDef:
     def handler(query: str, company: str | None = None, report_type: str | None = None,
                 period: str | None = None, report_id: str | None = None,
                 top_k: int = default_k, latest_only: bool = True) -> dict:
@@ -62,6 +149,8 @@ def make_search_disclosures_tool(retriever, *, default_k: int = 5) -> ToolDef:
             # 의 실제 본문을 그대로 가져온다 — latest_only 무관하게 그 문서 자체를 본다.
             flt = RetrievalFilter(report_ids=[report_id])
             results = retriever.search(query, k=max(top_k, 10), flt=flt)
+            if expand_table_siblings:
+                results = _expand_table_siblings(retriever, results, query, max_table_sibling_expansion)
             return {"results": [_evidence_dict(c, s) for c, s in results]}
 
         # Coarse-to-Fine (§51): 정확한 filter 로 먼저 시도하되, 0건이면 필터를
@@ -86,6 +175,8 @@ def make_search_disclosures_tool(retriever, *, default_k: int = 5) -> ToolDef:
             flt = RetrievalFilter(**kwargs)
             results = retriever.search(query, k=top_k, flt=flt)
             if results:
+                if expand_table_siblings:
+                    results = _expand_table_siblings(retriever, results, query, max_table_sibling_expansion)
                 return {"results": [_evidence_dict(c, s) for c, s in results], "note": None if kwargs == attempts[0] else "일부 필터를 완화해 재검색함(원 필터로는 0건)"}
         return {"results": [], "note": "필터를 단계적으로 완화했지만 관련 근거를 찾지 못함"}
 

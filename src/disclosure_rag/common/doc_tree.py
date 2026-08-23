@@ -7,6 +7,7 @@ Parser 는 전부 이 동일한 트리 구조로 수렴한다. Chunker(Phase 5)�
 
 from __future__ import annotations
 
+import uuid
 from dataclasses import dataclass, field
 from typing import Literal, Union
 
@@ -18,6 +19,13 @@ class TableCell:
     field_code: str | None = None   # DART TE[ACODE] — 구조화 추출 필드 코드
     unit_code: str | None = None    # DART TU[AUNIT]
     unit_value: str | None = None   # DART TU[AUNITVALUE] (예: 기간/날짜의 raw 값)
+    # 아래 두 필드는 semantic block 경계 검출(Phase 1, table_parser.detect_semantic_blocks)
+    # 을 위해 추가됐다 — 원본 셀 텍스트의 들여쓰기 폭과, rowspan/colspan 확장 전
+    # "원본 셀" 식별자(같은 origin_id 가 여러 grid 칸에 반복되면 rowspan 로 묶인
+    # 같은 셀이라는 뜻)를 보존한다. 기존 필드는 순서/기본값 그대로 유지해
+    # 위치 인자로 TableCell(...) 을 생성하는 기존 코드가 깨지지 않게 한다.
+    indent: int = 0
+    origin_id: int = -1
 
 
 @dataclass
@@ -29,6 +37,10 @@ class TableNode:
     title_hint: str | None = None  # 표 직전 문단(§21 Table Title) — split 시 반복 삽입용
     unit_hint: str | None = None   # "단위: 백만원" 류, 표 안/직전에서 발견되면 채움
     acode_group: str | None = None  # TABLE-GROUP[ACLASS] (예: TBL_ACQ_STK) — 존재 시
+    # 이 표(원본 하나) 를 식별하는 id. 나중에 이 표가 여러 chunk 로 쪼개져도
+    # 전부 같은 table_id 를 공유해 sibling expansion(Phase 5)에 쓸 수 있게 한다.
+    # 재현성(빌드마다 동일 id)은 요구되지 않고, 한 빌드 내에서만 유일하면 된다.
+    table_id: str = field(default_factory=lambda: uuid.uuid4().hex[:12])
 
 
 @dataclass

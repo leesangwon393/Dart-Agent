@@ -60,6 +60,24 @@ def _is_toc_table(node: ContentNode) -> bool:
     return (dash_hits / n) >= _TOC_DASH_RATIO_MIN and (pagenum_hits / n) >= _TOC_PAGENUM_RATIO_MIN
 
 
+def _link_table_chunk_siblings(chunks: list[ChunkSchema]) -> None:
+    """Phase 4/5: 같은 table_id 를 가진 chunk 들 사이에 prev/next 실제 chunk_id 를
+    채운다. PackedUnit 단계에서는 아직 최종 ChunkSchema.chunk_id 가 없어서
+    (chunk_id 는 이 함수 호출 이전, C{i} 카운터로 나중에 정해짐) 이 링크는
+    ChunkSchema 를 전부 만든 뒤 한 번 더 순회해서 채운다. 표 하나가 여러
+    chunk 로 나뉜 경우, 원래 렌더링 순서(=여기 chunks 리스트에 나타나는 순서)
+    그대로 prev/next 를 연결한다 — 같은 table_id 를 가진 chunk 들은 항상
+    같은 section 안에서 연속으로 생성되므로 순서가 곧 표 안에서의 순서다."""
+    by_table: dict[str, list[ChunkSchema]] = {}
+    for c in chunks:
+        if c.table_id:
+            by_table.setdefault(c.table_id, []).append(c)
+    for group in by_table.values():
+        for i, c in enumerate(group):
+            c.prev_table_chunk_id = group[i - 1].chunk_id if i > 0 else None
+            c.next_table_chunk_id = group[i + 1].chunk_id if i < len(group) - 1 else None
+
+
 def _period_str(row: ManifestRow) -> str | None:
     if row.base_year is None:
         return None
@@ -145,10 +163,16 @@ def chunk_parent_child(
                     content_type=unit.content_type,
                     source_path=parsed.source_path,
                     field_codes=unit.field_codes,
+                    table_id=unit.table_id,
+                    semantic_groups=unit.semantic_groups,
+                    metric_hints=unit.metric_hints,
+                    table_chunk_index=unit.table_chunk_index,
+                    table_chunk_count=unit.table_chunk_count,
                     **base,
                 )
             )
 
+    _link_table_chunk_siblings(chunks)
     return chunks
 
 
@@ -220,9 +244,15 @@ def chunk_flat_whole_doc_preferred(
                     content_type=unit.content_type,
                     source_path=parsed.source_path,
                     field_codes=unit.field_codes,
+                    table_id=unit.table_id,
+                    semantic_groups=unit.semantic_groups,
+                    metric_hints=unit.metric_hints,
+                    table_chunk_index=unit.table_chunk_index,
+                    table_chunk_count=unit.table_chunk_count,
                     **base,
                 )
             )
+    _link_table_chunk_siblings(chunks)
     return chunks
 
 

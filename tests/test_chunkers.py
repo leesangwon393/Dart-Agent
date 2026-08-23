@@ -119,6 +119,26 @@ def test_toc_detector_does_not_flag_real_data_table(manifest):
     assert control_chunks, "내부통제 관련 chunk 가 통째로 사라짐(오탐으로 필터링됐을 가능성)"
 
 
+def test_keyvalue_node_long_value_characterization(manifest):
+    """Characterization test (Phase 6, 표 semantic chunking 회귀 수정과 무관하게 유지되어야 함):
+    exchange_20241220800005 의 "2. 주요내용" KeyValueNode value 안에는 "1. 투자 목적 /
+    2. 투자 금액 / 3. 투자 기간 / 4. 투자 방법" 이 전부 한 문자열로 이어붙여져 있다
+    (약 300 토큰, 아직 semantic 하게 쪼개지 않는다).
+
+    TODO: long KeyValueNode value semantic subdivision — 이번 작업(표 TableNode
+    semantic block chunking)은 KeyValueNode 내부는 건드리지 않았다. 지금은
+    정보 손실 없이 통째로 보존만 하고 있고(이 테스트가 그 현재 동작을 캡처),
+    "투자 목적/금액/기간/방법" 처럼 KeyValueNode 의 한 value 안에 여러 의미
+    항목이 섞인 경우를 개별 검색 가능한 단위로 나누는 건 별도 작업 범위다.
+    이 테스트는 그 전까지 최소한 "정보가 사라지지 않는다"는 것만 고정한다."""
+    chunks = _chunks_for(manifest, {"exchange_20241220800005"})
+    assert len(chunks) == 1  # 표 semantic chunking 변경으로도 exchange 짧은 문서는 여전히 1 chunk
+    text = chunks[0].raw_text
+    assert chunks[0].content_type == "key_value"
+    for must_have in ("5.9조원", "HBM 경쟁력 강화", "2025년 1월 ~ 2039년 12월"):
+        assert must_have in text, f"{must_have!r} 가 KeyValueNode chunk 에서 사라짐 (회귀)"
+
+
 def test_all_chunks_are_valid_schema(manifest):
     """무작위 표본에 대해 스키마 필수 필드가 채워지는지 확인."""
     import random
