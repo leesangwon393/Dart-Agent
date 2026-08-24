@@ -8,9 +8,24 @@
   group_label 단위(이미 "결정내용/금액/일정" 처럼 의미 단위로 쪼개져 있음)로 나눈다.
 - exchange: 원문 그대로 1 chunk 를 우선한다 (§18). 표본 실측상 평균 9.7KB 로
   거의 항상 여기 해당한다.
+
+=== Kim 브랜치 감사 결과 병합 (2026-08-25) ===
+청킹 파라미터를 모듈 상수 대신 `ChunkConfig` dataclass 로 모았다(Kim 실험,
+scripts/exp_chunk_size.py: 조건 12개(크기 6 x 표표현 2) / 회사 10 / 문서 587 /
+질의 314). 크기는 600 유지가 노이즈 범위 내 최선(비용 대비 유리). 표 표현은
+grid/kv 둘 다 지원하되(hit@5 는 kv 가 6/6 쌍 우세), **기본값은 grid 로 보수적
+유지**한다 — kv 채택은 전체 코퍼스 재청킹/재임베딩을 동반하는 별도 실험 결정
+사항이라 이번 병합(파싱/표 정합성 통합) 범위 밖으로 판단했다(PROJECT_STATE
+§9/§12 참고). `chunk_document(parsed, row, correction, cfg=...)`처럼 마지막
+인자로만 받으므로, 이 인자를 안 넘기는 기존 호출부(pipeline.py)는 그대로 동작한다.
+
+표 semantic chunking 메타데이터(table_id 등, b112925)와 그 sibling 연결
+(`_link_table_chunk_siblings`)은 그대로 유지한다.
 """
 
 from __future__ import annotations
+
+from dataclasses import dataclass
 
 from disclosure_rag.chunking.chunk_schema import ChunkSchema, estimate_tokens, render_search_text
 from disclosure_rag.chunking.packer import pack_nodes
@@ -21,6 +36,39 @@ from disclosure_rag.correction.correction_graph_builder import CorrectionRecord
 CHILD_TARGET_TOKENS = 600
 CHILD_MAX_TOKENS = 1000
 WHOLE_DOC_MAX_TOKENS = 1000  # 이보다 작으면 major/exchange 는 "공시 1건 = chunk 1개"
+
+
+@dataclass(frozen=True)
+class ChunkConfig:
+    """청킹 파라미터를 한 곳에 모은다 (실험 축, Kim 브랜치 도입).
+
+    === Kim 2026-08-23 실험으로 확정(scripts/exp_chunk_size.py, 실제 BGE-M3 토크나이저) ===
+    조건 12개(크기 6 x 표표현 2) / 회사 10 / 문서 587 / 조각수준 질의 314.
+
+    **크기: 600 유지.** MRR 범위가 0.389~0.422, 폭이 표준오차의 1.4배라 차이가
+    노이즈다. 300~1200 사이 어디를 골라도 통계적으로 같다(1800 만 명확히 나쁘다).
+    작은 청크(600)는 매 질의마다 넘기는 컨텍스트가 절반이라(p50 1,242자 vs
+    2,296자) 서빙 비용 기준으로 600 이 유리하다.
+
+    **표 표현(table_style): grid 유지(보수적 기본값).** Kim 실험은 같은 크기끼리
+    짝지어 비교했을 때 kv 가 hit@5 6/6 쌍 우세(평균 +0.019)라고 보고했지만, kv
+    채택은 전체 코퍼스 재청킹/재임베딩을 요구하는 별도 실험 결정이다 — 이번
+    병합은 파싱/표 정합성 통합이 범위이므로 기본값은 현재 프로덕션과 동일한
+    grid 로 유지하고, table_style="kv" 옵션만 열어둔다.
+    """
+
+    target_tokens: int = CHILD_TARGET_TOKENS
+    max_tokens: int = CHILD_MAX_TOKENS
+    whole_doc_max_tokens: int = WHOLE_DOC_MAX_TOKENS
+    table_max_rows: int = 20
+    table_style: str = "grid"  # "grid" | "kv"
+
+    @property
+    def label(self) -> str:
+        return f"t{self.target_tokens}_m{self.max_tokens}_r{self.table_max_rows}_{self.table_style}"
+
+
+DEFAULT_CHUNK_CONFIG = ChunkConfig()
 
 _TOC_DASH_RATIO_MIN = 0.6
 _TOC_PAGENUM_RATIO_MIN = 0.6
@@ -61,13 +109,13 @@ def _is_toc_table(node: ContentNode) -> bool:
 
 
 def _link_table_chunk_siblings(chunks: list[ChunkSchema]) -> None:
-    """Phase 4/5: 같은 table_id 를 가진 chunk 들 사이에 prev/next 실제 chunk_id 를
-    채운다. PackedUnit 단계에서는 아직 최종 ChunkSchema.chunk_id 가 없어서
-    (chunk_id 는 이 함수 호출 이전, C{i} 카운터로 나중에 정해짐) 이 링크는
-    ChunkSchema 를 전부 만든 뒤 한 번 더 순회해서 채운다. 표 하나가 여러
-    chunk 로 나뉜 경우, 원래 렌더링 순서(=여기 chunks 리스트에 나타나는 순서)
-    그대로 prev/next 를 연결한다 — 같은 table_id 를 가진 chunk 들은 항상
-    같은 section 안에서 연속으로 생성되므로 순서가 곧 표 안에서의 순서다."""
+    """같은 table_id 를 가진 chunk 들 사이에 prev/next 실제 chunk_id 를 채운다.
+    PackedUnit 단계에서는 아직 최종 ChunkSchema.chunk_id 가 없어서(chunk_id 는
+    이 함수 호출 이전, C{i} 카운터로 나중에 정해짐) 이 링크는 ChunkSchema 를
+    전부 만든 뒤 한 번 더 순회해서 채운다. 표 하나가 여러 chunk 로 나뉜 경우,
+    원래 렌더링 순서(=여기 chunks 리스트에 나타나는 순서) 그대로 prev/next 를
+    연결한다 — 같은 table_id 를 가진 chunk 들은 항상 같은 section 안에서
+    연속으로 생성되므로 순서가 곧 표 안에서의 순서다."""
     by_table: dict[str, list[ChunkSchema]] = {}
     for c in chunks:
         if c.table_id:
@@ -115,6 +163,7 @@ def _content_bearing_sections(sections: list[SectionNode]):
 
 def chunk_parent_child(
     parsed: ParsedDocument, row: ManifestRow, correction: CorrectionRecord,
+    cfg: ChunkConfig = DEFAULT_CHUNK_CONFIG,
 ) -> list[ChunkSchema]:
     """periodic / holding 공용: Section = Parent, 그 아래 packed unit = Child (§13, §20)."""
     base = _base_fields(row, correction, parsed.document_name)
@@ -127,7 +176,10 @@ def chunk_parent_child(
         section_path = section.path
 
         # Parent: Context 확장용 — 해당 section 의 전체 raw 내용을 그대로 이어붙인다.
-        packed_full = pack_nodes(direct_content, target_tokens=10**9, max_tokens=10**9)
+        packed_full = pack_nodes(
+            direct_content, target_tokens=10**9, max_tokens=10**9,
+            table_max_rows=10**9, table_max_tokens=10**9, table_style=cfg.table_style,
+        )
         parent_raw = "\n\n".join(u.text for u in packed_full) if packed_full else section.title
         parent_content_type = packed_full[0].content_type if packed_full else "text"
         chunks.append(
@@ -142,12 +194,18 @@ def chunk_parent_child(
                 section_path=section_path,
                 content_type=parent_content_type,
                 source_path=parsed.source_path,
+                field_codes=[r for u in packed_full for r in u.field_refs],
+                unit_hint=next((u.unit_hint for u in packed_full if u.unit_hint), None),
+                period_hint=next((u.period_hint for u in packed_full if u.period_hint), None),
                 **base,
             )
         )
 
         # Child: 실제 검색 대상, target/max token 예산으로 쪼갠다.
-        child_units = pack_nodes(direct_content, target_tokens=CHILD_TARGET_TOKENS, max_tokens=CHILD_MAX_TOKENS)
+        child_units = pack_nodes(
+            direct_content, target_tokens=cfg.target_tokens, max_tokens=cfg.max_tokens,
+            table_max_rows=cfg.table_max_rows, table_style=cfg.table_style,
+        )
         for i, unit in enumerate(child_units, start=1):
             child_id = f"{parent_id}::C{i}"
             chunks.append(
@@ -162,7 +220,9 @@ def chunk_parent_child(
                     section_path=section_path,
                     content_type=unit.content_type,
                     source_path=parsed.source_path,
-                    field_codes=unit.field_codes,
+                    field_codes=unit.field_refs,
+                    unit_hint=unit.unit_hint,
+                    period_hint=unit.period_hint,
                     table_id=unit.table_id,
                     semantic_groups=unit.semantic_groups,
                     metric_hints=unit.metric_hints,
@@ -189,6 +249,7 @@ def _flatten_with_section(sections: list[SectionNode]) -> list[tuple[list[str], 
 
 def chunk_flat_whole_doc_preferred(
     parsed: ParsedDocument, row: ManifestRow, correction: CorrectionRecord,
+    cfg: ChunkConfig = DEFAULT_CHUNK_CONFIG,
 ) -> list[ChunkSchema]:
     """major / exchange 공용: "공시 1건 = chunk 1개" 를 우선하고(§15, §18),
     너무 길 때만 group_label/문단 단위(이미 packer 가 나누는 단위)로 쪼갠다.
@@ -199,7 +260,10 @@ def chunk_flat_whole_doc_preferred(
         return []
 
     all_nodes = [n for _sp, n in node_section_pairs]
-    whole_units = pack_nodes(all_nodes, target_tokens=10**9, max_tokens=10**9)
+    whole_units = pack_nodes(
+        all_nodes, target_tokens=10**9, max_tokens=10**9,
+        table_max_rows=10**9, table_max_tokens=10**9, table_style=cfg.table_style,
+    )
     whole_text = "\n\n".join(u.text for u in whole_units)
 
     chunks: list[ChunkSchema] = []
@@ -207,10 +271,8 @@ def chunk_flat_whole_doc_preferred(
     # 보통 고정 안내문 뿐이라 content 가 없고, 두번째 section 이 진짜 이벤트다 — 실측 §4).
     representative_section_path = node_section_pairs[-1][0]
 
-    if estimate_tokens(whole_text) <= WHOLE_DOC_MAX_TOKENS:
-        field_codes: dict[str, str] = {}
-        for u in whole_units:
-            field_codes.update(u.field_codes)
+    if estimate_tokens(whole_text) <= cfg.whole_doc_max_tokens:
+        field_codes = [r for u in whole_units for r in u.field_refs]
         content_type = whole_units[0].content_type if whole_units else "text"
         chunks.append(
             ChunkSchema(
@@ -225,11 +287,16 @@ def chunk_flat_whole_doc_preferred(
                 content_type=content_type,
                 source_path=parsed.source_path,
                 field_codes=field_codes,
+                unit_hint=next((u.unit_hint for u in whole_units if u.unit_hint), None),
+                period_hint=next((u.period_hint for u in whole_units if u.period_hint), None),
                 **base,
             )
         )
     else:
-        units = pack_nodes(all_nodes, target_tokens=CHILD_TARGET_TOKENS, max_tokens=CHILD_MAX_TOKENS)
+        units = pack_nodes(
+            all_nodes, target_tokens=cfg.target_tokens, max_tokens=cfg.max_tokens,
+            table_max_rows=cfg.table_max_rows, table_style=cfg.table_style,
+        )
         for i, unit in enumerate(units, start=1):
             chunks.append(
                 ChunkSchema(
@@ -243,7 +310,9 @@ def chunk_flat_whole_doc_preferred(
                     section_path=representative_section_path,
                     content_type=unit.content_type,
                     source_path=parsed.source_path,
-                    field_codes=unit.field_codes,
+                    field_codes=unit.field_refs,
+                    unit_hint=unit.unit_hint,
+                    period_hint=unit.period_hint,
                     table_id=unit.table_id,
                     semantic_groups=unit.semantic_groups,
                     metric_hints=unit.metric_hints,
@@ -256,9 +325,12 @@ def chunk_flat_whole_doc_preferred(
     return chunks
 
 
-def chunk_document(parsed: ParsedDocument, row: ManifestRow, correction: CorrectionRecord) -> list[ChunkSchema]:
+def chunk_document(
+    parsed: ParsedDocument, row: ManifestRow, correction: CorrectionRecord,
+    cfg: ChunkConfig = DEFAULT_CHUNK_CONFIG,
+) -> list[ChunkSchema]:
     if parsed.doc_group in ("periodic", "holding"):
-        return chunk_parent_child(parsed, row, correction)
+        return chunk_parent_child(parsed, row, correction, cfg)
     if parsed.doc_group in ("major", "exchange"):
-        return chunk_flat_whole_doc_preferred(parsed, row, correction)
+        return chunk_flat_whole_doc_preferred(parsed, row, correction, cfg)
     raise ValueError(f"알 수 없는 doc_group: {parsed.doc_group}")

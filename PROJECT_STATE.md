@@ -428,6 +428,18 @@ BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
    말 것** — 근본 원인(bare `&`/`<`)을 찾으면 훨씬 광범위한 문제(문서 전체
    유실)였음이 §10에서 드러남. 이번처럼 "이상한 결과가 나오면 반드시 원문
    대조부터" 하는 습관이 중요.
+10. **bare `<` 만 고치고 속성값 안 여분 따옴표(malformation C)는 "위험해서"
+    미루지 말 것 — 둘은 서로를 가리는 관계다.** 2026-08-25 Kim 브랜치 병합
+    실측: bare `<` 가 만드는 유령 element 가 스택을 깊게 쌓아둔 덕에, 속성값
+    파싱 실패가 유발하는 연쇄 tag mismatch 가 DOCUMENT 까지 pop 되지 못하고
+    멈춰 있던 문서가 실존한다. 그 상태에서 `<` 만 고치면 완충재가 사라져
+    루트가 조기 종료되고 이후 내용이 통째로 폐기된다(Kim 실측: 현대차
+    813천자→422천자, KB금융 1,634천자→814천자 — **B만 고치면 오히려 본문이
+    줄어든다**). "위험해서 부분적으로만 고친다"는 판단 자체가 함정이었다 —
+    두 malformation 을 **함께** 고쳐야 순수 이득이 된다(bytes 레벨에서 실제
+    파싱 실패가 난 지점만 최소 개입으로 수리하면 안전하게 가능함이
+    `xml_sanitizer.py` 로 증명됨). §12 TODO #3(3번째 malformation 패턴)도
+    이번에 완료 처리.
 
 ---
 
@@ -443,14 +455,15 @@ BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
   116건→0건(같은 진단 기준). KB금융/현대자동차 실제 질의로 end-to-end
   재검증 완료(§5 참고, `matrix.csv`에 [재검증] PASS 행 추가). 회귀 테스트
   4건 `tests/test_parsers.py`에 추가.
-- **[별개 이슈로 재확인, 미수정]** 3번째 malformation 패턴(속성값 안
+- **[2026-08-25 Kim 브랜치 병합으로 수정 완료]** 3번째 malformation 패턴(속성값 안
   이스케이프 안 된 따옴표, 예: `ENG="" KB Insurance Co., Ltd ""`) —
-  전체 코퍼스 재스캔(2,732건)으로 정밀 정량화: **여전히 627건(23.0%)
-  영향**, 전부 periodic, 금융지주·대기업 계열의 특수관계자/종속기업
+  전체 코퍼스 재스캔(2,732건)으로 정밀 정량화됐던 시점엔 627건(23.0%)
+  영향, 전부 periodic, 금융지주·대기업 계열의 특수관계자/종속기업
   현황 표(영문 회사명을 ENG 속성에 넣는 표)에 집중. 속성값 경계를
-  정규식으로 안전하게 판별하기 어려워 여전히 미수정(잘못 고치면 정상
-  데이터를 깨뜨릴 위험) — 다음에 손댈 후보면 §12 참고. 상세: `results/
-  generalization_check/summary.md`.
+  정규식으로 안전하게 판별하기 어려워 미뤄왔던 것을, 팀원 Kim 이 별도
+  작업본에서 bytes 레벨 상태기계 파서(`xml_sanitizer.py`, "닫는 따옴표
+  직후 잡문자가 오면 다음 속성명=/> 앞의 진짜 닫는 따옴표를 찾아 재작성"
+  방식)로 안전하게 해결 — 상세는 아래 "Kim 브랜치 병합" 절 참고.
 - **[수정됨]** TOC(목차) 표가 청크로 인덱싱돼 BM25 허위매칭 유발 —
   `chunkers.py`의 `_is_toc_table()`로 필터링.
 - **[수정됨]** 카운팅 질문("몇 건이야?")이 calculation route로 오분류돼
@@ -533,6 +546,91 @@ BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
     줄어들어 **4개 파일 전부 KeyValueNode 로 분류됨(TableNode 0개)** —
     기존 `classify_grid()`의 의도된 동작이고 버그 아님.
 
+### Kim 브랜치(pipeline-kim) 감사 결과 병합 (2026-08-25)
+
+팀원 "Kim"이 우리 리포를 복사해서 독립적으로 파싱/표 정합성 버그를 감사·
+수정한 작업본(`~/Downloads/pipeline-kim`, 읽기 전용 참고)의 검증된 수정
+5가지를 새 base 로 삼고, 그 위에 2026-08-24 밤에 구현한 semantic block
+table chunking(바로 위 절)을 다시 얹어서 병합했다. Kim 쪽은 절대 수정하지
+않고 전부 우리 리포에만 반영. 상세 diff 분석은 `docs/kim_merge_analysis.md`.
+
+- **xml_sanitizer.py(신규)**: bare `&`(무죄, 구조 안 깨짐)/bare `<`(구조
+  붕괴 원인)/속성값 안 여분 따옴표(문서 절단 원인, §9 교훈 10 참고) 3종을
+  bytes 레벨 상태기계로 정밀 수리. `dart_xml_parser.py`가 기존
+  `_escape_bare_special_chars`(bare &/< 만) 대신 이걸 쓰도록 교체하고,
+  `_parse_with_sanitizer()`로 "정리가 오히려 손해면 원본 파싱으로 폴백"
+  안전망도 추가. 우리 코퍼스로 실측(전/후 비교, `git stash` 로 대조):
+  현대자동차(`periodic_20260318001394`) BODY 직속 SECTION-1 7→14개 회복,
+  본문 총량은 6개사(현대자동차/메리츠금융지주/삼성SDI/LG에너지솔루션/
+  삼성전자/한미반도체) 전부 증가(+17~102%, 예: 현대차 381,379→770,557자,
+  LG에너지솔루션 357,262→464,464자) — 줄어든 문서는 하나도 없음(Kim 의
+  핵심 주장과 일치). 4개사는 SECTION-1 개수 자체는 우리 코퍼스의 최신
+  버전 필터링에서 이미 안 깨져 있었지만(Kim 이 테스트한 특정 필링과 우리
+  "latest" 필링이 달라 정확히 같은 문서는 아님), `[TABLE_PARSER] TR 수
+  비정상` 캡 경고가 수정 후 전부 사라져 표 내부 절단은 동일하게 존재했고
+  고쳐졌음을 확인.
+- **table_parser.expand_grid()**: RLE 축약 저장 대신 정규 그리드 그대로
+  저장, span 복제 칸은 `TableCell.dup_left`/`dup_up` 플래그로 표시해
+  렌더링에서만 빈칸 처리(열 수 유지 + 텍스트 중복 방지 동시 해결).
+  Kim 의 `_GridCell.origin_id` 래퍼는 우리가 이미 갖고 있던
+  `TableCell.origin_id`(어젯밤 semantic block 검출용으로 추가)와 개념이
+  동일해 래퍼를 없애고 `TableCell` 필드로 통합.
+- **classify_grid() 1열 행 처리**: `else: continue`(버림) → `TextNode(
+  from_table_row=True)`(보존). `_scan_hints()`로 unit_hint/period_hint 를
+  실제로 채움(호출부 `dart_xml_parser.py`가 파라미터에 값을 넘긴 적이
+  없어 전 코퍼스 0%였던 죽은 코드였음).
+- **field_codes 재설계**: `dict[셀텍스트→코드]`(텍스트 충돌 시 덮어써서
+  소실 + unit_value 미보존) → `list[FieldRef(code, unit, unit_value, text,
+  row, col, key)]`. repo 전체에서 field_codes 참조처가 chunking/*.py +
+  테스트뿐임을 grep 으로 확인 후 진행(다른 계층 영향 없음).
+- **packer.split_long_text()**: 문단>줄>문장>어절>문자 순 재귀 분할로
+  "버퍼가 비어있으면 오버사이즈 노드가 그대로 통과되는" 가드 버그 수정.
+  **병합 중 추가로 발견한 버그**: 표가 여러 chunk 로 쪼개지는 경로는
+  sibling expansion 순서를 지키려고 `add()`(split_long_text 적용 경로)를
+  거치지 않고 독립 unit 으로 바로 나가는데, `render_table_node_fragments`
+  의 block 내부 분할은 "행 1개 자체가 이미 max_tokens 를 넘는" 극단적
+  케이스(표 셀 안의 긴 각주)를 더 쪼개지 않는다 — **바로 §12 "재임베딩
+  중 발견한 극단적으로 큰 표 chunk"(153,345자 outlier) TODO의 근본
+  원인**. `packer.pack_nodes()`의 표 분기에서 각 fragment 를
+  `split_long_text()` 에 한 번 더 통과시키는 안전망을 추가해 해결 —
+  Kim 의 `test_properties.py::test_leaf_chunk_size_is_actually_bounded`
+  가 이 수정 전엔 실패(상한 2200자 초과 leaf 22개, 최대 36,047자)했다가
+  수정 후 통과함을 확인.
+- **render_table_node_fragments (semantic-block-first) 재작성**: Kim 의
+  렌더링 디테일(dup_left/dup_up skip 하는 `_cell_text`, 여러 헤더 행을
+  열별로 합치는 `_header_labels`, `style="kv"/"grid"`, preamble 에
+  title_hint+unit_hint+period_hint 전부 포함)을 기반으로 삼되, body row
+  순회는 Kim 의 순수 row/token count 방식이 아니라 우리
+  `detect_semantic_blocks()` + block 단위 패킹을 그대로 유지 — SK하이닉스
+  사업보고서 재현 테스트(`test_periodic_sk_hynix_repro_operating_profit_
+  same_chunk`) 그대로 통과 확인. `table_style` 기본값은 `"grid"`로 보수적
+  유지(Kim 실험은 kv 가 hit@5 우세라고 보고했지만, 채택은 전체 재청킹/
+  재임베딩을 요구하는 별도 실험 결정이라 이번 병합 범위 밖으로 판단).
+- **테스트**: 기존 112건 + Kim `test_xml_sanitizer.py`(16건) +
+  `test_properties.py`(8건, 분포/비율 수준 계약 검증 — 개별 케이스 아니라
+  "청크 상한이 실제 상한인가/원문 커버리지/표 열 정렬/1열 행 보존/
+  AUNITVALUE 보존/parent-child 무결성") 이식 = 총 144건(`not slow` 기준
+  136 PASS + slow 8건은 HCX API 필요라 기존과 동일하게 deselect).
+  `field_codes` 관련 테스트는 FieldRef 리스트 기준으로 갱신(의도된 변경).
+- **수정 파일**: `parsing/xml_sanitizer.py`(신규, Kim 원본 그대로),
+  `parsing/dart_xml_parser.py`, `parsing/table_parser.py`,
+  `common/doc_tree.py`, `chunking/chunk_schema.py`, `chunking/packer.py`,
+  `chunking/chunkers.py`(ChunkConfig dataclass 도입, `pipeline.py`는 3-
+  positional-arg 호출이라 하위호환 유지), `tests/test_parsers.py`,
+  `tests/test_chunkers.py`, `tests/test_xml_sanitizer.py`(신규),
+  `tests/test_properties.py`(신규). `agent/tools.py`는 **변경 없음** —
+  이미 우리 sibling expansion 로직이 Kim 에 없는 것까지 갖고 있었음(Kim
+  쪽엔 대신 미배선 dead code인 `TOP_K_BY_ROUTE`가 있었으나 파싱/표 정합성
+  범위 밖이라 이식 안 함).
+- **다음 단계(실행 안 함, §12 참고)**: 이번 병합으로 chunking 로직이
+  바뀌었으므로 전체 코퍼스 재청킹(`chunks_v2/`) + 재임베딩
+  (`gpu_embeddings_v2/`)이 필요하다 — 단, 이 세션 도중 이미 돌고 있던
+  이전 버전(어젯밤 semantic block 커밋 b112925 기준) 재임베딩 프로세스
+  (`embed_full_corpus_mps.py`)가 **세션 중간에 이유 불명으로 종료됨을
+  발견**(더 이상 `ps aux`에 없고 `gpu_embeddings_v2/` 산출물도 디스크에
+  없음 — 이 세션에서 그 프로세스를 죽이거나 건드린 적 없음, 첫 확인 시점
+  에는 PID 5320 으로 정상 실행 중이었음). 사용자가 재확인 필요.
+
 ### 100문항 일반화 배치 트랙 (2026-08-19, §5-0 참고)
 
 - **[수정됨, 회귀테스트 추가]** Validator 오탐 — evidence 원문의 "(2023.12)"
@@ -600,6 +698,23 @@ BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
 **파싱 버그 재검증 체크리스트(1~7)는 전부 완료됨** (§5 참고). 다음은
 사용자가 명시적으로 요청할 경우의 후보 목록.
 
+### [최우선, 실행 필요] Kim 브랜치 병합 후 전체 코퍼스 재청킹/재임베딩 (2026-08-25)
+파싱(xml_sanitizer B+C, expand_grid dup 모델, 1열 행 보존, field_codes
+FieldRef화, unit/period hint 실채움)과 packer(split_long_text 안전망)가
+전부 바뀌었으므로, `chunks_v2/`/`gpu_embeddings_v2/`는 **이 병합 반영 전
+버전**이다 — 재실행 전까지 검색 품질에 이번 수정 효과가 전혀 반영 안 됨.
+이번 세션은 코드 병합 구현+테스트(144건 PASS)까지만 진행했고 재청킹/
+재임베딩은 **의도적으로 실행하지 않았다**(§10 "Kim 브랜치 병합" 절 마지막
+항목 참고 — 실행 전 이미 돌고 있던 이전 버전 재임베딩 프로세스가 세션 중
+이유 불명으로 사라진 것도 함께 확인 필요). 실행 순서: (1)
+`scripts/rebuild_chunks_v2.py` 재실행(전체 코퍼스 재청킹, 어젯밤 실측
+기준 494,194개 chunk 생성에 수 분 내외), (2)
+`scripts/embed_full_corpus_mps.py` 재실행(로컬 MPS, 어젯밤 실측 기준
+전체 소요 예상 수 시간대 — 정확한 시간은 이전 실행이 중간에 끊겨 재측정
+필요), (3) xml_sanitizer 로 본문이 늘어난 만큼 chunk 수/분포가 다시 바뀔
+수 있으니 재청킹 후 최소 `tests/test_properties.py` 재실행으로 계약
+위반 여부 확인 권장.
+
 ### 후보 (우선순위순 아님, 사용자 요청 시 진행)
 - **[완료 2026-08-18] ~~routes.py의 calculation/event_analysis ↔
   single_lookup 경계 재정리~~** — utterance 19개 추가로 semantic 단독
@@ -614,11 +729,9 @@ BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
   — 구현+테스트는 완료(§5-A)됐지만 아직 어떤 production 스크립트도
   이걸로 router를 조립하지 않음(지금까지 이 프로젝트의 모든 스크립트가
   매번 새로 HCXRouter 스텁을 즉석에서 짜왔음 — 이제 그럴 필요 없음).
-- **3번째 malformation 패턴(속성값 안 따옴표) 수정 검토** — 이제 실제
-  실패 시그니처를 확보함(`ENG="" 회사명 ""` 형태, 종속기업/특수관계자
-  표에 집중, 전체 periodic의 23%). "속성값 경계 판별이 위험하다"는 기존
-  우려가 여전히 유효한지, 이 특정 패턴(빈 따옴표+공백으로 시작·끝나는
-  ENG 속성값)만 좁게 타겟팅하면 안전하게 고칠 수 있는지 재검토 가치 있음.
+- **[완료 2026-08-25, Kim 브랜치 병합]** ~~3번째 malformation 패턴(속성값 안
+  따옴표) 수정 검토~~ — `xml_sanitizer.py` 로 해결. §10 "Kim 브랜치 병합"
+  절 참고.
 - 복합추론_Open retrieval breadth 개선(top_k 확대, 하위키워드 분할검색,
   전용 tool 등)
 - Router 파인튜닝 데이터 1,200건까지 확대(현재 149건, `results/router_tuning/`)
@@ -634,8 +747,15 @@ BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
 - TOC 버그가 Stage 1~14 지표에 준 영향 재검증(선택적, 비용 큼)
 - `test_dense_retriever.py`의 brittle assertion 완화(§10 참고, 급하지 않음)
 
-### 재임베딩(로컬 MPS) 중 발견 — 극단적으로 큰 표 chunk (2026-08-24, pre-existing, 이번 수정과 무관)
-- **[발견, 미수정 — 이번 세션 범위 밖]** 전체 코퍼스 재임베딩(§7 참고) 첫
+### 재임베딩(로컬 MPS) 중 발견 — 극단적으로 큰 표 chunk (2026-08-24 발견, 2026-08-25 Kim 브랜치 병합으로 수정)
+- **[2026-08-25 수정됨]** 아래 원인 분석까지는 2026-08-24 그대로이지만,
+  Kim 브랜치 병합 중 `packer.pack_nodes()`의 표 분기에 `split_long_text()`
+  안전망을 추가해 해결했다(§10 "Kim 브랜치 병합" 절 참고) — "다음에 제대로
+  고치려면" 아래 제안과 사실상 동일한 방향(문단/문장/어절 단위 재분할)을
+  Kim 의 범용 재귀 분할기로 구현. `test_properties.py::test_leaf_chunk_
+  size_is_actually_bounded` 로 상한 준수를 회귀 테스트로 고정(수정 전
+  36,047자 outlier 22개 실측 → 수정 후 0개). 원문 발견 경위는 아래 그대로 보존.
+- **[2026-08-24 원 발견 내용]** 전체 코퍼스 재임베딩(§7 참고) 첫
   시도에서 MPS `Insufficient Memory (kIOGPUCommandBufferCallbackErrorOut
   OfMemory)` 크래시. 원인: 표 셀 하나에 긴 각주성 텍스트가 통째로 들어간
   chunk 가 소수 존재(최대 153,345자 — 신한지주 `periodic_20260318000826`

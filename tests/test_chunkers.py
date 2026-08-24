@@ -70,12 +70,16 @@ def test_holding_deep_section_path_preserved(manifest):
 
 def test_field_codes_not_dropped_in_table_or_kv_chunks(manifest):
     """§14 금지: TE[ACODE]/TU[AUNIT] 값이 KeyValueNode 든 TableNode(큰 표) 든
-    field_codes 로 보존돼야 한다 (회귀: 이전에는 TableNode 경로에서 누락됐었음)."""
+    field_codes 로 보존돼야 한다 (회귀: 이전에는 TableNode 경로에서 누락됐었음).
+
+    Kim 병합: field_codes 가 {셀 텍스트: 코드} dict 에서 FieldRef 리스트로
+    바뀌었다 — 같은 셀 텍스트끼리 덮어쓰던 걸 위치 보존 리스트로 바꿨으므로,
+    위치 정보(row/col)까지 함께 검증한다."""
     chunks = _chunks_for(manifest, {"major_20241118000171"})
-    all_codes = {}
-    for c in chunks:
-        all_codes.update(c.field_codes)
-    assert all_codes, "field_codes 가 하나도 보존되지 않음 (회귀)"
+    refs = [r for c in chunks for r in c.field_codes]
+    assert refs, "field_codes 가 하나도 보존되지 않음 (회귀)"
+    assert any(r.code for r in refs), "ACODE 가 하나도 없음"
+    assert any(r.row is not None for r in refs), "위치 정보가 없음"
 
 
 def test_no_duplicated_text_from_colspan_expansion(manifest):

@@ -72,9 +72,20 @@ def test_major_extraction_table_preserves_acode(manifest, resolver):
     docs = parse_documents_for_row(row, resolver)
     main = docs[0]
     all_kv = [n for s in main.sections for n in _all_children(s) if isinstance(n, KeyValueNode)]
-    field_codes = {code for kv in all_kv for (_, _, code, _) in kv.pairs if code}
-    unit_codes = {uc for kv in all_kv for (_, _, _, uc) in kv.pairs if uc}
+    all_tables = [n for s in main.sections for n in _all_children(s) if isinstance(n, TableNode)]
+    cells = [c for t in all_tables for row in t.rows for c in row]
+    # Kim 병합 이후: 이 문서는 AUNIT/AUNITVALUE 가 KeyValueNode 가 아니라 큰 표
+    # (TableNode) 쪽에 있을 수 있다. 두 경로 어디에서도 버려지면 안 되므로 합쳐서 본다.
+    field_codes = ({p.field_code for kv in all_kv for p in kv.pairs if p.field_code}
+                   | {c.field_code for c in cells if c.field_code})
+    unit_codes = ({p.unit_code for kv in all_kv for p in kv.pairs if p.unit_code}
+                  | {c.unit_code for c in cells if c.unit_code})
+    unit_values = ({p.unit_value for kv in all_kv for p in kv.pairs if p.unit_value}
+                   | {c.unit_value for c in cells if c.unit_value})
     assert field_codes, "ACODE 가 하나도 보존되지 않음"
+    assert unit_codes, "AUNIT 이 하나도 보존되지 않음"
+    # Kim 병합: AUNITVALUE(DART 가 정규화해준 값)는 기존에 100% 폐기됐다.
+    assert unit_values, "AUNITVALUE 가 하나도 보존되지 않음 (회귀)"
     assert any(kv.acode_group for kv in all_kv), "TABLE-GROUP[ACLASS] 가 보존되지 않음"
 
 
@@ -84,7 +95,7 @@ def test_exchange_key_value_structure(manifest, resolver):
     docs = parse_documents_for_row(row, resolver)
     main = docs[0]
     all_kv = [n for s in main.sections for n in _all_children(s) if isinstance(n, KeyValueNode)]
-    pairs = {k: v for kv in all_kv for (k, v, _, _) in kv.pairs}
+    pairs = {p.key: p.value for kv in all_kv for p in kv.pairs}
     assert pairs.get("계약금액(원)") == "22,764,764,160,000"
     assert pairs.get("매출액대비(%)") == "7.6"
 
@@ -127,8 +138,13 @@ def test_no_silent_empty_content_across_random_sample(manifest, resolver):
 
 # 회귀 발견(2026-08-16, 회사 일반화 검증 2라운드): 콘텐츠 안의 escape 안 된
 # bare "&"/"<" 가 lxml recover 모드를 오정렬시켜 SECTION 구조 대부분을 표
-# 안으로 잘못 밀어넣고, 문서 대부분이 유실되던 버그. dart_xml_parser.py 의
-# _escape_bare_special_chars() 로 고쳤다 — 아래는 그 고정 테스트.
+# 안으로 잘못 밀어넣고, 문서 대부분이 유실되던 버그. 처음엔 dart_xml_parser.py
+# 의 `_escape_bare_special_chars()`(bare &/< 만 처리)로 고쳤으나, 2026-08-25
+# Kim 브랜치 병합으로 `xml_sanitizer.sanitize_dart_xml()`(bare &, bare <,
+# **속성값 안 여분 따옴표** 3종 모두 처리)로 교체했다 — 아래는 그 고정 테스트.
+# `_escape_bare_special_chars()` 자체에 대한 단위 테스트는 더 이상 존재하지
+# 않는 함수를 참조하므로 제거했고, 3종 malformation 각각에 대한 세밀한 단위
+# 테스트는 tests/test_xml_sanitizer.py 가 담당한다.
 _MALFORMED_XML_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
 <DOCUMENT ACLASS="OU"><DOCUMENT-NAME ACODE="1">사업보고서</DOCUMENT-NAME>
 <BODY>
@@ -144,17 +160,18 @@ _MALFORMED_XML_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
 </BODY></DOCUMENT>"""
 
 
-def test_escape_bare_special_chars_preserves_valid_xml_syntax():
+def test_sanitize_dart_xml_preserves_valid_xml_syntax():
     """실제 태그/entity 는 안 건드리고 콘텐츠 안 bare "&"/"<" 만 escape 해야 한다."""
-    from disclosure_rag.parsing.dart_xml_parser import _escape_bare_special_chars
+    from disclosure_rag.parsing.xml_sanitizer import sanitize_dart_xml
 
     raw = b'<TITLE ATOC="Y">I. \xea\xb0\x9c\xec\x9a\x94</TITLE><P>S&P &amp; &lt;Manufacturing Excellence&gt; \xec\x99\x84\xeb\xa3\x8c</P>'
-    fixed = _escape_bare_special_chars(raw)
+    fixed, stats = sanitize_dart_xml(raw)
     assert b"<TITLE ATOC=" in fixed, "유효한 여는 태그가 훼손됨"
     assert b"</TITLE>" in fixed, "유효한 닫는 태그가 훼손됨"
     assert b"S&amp;P" in fixed, "bare & 가 escape 안 됨"
     assert b"&amp;amp;" not in fixed, "이미 escape 된 &amp; 가 이중 escape 됨"
     assert b"&amp;lt;Manufacturing" not in fixed, "이미 escape 된 &lt; 가 이중 escape 됨"
+    assert stats.bare_amp == 1
 
 
 def test_parse_dart_xml_recovers_sections_despite_malformed_ampersand_and_bracket():
