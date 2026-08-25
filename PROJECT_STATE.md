@@ -402,9 +402,12 @@ doc_ids = [r.doc_id for r in periodic+major+exchange+holding]
 BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
 + **CascadingRouter**(§5-A, semantic margin 게이팅 + HCX-005 escalation,
 `router/hcx_router.py`) + **Agent=HCX-007** + **Answer=HCX-005**. `.env`의
-`HCX_MODEL=HCX-007`(agent 기본값) — answer 전용 모델 분리와 CascadingRouter
-둘 다 아직 `ask.py` 호출부에 실제로 배선되지 않음(둘 다 구현+테스트는
-완료, production 진입점에서 조립하는 코드만 없음 — §12 후보).
+`HCX_MODEL=HCX-007`(agent 기본값). answer 전용 모델 분리(2026-08-18)와
+CascadingRouter 조립(2026-08-25, `router.hcx_router.build_cascading_router`)
+둘 다 완료 — §12 참고. **주의**: Fusion 은 위 표에 "Normalized Weighted
+Fusion"으로 적혀있지만 실제 `retrieval/fusion.py`엔 그 함수가 없고 RRF만
+있다(2026-08-25, Kim 브랜치 감사로 발견, §10 참고) — 문서와 코드가 다시
+어긋난 사례이니 다음에 손볼 것.
 
 ---
 
@@ -444,6 +447,18 @@ BGE-M3 dense + Normalized Weighted Fusion + No-Reranker + Rule-only Entity
 ---
 
 ## 10. 발견된 문제 (버그 픽스 이력)
+
+### 2026-08-25 발견, 미수정 — `Normalized Weighted Fusion` 문서-코드 불일치
+
+§8 표/§8 "최종 확정 baseline"이 Fusion 채택 결과로 "Normalized Weighted
+Fusion"을 적어놨지만, 팀원(Kim)의 독립 감사에서 **`retrieval/fusion.py`에
+그 함수가 아예 없다**는 게 드러났다 — 실제로 `hybrid_retriever.py`가 쓰는
+건 `reciprocal_rank_fusion()`(RRF)뿐이다(직접 `grep -rl
+normalized_weighted_fusion .` → 0건으로 확인). CascadingRouter/answer 모델
+분리와 같은 계열의 "ablation으로 이겼는데 production에 안 배선됨" 패턴이
+Fusion에서도 벌어지고 있었던 것 — 이번이 세 번째 사례. RRF는 점수를
+버리고 순위만 쓰기 때문에, BM25가 확신하는 1등이 Dense의 애매한 후보에
+밀리는 문제가 있을 수 있다(Kim 지적). 아직 안 고침 — §12 후보 참고.
 
 ### 최근 발견/수정 (회사 일반화 검증 트랙, 2026-08-15~16)
 
@@ -718,17 +733,26 @@ FieldRef화, unit/period hint 실채움)과 packer(split_long_text 안전망)가
 ### 후보 (우선순위순 아님, 사용자 요청 시 진행)
 - **[완료 2026-08-18] ~~routes.py의 calculation/event_analysis ↔
   single_lookup 경계 재정리~~** — utterance 19개 추가로 semantic 단독
-  0.818→0.836, CascadingRouter 0.796→0.889 개선 확인(§5-A). **남은 부분**:
-  이 수정은 semantic_router 쪽만 개선했고 HCX 자체(escalate된 hard
-  케이스에서 여전히 오답 다수 발생)는 못 고쳤다 — HCX는 routes.py를
-  안 보므로, `hcx_router.py`의 `classify_route` tool schema에 route별
-  짧은 description(예: "calculation: 증가율/CAGR/비율처럼 두 수치를
-  비교·연산해야 나오는 값. single_lookup: 문서에 그대로 적힌 단일
-  수치/사실")을 추가해서 HCX 쪽 오분류를 직접 줄이는 게 다음 후보.
-- **CascadingRouter/HCXStructuredRouter를 `ask.py` 진입점에 실제 배선**
-  — 구현+테스트는 완료(§5-A)됐지만 아직 어떤 production 스크립트도
-  이걸로 router를 조립하지 않음(지금까지 이 프로젝트의 모든 스크립트가
-  매번 새로 HCXRouter 스텁을 즉석에서 짜왔음 — 이제 그럴 필요 없음).
+  0.818→0.836, CascadingRouter 0.796→0.889 개선 확인(§5-A).
+- **[완료 2026-08-25] ~~`hcx_router.py`의 `classify_route` tool schema에
+  route별 짧은 description 추가~~** — 6개 route 전부에 구별 기준 추가
+  (예: "calculation: 증가율/CAGR/비율처럼 문서에 없는 값을 연산해야 나옴
+  (단순 조회면 single_lookup)"). 실제 HCX API 라이브 호출 4건으로 검증:
+  "SK하이닉스가 최근 체결한 계약이 정정된 적 있어?"처럼 "정정"이라는
+  단어가 있어도 계약 이벤트 질문이면 `event_analysis`로 정확히 분류됨
+  (§10에 기록된 "'정정' 단어 과민반응" 문제가 라우터 레벨에서는 재현
+  안 됨 확인). tool schema `description` 필드는 system prompt 300자
+  제약(§9)과 별개 필드라 안전하게 늘려도 tool-calling이 안 깨짐을 라이브
+  호출로 확인(400 에러 0건, 4/4 정상 분류).
+- **[완료 2026-08-25] ~~CascadingRouter/HCXStructuredRouter를 `ask.py`
+  진입점에 실제 배선~~** — `router/hcx_router.py`에 `build_cascading_router
+  (embed_provider, hcx_client)` 팩토리 함수 추가(단일 조립 진입점, 매번
+  스텁 새로 짜는 관행 종료). `results/generalization_check/100q_batch/
+  assemble_pipeline.py`가 이제 이걸로 조립(기존엔 SemanticRouterAdapter
+  절대 threshold=0.5만 썼음 — 즉 100문항 배치조차 CascadingRouter가
+  아니었다). `ask()` 자체는 원래도 `router: Router | None` protocol
+  파라미터라 코드 변경 불필요했음 — 문제는 항상 "조립하는 코드가
+  없었다"는 것.
 - **[완료 2026-08-25, Kim 브랜치 병합]** ~~3번째 malformation 패턴(속성값 안
   따옴표) 수정 검토~~ — `xml_sanitizer.py` 로 해결. §10 "Kim 브랜치 병합"
   절 참고.
@@ -741,7 +765,12 @@ FieldRef화, unit/period hint 실채움)과 packer(split_long_text 안전망)가
   전용 모델(HCX-005) 분리 적용~~ — `ask()`가 `answer_client` 파라미터를
   이미 지원하고(agent=HCX-007, answer=HCX-005), 100문항 배치도 이 설정으로
   실행됨(`results/generalization_check/100q_batch/assemble_pipeline.py`
-  확인). CascadingRouter는 아직 미배선 상태 유지(위 항목 참고).
+  확인).
+- **`fusion.py`에 `normalized_weighted_fusion()` 실제 구현 + 배선** — §10
+  "2026-08-25 발견" 참고. §8의 Stage 4 결과(R@10=0.903)를 실제로 재현하는
+  함수가 코드에 없다. 구현 후 RRF와 A/B 비교 필요(지금 RRF 성능이 얼마나
+  떨어지는지도 아직 실측 안 됨 — 위 표 수치는 원래 다른 함수를 가정하고
+  측정된 것일 수 있어 그대로 못 믿는다).
 - char_2gram BM25 토크나이저 재검토
 - Stage 14 test set 표본 확대(n=10 한계 보완)
 - TOC 버그가 Stage 1~14 지표에 준 영향 재검증(선택적, 비용 큼)

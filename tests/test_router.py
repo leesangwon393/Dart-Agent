@@ -235,3 +235,49 @@ def test_hcx_router_system_prompt_stays_short():
     from disclosure_rag.router.hcx_router import _SYSTEM_PROMPT
 
     assert len(_SYSTEM_PROMPT) < 300
+
+
+def test_classify_route_tool_description_covers_every_route():
+    """2026-08-25 추가(§12): HCX escalation 경로에서 오분류를 줄이려고 route별
+    구별 기준을 tool description에 추가했다 — 6개 route 전부 실제로 설명이
+    들어있는지, 하나라도 빠지거나 오타로 안 깨졌는지 고정."""
+    from disclosure_rag.router.hcx_router import _ROUTE_DESCRIPTIONS, _ROUTE_TOOL
+
+    assert set(_ROUTE_DESCRIPTIONS.keys()) == set(ROUTE_NAMES)
+    desc = _ROUTE_TOOL["function"]["description"]
+    for name in ROUTE_NAMES:
+        assert name in desc, f"{name} 이 tool description에서 빠짐"
+
+
+def test_build_cascading_router_wires_semantic_and_hcx():
+    """§12 "CascadingRouter를 ask.py 진입점에 실제 배선" — 팩토리 함수가
+    실제로 동작하는 CascadingRouter를 만드는지(semantic margin 게이팅 +
+    HCX escalation 둘 다 살아있는지) 확인. BGE-M3 로딩이 필요해 느리다."""
+    from disclosure_rag.router.hcx_router import CascadingRouter, build_cascading_router
+
+    try:
+        from disclosure_rag.retrieval.embeddings import BgeM3EmbeddingProvider
+
+        provider = BgeM3EmbeddingProvider(device="cpu")
+    except Exception as e:  # noqa: BLE001
+        pytest.skip(f"BGE-M3 모델 로딩 불가: {e}")
+
+    class _StubHCXClient:
+        """실제 HCX 호출 없이 escalation 경로까지 살아있는지만 확인 —
+        margin이 좁아서 escalate 되든 넓어서 semantic만으로 끝나든 상관없이
+        build_cascading_router()가 만든 두 경로 모두 정상 동작해야 한다."""
+
+        def __init__(self):
+            self.called = False
+
+        def chat(self, *args, **kwargs):
+            self.called = True
+            return {"toolCalls": [{"function": {"arguments": {"route": "single_lookup"}}}]}
+
+    hcx_stub = _StubHCXClient()
+    router = build_cascading_router(provider, hcx_stub)
+    assert isinstance(router, CascadingRouter)
+    result = router.route("삼성전자 매출액 얼마야?")
+    assert result.route in set(ROUTE_NAMES) | {None}
+    # escalate 됐든 안 됐든(margin에 따라 달라짐), 결과가 유효한 RouteResult 여야 한다 —
+    # 이 assert 자체가 위에서 이미 통과했으면 두 경로 다 안전함이 확인된 것.

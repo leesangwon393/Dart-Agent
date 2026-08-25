@@ -41,7 +41,7 @@ def assemble():
     from disclosure_rag.retrieval.hybrid_retriever import HybridRetriever
     from disclosure_rag.retrieval.qdrant_store import QdrantVectorStore
     from disclosure_rag.retrieval.tokenizers import build_tokenizer
-    from disclosure_rag.router.semantic_router_wrapper import SemanticRouterAdapter
+    from disclosure_rag.router.hcx_router import build_cascading_router
 
     t0 = time.time()
     log(f"캐시 로드: {VECTOR_CACHE}")
@@ -81,11 +81,6 @@ def assemble():
     tools = build_all_tools(retriever, manifest, correction_index)
     extractor = EntityExtractor(corpus_root=CORPUS_ROOT, metric_terms_path=CONFIG_ROOT / "metric_terms.txt")
 
-    log("Semantic Router 구축")
-    t5 = time.time()
-    router = SemanticRouterAdapter(embed_provider)
-    log(f"Router 구축 완료 ({time.time()-t5:.0f}s)")
-
     class RetryableHCXClient(HCXClient):
         """100문항 연속 호출 특성상 429(rate limit) 대비 max_retries 를 6으로
         올린다(README/작업지시 요구사항) — hcx_client.py 자체는 건드리지 않고
@@ -98,6 +93,15 @@ def assemble():
     agent_client = RetryableHCXClient(env_path=ENV_PATH)  # .env 의 HCX_MODEL=HCX-007
     answer_client = RetryableHCXClient(env_path=ENV_PATH, model="HCX-005")
     log(f"agent_client.model={agent_client.model} answer_client.model={answer_client.model}")
+
+    log("CascadingRouter 구축 (semantic margin 게이팅 + HCX escalation)")
+    t5 = time.time()
+    # 2026-08-25: 이전엔 여기서 SemanticRouterAdapter(절대 threshold=0.5)만 썼다
+    # (100문항 배치가 그 예 — accuracy 0.836). CascadingRouter(accuracy 0.889,
+    # §8/§12)가 구현된 지 오래됐는데도 실제 조립 코드가 한 번도 없어서 계속
+    # 미배선 상태였다 — build_cascading_router()로 정식 배선.
+    router = build_cascading_router(embed_provider, agent_client)
+    log(f"Router 구축 완료 ({time.time()-t5:.0f}s)")
 
     log(f"파이프라인 조립 총 소요 {time.time()-t0:.0f}s")
     return {

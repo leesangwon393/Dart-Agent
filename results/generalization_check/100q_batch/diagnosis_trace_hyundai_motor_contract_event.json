@@ -1,0 +1,562 @@
+{
+  "tag": "hyundai_motor_contract_event",
+  "query": "현대자동차가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+  "elapsed": 7.062358140945435,
+  "entities": {
+    "raw_query": "현대자동차가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+    "companies": [
+      "현대자동차"
+    ],
+    "company_count": 1,
+    "period": [],
+    "metrics": [],
+    "report_name": null,
+    "explicit_correction": true
+  },
+  "normalized_query": "[COMPANY]가 최근 체결한 계약 중 해지되거나 정정된 게 있어?",
+  "route": "event_analysis",
+  "route_score": 0.8612803569177256,
+  "iterations": 2,
+  "stopped_reason": "no_more_tool_calls",
+  "tool_calls": [
+    {
+      "name": "get_correction_history",
+      "arguments": {
+        "company": "현대자동차"
+      },
+      "result": {
+        "correction_groups": [
+          {
+            "correction_group_id": "periodic_20230515002403",
+            "chain": [
+              {
+                "doc_id": "periodic_20230515002403",
+                "report_nm": "분기보고서 (2023.03)",
+                "rcept_dt": "20230515",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "manifest_key"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "periodic_20230814002457",
+            "chain": [
+              {
+                "doc_id": "periodic_20230814002457",
+                "report_nm": "반기보고서 (2023.06)",
+                "rcept_dt": "20230814",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "manifest_key"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "periodic_20231114002201",
+            "chain": [
+              {
+                "doc_id": "periodic_20231114002201",
+                "report_nm": "분기보고서 (2023.09)",
+                "rcept_dt": "20231114",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "manifest_key"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "periodic_20240313001451",
+            "chain": [
+              {
+                "doc_id": "periodic_20240313001451",
+                "report_nm": "사업보고서 (2023.12)",
+                "rcept_dt": "20240313",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "manifest_key"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "periodic_20240516001860",
+            "chain": [
+              {
+                "doc_id": "periodic_20240516001860",
+                "report_nm": "분기보고서 (2024.03)",
+                "rcept_dt": "20240516",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "manifest_key"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "periodic_20240814004199",
+            "chain": [
+              {
+                "doc_id": "periodic_20240814004199",
+                "report_nm": "반기보고서 (2024.06)",
+                "rcept_dt": "20240814",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "manifest_key"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "periodic_20241114002593",
+            "chain": [
+              {
+                "doc_id": "periodic_20241114002593",
+                "report_nm": "분기보고서 (2024.09)",
+                "rcept_dt": "20241114",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "manifest_key"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "periodic_20250312001148",
+            "chain": [
+              {
+                "doc_id": "periodic_20250312001148",
+                "report_nm": "사업보고서 (2024.12)",
+                "rcept_dt": "20250312",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "manifest_key"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "periodic_20250515001159",
+            "chain": [
+              {
+                "doc_id": "periodic_20250515001159",
+                "report_nm": "분기보고서 (2025.03)",
+                "rcept_dt": "20250515",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "manifest_key"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "periodic_20250814003906",
+            "chain": [
+              {
+                "doc_id": "periodic_20250814003906",
+                "report_nm": "반기보고서 (2025.06)",
+                "rcept_dt": "20250814",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "manifest_key"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "periodic_20251114002658",
+            "chain": [
+              {
+                "doc_id": "periodic_20251114002658",
+                "report_nm": "분기보고서 (2025.09)",
+                "rcept_dt": "20251114",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "manifest_key"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "periodic_20260318001394",
+            "chain": [
+              {
+                "doc_id": "periodic_20260318001394",
+                "report_nm": "사업보고서 (2025.12)",
+                "rcept_dt": "20260318",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "manifest_key"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "periodic_20260515002418",
+            "chain": [
+              {
+                "doc_id": "periodic_20260515002418",
+                "report_nm": "분기보고서 (2026.03)",
+                "rcept_dt": "20260515",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "manifest_key"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "major_20230222002468",
+            "chain": [
+              {
+                "doc_id": "major_20230222002468",
+                "report_nm": "주요사항보고서(자기주식처분결정)",
+                "rcept_dt": "20230222",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "major_20230425000630",
+            "chain": [
+              {
+                "doc_id": "major_20230425000630",
+                "report_nm": "주요사항보고서(자기주식처분결정)",
+                "rcept_dt": "20230425",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "major_20231026000201",
+            "chain": [
+              {
+                "doc_id": "major_20231026000201",
+                "report_nm": "주요사항보고서(자기주식처분결정)",
+                "rcept_dt": "20231026",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "major_20240425000482",
+            "chain": [
+              {
+                "doc_id": "major_20240425000482",
+                "report_nm": "주요사항보고서(자기주식처분결정)",
+                "rcept_dt": "20240425",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "major_20240822000381",
+            "chain": [
+              {
+                "doc_id": "major_20240822000381",
+                "report_nm": "주요사항보고서(자기주식처분결정)",
+                "rcept_dt": "20240822",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "major_20241024000243",
+            "chain": [
+              {
+                "doc_id": "major_20241024000243",
+                "report_nm": "주요사항보고서(해외증권시장주권등상장폐지결정)",
+                "rcept_dt": "20241024",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "major_20241127000199",
+            "chain": [
+              {
+                "doc_id": "major_20241127000199",
+                "report_nm": "주요사항보고서(자기주식취득결정)",
+                "rcept_dt": "20241127",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "major_20241220000228",
+            "chain": [
+              {
+                "doc_id": "major_20241220000228",
+                "report_nm": "주요사항보고서(해외증권시장주권등상장폐지)",
+                "rcept_dt": "20241220",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "major_20250724000437",
+            "chain": [
+              {
+                "doc_id": "major_20250724000437",
+                "report_nm": "주요사항보고서(자기주식처분결정)",
+                "rcept_dt": "20250724",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "major_20251030000466",
+            "chain": [
+              {
+                "doc_id": "major_20251030000466",
+                "report_nm": "주요사항보고서(자기주식처분결정)",
+                "rcept_dt": "20251030",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "major_20260129000336",
+            "chain": [
+              {
+                "doc_id": "major_20260129000336",
+                "report_nm": "주요사항보고서(자기주식취득결정)",
+                "rcept_dt": "20260129",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "major_20260326001343",
+            "chain": [
+              {
+                "doc_id": "major_20260326001343",
+                "report_nm": "주요사항보고서(자기주식처분결정)",
+                "rcept_dt": "20260326",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "holding_20230509000636",
+            "chain": [
+              {
+                "doc_id": "holding_20230509000636",
+                "report_nm": "주식등의대량보유상황보고서(일반)",
+                "rcept_dt": "20230509",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "holding_20230802000234",
+            "chain": [
+              {
+                "doc_id": "holding_20230802000234",
+                "report_nm": "주식등의대량보유상황보고서(일반)",
+                "rcept_dt": "20230802",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "holding_20240328001596",
+            "chain": [
+              {
+                "doc_id": "holding_20240328001596",
+                "report_nm": "주식등의대량보유상황보고서(일반)",
+                "rcept_dt": "20240328",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "holding_20240503000063",
+            "chain": [
+              {
+                "doc_id": "holding_20240503000063",
+                "report_nm": "주식등의대량보유상황보고서(일반)",
+                "rcept_dt": "20240503",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "holding_20240805000241",
+            "chain": [
+              {
+                "doc_id": "holding_20240805000241",
+                "report_nm": "주식등의대량보유상황보고서(약식)",
+                "rcept_dt": "20240805",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "holding_20240925000398",
+            "chain": [
+              {
+                "doc_id": "holding_20240925000398",
+                "report_nm": "주식등의대량보유상황보고서(약식)",
+                "rcept_dt": "20240925",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "holding_20250103000400",
+            "chain": [
+              {
+                "doc_id": "holding_20250103000400",
+                "report_nm": "주식등의대량보유상황보고서(일반)",
+                "rcept_dt": "20250103",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "holding_20250207000847",
+            "chain": [
+              {
+                "doc_id": "holding_20250207000847",
+                "report_nm": "주식등의대량보유상황보고서(일반)",
+                "rcept_dt": "20250207",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "holding_20250324000608",
+            "chain": [
+              {
+                "doc_id": "holding_20250324000608",
+                "report_nm": "주식등의대량보유상황보고서(일반)",
+                "rcept_dt": "20250324",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "holding_20250804000206",
+            "chain": [
+              {
+                "doc_id": "holding_20250804000206",
+                "report_nm": "주식등의대량보유상황보고서(일반)",
+                "rcept_dt": "20250804",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "holding_20260105000281",
+            "chain": [
+              {
+                "doc_id": "holding_20260105000281",
+                "report_nm": "주식등의대량보유상황보고서(일반)",
+                "rcept_dt": "20260105",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          },
+          {
+            "correction_group_id": "holding_20260330001249",
+            "chain": [
+              {
+                "doc_id": "holding_20260330001249",
+                "report_nm": "주식등의대량보유상황보고서(일반)",
+                "rcept_dt": "20260330",
+                "is_correction": false,
+                "correction_order": 0,
+                "is_latest": true,
+                "resolution_source": "original"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "evidence_pack_prompt_text": "[USER QUESTION]\n현대자동차가 최근 체결한 계약 중 해지되거나 정정된 게 있어?\n\n[TOOL RESULT]\nget_correction_history: {\"correction_groups\": [{\"correction_group_id\": \"periodic_20230515002403\", \"chain\": [{\"doc_id\": \"periodic_20230515002403\", \"report_nm\": \"분기보고서 (2023.03)\", \"rcept_dt\": \"20230515\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"manifest_key\"}]}, {\"correction_group_id\": \"periodic_20230814002457\", \"chain\": [{\"doc_id\": \"periodic_20230814002457\", \"report_nm\": \"반기보고서 (2023.06)\", \"rcept_dt\": \"20230814\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"manifest_key\"}]}, {\"correction_group_id\": \"periodic_20231114002201\", \"chain\": [{\"doc_id\": \"periodic_20231114002201\", \"report_nm\": \"분기보고서 (2023.09)\", \"rcept_dt\": \"20231114\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"manifest_key\"}]}, {\"correction_group_id\": \"periodic_20240313001451\", \"chain\": [{\"doc_id\": \"periodic_20240313001451\", \"report_nm\": \"사업보고서 (2023.12)\", \"rcept_dt\": \"20240313\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"manifest_key\"}]}, {\"correction_group_id\": \"periodic_20240516001860\", \"chain\": [{\"doc_id\": \"periodic_20240516001860\", \"report_nm\": \"분기보고서 (2024.03)\", \"rcept_dt\": \"20240516\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"manifest_key\"}]}, {\"correction_group_id\": \"periodic_20240814004199\", \"chain\": [{\"doc_id\": \"periodic_20240814004199\", \"report_nm\": \"반기보고서 (2024.06)\", \"rcept_dt\": \"20240814\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"manifest_key\"}]}, {\"correction_group_id\": \"periodic_20241114002593\", \"chain\": [{\"doc_id\": \"periodic_20241114002593\", \"report_nm\": \"분기보고서 (2024.09)\", \"rcept_dt\": \"20241114\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"manifest_key\"}]}, {\"correction_group_id\": \"periodic_20250312001148\", \"chain\": [{\"doc_id\": \"periodic_20250312001148\", \"report_nm\": \"사업보고서 (2024.12)\", \"rcept_dt\": \"20250312\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"manifest_key\"}]}, {\"correction_group_id\": \"periodic_20250515001159\", \"chain\": [{\"doc_id\": \"periodic_20250515001159\", \"report_nm\": \"분기보고서 (2025.03)\", \"rcept_dt\": \"20250515\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"manifest_key\"}]}, {\"correction_group_id\": \"periodic_20250814003906\", \"chain\": [{\"doc_id\": \"periodic_20250814003906\", \"report_nm\": \"반기보고서 (2025.06)\", \"rcept_dt\": \"20250814\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"manifest_key\"}]}, {\"correction_group_id\": \"periodic_20251114002658\", \"chain\": [{\"doc_id\": \"periodic_20251114002658\", \"report_nm\": \"분기보고서 (2025.09)\", \"rcept_dt\": \"20251114\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"manifest_key\"}]}, {\"correction_group_id\": \"periodic_20260318001394\", \"chain\": [{\"doc_id\": \"periodic_20260318001394\", \"report_nm\": \"사업보고서 (2025.12)\", \"rcept_dt\": \"20260318\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"manifest_key\"}]}, {\"correction_group_id\": \"periodic_20260515002418\", \"chain\": [{\"doc_id\": \"periodic_20260515002418\", \"report_nm\": \"분기보고서 (2026.03)\", \"rcept_dt\": \"20260515\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"manifest_key\"}]}, {\"correction_group_id\": \"major_20230222002468\", \"chain\": [{\"doc_id\": \"major_20230222002468\", \"report_nm\": \"주요사항보고서(자기주식처분결정)\", \"rcept_dt\": \"20230222\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"major_20230425000630\", \"chain\": [{\"doc_id\": \"major_20230425000630\", \"report_nm\": \"주요사항보고서(자기주식처분결정)\", \"rcept_dt\": \"20230425\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"major_20231026000201\", \"chain\": [{\"doc_id\": \"major_20231026000201\", \"report_nm\": \"주요사항보고서(자기주식처분결정)\", \"rcept_dt\": \"20231026\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"major_20240425000482\", \"chain\": [{\"doc_id\": \"major_20240425000482\", \"report_nm\": \"주요사항보고서(자기주식처분결정)\", \"rcept_dt\": \"20240425\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"major_20240822000381\", \"chain\": [{\"doc_id\": \"major_20240822000381\", \"report_nm\": \"주요사항보고서(자기주식처분결정)\", \"rcept_dt\": \"20240822\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"major_20241024000243\", \"chain\": [{\"doc_id\": \"major_20241024000243\", \"report_nm\": \"주요사항보고서(해외증권시장주권등상장폐지결정)\", \"rcept_dt\": \"20241024\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"major_20241127000199\", \"chain\": [{\"doc_id\": \"major_20241127000199\", \"report_nm\": \"주요사항보고서(자기주식취득결정)\", \"rcept_dt\": \"20241127\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"major_20241220000228\", \"chain\": [{\"doc_id\": \"major_20241220000228\", \"report_nm\": \"주요사항보고서(해외증권시장주권등상장폐지)\", \"rcept_dt\": \"20241220\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"major_20250724000437\", \"chain\": [{\"doc_id\": \"major_20250724000437\", \"report_nm\": \"주요사항보고서(자기주식처분결정)\", \"rcept_dt\": \"20250724\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"major_20251030000466\", \"chain\": [{\"doc_id\": \"major_20251030000466\", \"report_nm\": \"주요사항보고서(자기주식처분결정)\", \"rcept_dt\": \"20251030\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"major_20260129000336\", \"chain\": [{\"doc_id\": \"major_20260129000336\", \"report_nm\": \"주요사항보고서(자기주식취득결정)\", \"rcept_dt\": \"20260129\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"major_20260326001343\", \"chain\": [{\"doc_id\": \"major_20260326001343\", \"report_nm\": \"주요사항보고서(자기주식처분결정)\", \"rcept_dt\": \"20260326\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"holding_20230509000636\", \"chain\": [{\"doc_id\": \"holding_20230509000636\", \"report_nm\": \"주식등의대량보유상황보고서(일반)\", \"rcept_dt\": \"20230509\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"holding_20230802000234\", \"chain\": [{\"doc_id\": \"holding_20230802000234\", \"report_nm\": \"주식등의대량보유상황보고서(일반)\", \"rcept_dt\": \"20230802\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"holding_20240328001596\", \"chain\": [{\"doc_id\": \"holding_20240328001596\", \"report_nm\": \"주식등의대량보유상황보고서(일반)\", \"rcept_dt\": \"20240328\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"holding_20240503000063\", \"chain\": [{\"doc_id\": \"holding_20240503000063\", \"report_nm\": \"주식등의대량보유상황보고서(일반)\", \"rcept_dt\": \"20240503\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"holding_20240805000241\", \"chain\": [{\"doc_id\": \"holding_20240805000241\", \"report_nm\": \"주식등의대량보유상황보고서(약식)\", \"rcept_dt\": \"20240805\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"holding_20240925000398\", \"chain\": [{\"doc_id\": \"holding_20240925000398\", \"report_nm\": \"주식등의대량보유상황보고서(약식)\", \"rcept_dt\": \"20240925\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"holding_20250103000400\", \"chain\": [{\"doc_id\": \"holding_20250103000400\", \"report_nm\": \"주식등의대량보유상황보고서(일반)\", \"rcept_dt\": \"20250103\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"holding_20250207000847\", \"chain\": [{\"doc_id\": \"holding_20250207000847\", \"report_nm\": \"주식등의대량보유상황보고서(일반)\", \"rcept_dt\": \"20250207\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"holding_20250324000608\", \"chain\": [{\"doc_id\": \"holding_20250324000608\", \"report_nm\": \"주식등의대량보유상황보고서(일반)\", \"rcept_dt\": \"20250324\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"holding_20250804000206\", \"chain\": [{\"doc_id\": \"holding_20250804000206\", \"report_nm\": \"주식등의대량보유상황보고서(일반)\", \"rcept_dt\": \"20250804\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"holding_20260105000281\", \"chain\": [{\"doc_id\": \"holding_20260105000281\", \"report_nm\": \"주식등의대량보유상황보고서(일반)\", \"rcept_dt\": \"20260105\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}, {\"correction_group_id\": \"holding_20260330001249\", \"chain\": [{\"doc_id\": \"holding_20260330001249\", \"report_nm\": \"주식등의대량보유상황보고서(일반)\", \"rcept_dt\": \"20260330\", \"is_correction\": false, \"correction_order\": 0, \"is_latest\": true, \"resolution_source\": \"original\"}]}]}\n",
+  "n_citations": 0,
+  "answer": "제공된 근거에는 현대자동차의 최근 계약 중에서 해지되거나 정정된 것에 대한 정보가 포함되어 있지 않습니다. 따라서 이에 대해 확인할 수 없습니다.\n\n근거: report_id(chunk_id), ...",
+  "validation": {
+    "numbers_grounded": true,
+    "ungrounded_numbers": [],
+    "has_citation": true,
+    "warnings": [
+      "정정 분석 질문인데 원본/정정본 근거가 모두 확보되지 않음 (정정 체인 재검색 필요할 수 있음)"
+    ]
+  }
+}

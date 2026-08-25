@@ -44,8 +44,9 @@ Stage 9 는 `hcx_structured_router` 를 최종 baseline 으로 채택했지만
 from __future__ import annotations
 
 from disclosure_rag.agent.hcx_client import HCXClient
+from disclosure_rag.retrieval.embeddings import EmbeddingProvider
 from disclosure_rag.router.routes import ROUTE_UTTERANCES
-from disclosure_rag.router.semantic_router_wrapper import Router, RouteResult
+from disclosure_rag.router.semantic_router_wrapper import Router, RouteResult, build_semantic_router
 
 ROUTE_NAMES = list(ROUTE_UTTERANCES.keys())
 
@@ -56,11 +57,29 @@ _SYSTEM_PROMPT = (
     "여러 유형에 걸치거나 애매하면 route=unclear로 답하세요."
 )
 
+# 2026-08-25 추가(§12 후보): CascadingRouter가 escalate하는 hard case에서
+# HCX 자체 오분류가 여전히 많았다(routes.py 경계 재정리는 semantic_router
+# 쪽만 개선했음, §5-A "남은 부분" 참고) — HCX는 routes.py의 utterance 예시를
+# 안 보고 이 tool description만 보므로, route별 짧은 구별 기준을 직접 준다.
+# system prompt(위 300자 제약)와는 별개 필드라 길이 제약이 다르지만, 과거
+# 사례를 감안해 보수적으로 짧게 유지한다.
+_ROUTE_DESCRIPTIONS = {
+    "single_lookup": "문서에 그대로 적힌 단일 수치/사실 1개 조회(계산·비교 불필요)",
+    "correction_analysis": "정정공시(기재정정) 사유/변경내용/원본-정정본 비교/정정이력",
+    "multi_compare": "2개 이상 회사 또는 2개 이상 기간을 서로 비교",
+    "calculation": "증가율/CAGR/비율처럼 문서에 없는 값을 연산해야 나옴(단순 조회면 single_lookup)",
+    "ownership_analysis": "지분율/최대주주/종속기업·계열사 등 소유·지배구조",
+    "event_analysis": "계약체결/해지, 자기주식취득 등 개별 이벤트 1건의 내용",
+}
+
 _ROUTE_TOOL = {
     "type": "function",
     "function": {
         "name": "classify_route",
-        "description": "질문을 유형 중 하나로 분류한다. 특정하기 어려우면 unclear.",
+        "description": (
+            "질문을 아래 유형 중 하나로 분류한다. 특정하기 어려우면 unclear.\n"
+            + "\n".join(f"- {name}: {desc}" for name, desc in _ROUTE_DESCRIPTIONS.items())
+        ),
         "parameters": {
             "type": "object",
             "properties": {
@@ -125,3 +144,22 @@ class CascadingRouter:
         if top1.name is not None and margin >= self._margin_threshold:
             return RouteResult(route=top1.name, score=top1_score)
         return self._hcx.route(normalized_query)
+
+
+def build_cascading_router(
+    embed_provider: EmbeddingProvider, hcx_client: HCXClient, *,
+    margin_threshold: float = 0.05, hcx_max_retries: int = 6,
+) -> CascadingRouter:
+    """§12 "CascadingRouter를 ask.py 진입점에 실제 배선" — production 조립용
+    단일 진입점. 여태까지 이 프로젝트의 모든 배치 스크립트가 (a) 이 CascadingRouter
+    자체를 안 쓰고 SemanticRouterAdapter(절대 threshold=0.5)만 썼거나(§9-0의
+    100문항 배치가 그 예 — accuracy 0.836), (b) CascadingRouter를 매번 즉석
+    스텁으로 새로 조립해왔다(§12). 둘 다 이 함수 하나로 대체한다.
+
+    `semantic_router`는 raw SemanticRouter를 threshold=0.0으로 만들어야 한다 —
+    CascadingRouter가 라이브러리의 절대 threshold 게이팅이 아니라 자체
+    top1-top2 margin으로 게이팅하기 때문에, top-2 후보가 항상 나와야 margin을
+    계산할 수 있다(CascadingRouter.__init__ docstring 참고)."""
+    semantic = build_semantic_router(embed_provider, threshold=0.0)
+    hcx_router = HCXStructuredRouter(hcx_client, max_retries=hcx_max_retries)
+    return CascadingRouter(semantic, hcx_router, margin_threshold=margin_threshold)
