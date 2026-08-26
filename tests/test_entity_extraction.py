@@ -111,6 +111,15 @@ def test_event_terms_detection(extractor):
     assert "자기주식취득" in e.event_terms
 
 
+def test_event_terms_generic_contract_wording(extractor):
+    """파트 2 검증(실제 대회 예시 질문 5번) 중 발견된 갭 회귀: 문서 제목의
+    명사구 형태("단일판매ㆍ공급계약체결")가 아니라 "~이 체결한 계약 이후
+    해지된 계약"처럼 동사가 명사 앞에 오는 자연어 관계절 표현도 잡아야 한다."""
+    e = extractor.extract("LG에너지솔루션이 2025년에 체결한 주요 계약 이후 해지된 계약이 존재하는가?")
+    assert "체결" in e.event_terms
+    assert "해지" in e.event_terms
+
+
 def test_ownership_terms_detection_and_metrics_unrelated(extractor):
     e = extractor.extract("삼성전자의 최대주주가 누구야?")
     assert "최대주주" in e.ownership_terms
