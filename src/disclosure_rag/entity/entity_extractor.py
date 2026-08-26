@@ -23,6 +23,46 @@ _HALF = r"상반기|하반기"
 _YM = r"20\d{2}[.\-]\s*\d{1,2}\s*월?"
 _PERIOD_PAT = re.compile("|".join([_RECENT_N_YEAR, _YM, _YEAR, _QUARTER, _HALF]))
 
+# period_type 분류용 sub-pattern (2026-08-26 확장). 우선순위는 "구체성(narrowness)"
+# 기준: 특정 월을 못박는 year_month 가 가장 구체적이고, recent_n_year("최근 3년"
+# 처럼 여러 해를 아우르는 범위)가 가장 넓다(=가장 덜 구체적). 한 질의에서 여러
+# period 패턴이 동시에 매칭되면(예: "2025년 1분기" -> annual + quarter 둘 다
+# 매칭) 이 우선순위표에서 앞에 있는(더 구체적인) 타입 하나를 period_type 으로
+# 채택한다 — "리스트로 다 담기"도 합리적인 대안이지만, period_type 을 Agent가
+# "이 질의가 어떤 세분화 단위로 조회해야 하는지" 판단하는 단일 힌트로 쓰길
+# 원하므로(예: agent가 분기 데이터를 찾아야 하는지 연간 데이터로 충분한지),
+# 단일 값이 더 실용적이라고 판단했다. 원본 period 리스트는 그대로 유지되므로
+# 여러 매칭이 있었다는 사실 자체는 손실되지 않는다.
+_PERIOD_TYPE_PRIORITY: list[tuple[str, re.Pattern[str]]] = [
+    ("year_month", re.compile(_YM)),
+    ("quarter", re.compile(_QUARTER)),
+    ("half", re.compile(_HALF)),
+    ("annual", re.compile(_YEAR)),
+    ("recent_n_year", re.compile(_RECENT_N_YEAR)),
+]
+
+# period_comparison: "두 기간을 비교하려는 신호". 100문항 배치 실패 사례("당기
+# 대비 전기 영업이익 변화를 정리해줘" — period=[] 로 빈 채 넘어감, PROJECT_STATE
+# §9-0/§10)와 router/routes.py 의 multi_compare/calculation utterance("전년
+# 대비", "작년과 올해", "[YEAR_1]년 대비 [YEAR_2]년" 등)에서 실제 쓰이는 표현을
+# 모아 정규식으로 구성했다.
+_PERIOD_COMPARISON_PAT = re.compile(
+    "|".join([
+        r"당기\s*대비\s*전기",
+        r"전기\s*대비",
+        r"전년\s*동기",
+        r"전년\s*대비",
+        r"작년\s*보다",
+        r"작년\s*대비",
+        r"작년(?:과|와)\s*올해",
+        r"올해(?:와|과)\s*작년",
+        r"직전\s*(?:분기|반기|년도?|기)\s*대비",
+        r"전기말\s*대비",
+        r"전년말\s*대비",
+        r"20\d{2}\s*년?\s*대비\s*20\d{2}\s*년?",
+    ])
+)
+
 _CORRECTION_KEYWORDS = ("기재정정", "정정공시", "정정")
 
 _REPORT_NAME_TERMS = [
@@ -30,6 +70,14 @@ _REPORT_NAME_TERMS = [
     "주요사항보고서", "주식등의대량보유상황보고서", "대량보유상황보고서",
     "감사보고서", "연결감사보고서",
 ]
+
+
+def _classify_period_type(matched: str) -> str | None:
+    """하나의 _PERIOD_PAT 매칭 문자열이 어떤 sub-pattern 인지 fullmatch 로 분류."""
+    for name, pat in _PERIOD_TYPE_PRIORITY:
+        if pat.fullmatch(matched):
+            return name
+    return None
 
 
 class ExtractedEntities(BaseModel):
@@ -40,6 +88,13 @@ class ExtractedEntities(BaseModel):
     metrics: list[str] = Field(default_factory=list)
     report_name: str | None = None
     explicit_correction: bool = False
+    # --- 2026-08-26 확장 (event_analysis/ownership_analysis/기간비교형
+    # calculation route 전용 신호, 전부 하위호환을 위해 기본값 있음) ---
+    period_type: str | None = None
+    period_comparison: bool = False
+    event_terms: list[str] = Field(default_factory=list)
+    ownership_terms: list[str] = Field(default_factory=list)
+    comparison_axis: str | None = None
     # (start, end) 는 normalize_query 가 재사용할 수 있도록 company 매칭 위치도 보존
     company_spans: list[tuple[int, int, str]] = Field(default_factory=list, exclude=True)
 
@@ -52,7 +107,14 @@ def _load_metric_terms(path: str | Path) -> list[str]:
 
 
 class EntityExtractor:
-    def __init__(self, *, corpus_root: str | Path, metric_terms_path: str | Path | None = None):
+    def __init__(
+        self,
+        *,
+        corpus_root: str | Path,
+        metric_terms_path: str | Path | None = None,
+        event_terms_path: str | Path | None = None,
+        ownership_terms_path: str | Path | None = None,
+    ):
         universe = load_universe(corpus_root)
         alias_map: dict[str, str] = {}
         for _, row in universe.iterrows():
@@ -64,6 +126,8 @@ class EntityExtractor:
         self._alias_map = alias_map
         self._sorted_aliases = sorted(alias_map.keys(), key=len, reverse=True)
         self._metric_terms = _load_metric_terms(metric_terms_path) if metric_terms_path else []
+        self._event_terms = _load_metric_terms(event_terms_path) if event_terms_path else []
+        self._ownership_terms = _load_metric_terms(ownership_terms_path) if ownership_terms_path else []
 
     def _extract_companies(self, query_nfc: str) -> list[tuple[int, int, str]]:
         spans: list[tuple[int, int, str]] = []
@@ -88,13 +152,41 @@ class EntityExtractor:
             if corp not in companies:
                 companies.append(corp)
 
-        periods = [m.group(0).strip() for m in _PERIOD_PAT.finditer(query_nfc)]
+        period_matches = [m.group(0).strip() for m in _PERIOD_PAT.finditer(query_nfc)]
+        periods = period_matches
+
+        period_types = [t for t in (_classify_period_type(p) for p in period_matches) if t is not None]
+        period_type = None
+        for name, _pat in _PERIOD_TYPE_PRIORITY:
+            if name in period_types:
+                period_type = name
+                break
+
+        period_comparison = bool(_PERIOD_COMPARISON_PAT.search(query_nfc))
 
         metrics = [term for term in self._metric_terms if term.lower() in query_nfc.lower()]
+        event_terms = [term for term in self._event_terms if term.lower() in query_nfc.lower()]
+        ownership_terms = [term for term in self._ownership_terms if term.lower() in query_nfc.lower()]
 
         report_name = next((t for t in _REPORT_NAME_TERMS if t in query_nfc), None)
 
         explicit_correction = any(kw in query_nfc for kw in _CORRECTION_KEYWORDS)
+
+        # comparison_axis: company_count>=2 와 (period_comparison 또는 period 매칭
+        # 2개 이상)가 동시에 참인 "복합 비교"(예: "A기업과 B기업의 2023년과 2025년
+        # 매출을 비교해줘")도 실제로 가능하다 — 이 경우 "company"를 우선한다.
+        # 근거: 그런 질의라도 Agent 가 결국 해야 할 1차 분기(branching)는 "회사별로
+        # 나눠서 조회"이고, 기간 비교는 회사마다 반복되는 2차 축이기 때문이다(회사
+        # 축을 놓치면 아예 다른 회사 데이터를 섞어버리는 치명적 오류가 나지만, 기간
+        # 축을 놓쳐도 "일단 최근 기간으로 회사별 조회"까지는 절반은 맞는 답이 나옴
+        # — 실패 시 피해가 더 큰 축을 우선한다는 원칙).
+        has_period_comparison_signal = period_comparison or len(period_matches) >= 2
+        if len(companies) >= 2:
+            comparison_axis = "company"
+        elif has_period_comparison_signal:
+            comparison_axis = "period"
+        else:
+            comparison_axis = None
 
         return ExtractedEntities(
             raw_query=query,
@@ -104,5 +196,10 @@ class EntityExtractor:
             metrics=metrics,
             report_name=report_name,
             explicit_correction=explicit_correction,
+            period_type=period_type,
+            period_comparison=period_comparison,
+            event_terms=event_terms,
+            ownership_terms=ownership_terms,
+            comparison_axis=comparison_axis,
             company_spans=company_spans,
         )

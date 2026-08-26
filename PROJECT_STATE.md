@@ -278,6 +278,65 @@ report_id 실제 일치 여부와 무관하게 통과시키는 기존 약점 재
 무관해 보이는 것들(카운팅 오분류 등은 이미 별도로 수정 확인됨)은 재확인
 결과 진짜 별개 이슈였던 것으로 보임 — 6번 항목 재확인 완료로 간주.
 
+### 5-C. [완료] Entity Extraction 확장 — event/ownership/기간비교 신호 추가 (2026-08-26)
+6개 route(single_lookup/correction_analysis/multi_compare/calculation/
+ownership_analysis/event_analysis) 중 **event_analysis·ownership_analysis·
+기간비교형 calculation 세 갈래는 회사명 말고 전용 entity 신호가 전혀
+없었다**는 게 사용자와의 논의로 확인돼 갭을 채웠다. 원칙 그대로 유지:
+전부 deterministic 정규식/사전 매칭, LLM 미사용(§12 원칙 9~10, Stage 8
+ablation 에서 rule-only 가 승자였던 이유와 동일 근거).
+
+**추가한 필드/사전 파일** (`src/disclosure_rag/entity/entity_extractor.py`,
+`ExtractedEntities` 전부 기본값 있어 하위호환 유지):
+- `period_type: str | None` — 기존 `_PERIOD_PAT` 5개 sub-pattern
+  (연도/연월/분기/반기/최근N년) 중 매칭된 것을 `"annual"|"year_month"|
+  "quarter"|"half"|"recent_n_year"` 로 분류. **정책**: 여러 개 동시 매칭
+  시(예: "2025년 1분기" → annual+quarter 둘 다 매칭) "가장 구체적인 것
+  하나"를 우선 채택(우선순위: year_month > quarter > half > annual >
+  recent_n_year, "특정 월을 못박는 게 가장 좁고 구체적, 최근N년 범위가
+  가장 넓다"는 기준). 원본 `period` 리스트는 그대로 유지되므로 여러 매칭
+  사실 자체는 손실 안 됨 — 근거는 코드 주석에 남김.
+- `period_comparison: bool` — "당기 대비 전기", "전기 대비", "전년 대비",
+  "작년보다", "전년동기" 등 두 기간 비교 신호를 정규식으로 감지. 100문항
+  배치 실패 사례("OO의 당기 대비 전기 영업이익 변화를 정리해줘" 5건이
+  `period=[]`로 빈 채 넘어감, §9-0)를 실제로 잡는지 회귀 테스트로 확인.
+- `event_terms: list[str]` (신규 `config/event_terms.txt`, 32개) — major/
+  수시공시 하위 이벤트 유형 키워드. `corpus/raw/major/*/list_B001.json`,
+  `corpus/raw/exchange/*/list_*.json` 의 실제 `report_nm` 집계(grep/python
+  으로 직접 확인, 예: "자기주식처분결정" 158건, "유상증자결정" 59건,
+  "단일판매ㆍ공급계약체결" 512건 등)와 routes.py event_analysis utterance
+  를 참고해 채움. "단일판매·공급계약체결"은 원문에 실제 쓰이는 가운뎃점
+  (ㆍ, U+318D)과 흔히 입력되는 일반 가운뎃점(·, U+00B7) 두 형태를 모두
+  등록(안 그러면 문자 하나 차이로 매칭 누락).
+- `ownership_terms: list[str]` (신규 `config/ownership_terms.txt`, 16개) —
+  기존 `metric_terms.txt`에 섞여 있던 "지분율"/"최대주주 지분율"/
+  "보유비율"을 이 필드 전용으로 이동(metric_terms.txt 에서는 제거해 중복
+  매칭 방지)하고 "최대주주", "종속기업", "특수관계자", "계열회사" 등 추가.
+- `comparison_axis: str | None` — `"company"`(company_count>=2) |
+  `"period"`(period_comparison 이거나 period 매칭 2개 이상) | `None`.
+  **정책**: 둘 다 참인 복합 케이스("A기업과 B기업의 2023년과 2025년 매출을
+  비교해줘" — 실제로 만들 수 있음을 회귀 테스트로 확인)는 `"company"`를
+  우선. 근거: 회사 축을 놓치면 다른 회사 데이터가 섞이는 치명적 오류가
+  나지만, 기간 축을 놓쳐도 "일단 최근 기간으로 회사별 조회"까지는 절반은
+  맞는 답이 나옴 — 실패 시 피해가 더 큰 축을 우선한다는 원칙.
+
+**통합**: `agent_loop.py`의 `_route_hint_message()`에 새 필드들 반영(기간
+유형/기간비교 여부/이벤트 키워드/지분 키워드/비교 축 몇 줄 추가, 길이는
+기존 필드 나열 방식 그대로 유지). `results/generalization_check/100q_batch/
+assemble_pipeline.py`의 `EntityExtractor` 생성부도 새 사전 경로 전달하도록
+동기화.
+
+**의도적으로 안 건드린 것**: `query_normalizer.py`의 `normalize_query()`는
+이번 범위 밖(회사명 정규화만 하는 기존 범위 유지) — `[YEAR]` placeholder가
+아직 없어서 "OO의 2023년 대비 2025년" 같은 질의가 회사만 `[COMPANY]`로
+치환되고 연도는 그대로 노출되는 이슈는 **별도 TODO로 남김**(§12 참고).
+
+**테스트**: `tests/test_entity_extraction.py`에 회귀 8건 추가(period_type
+annual/quarter 우선순위, period_comparison, event_terms, ownership_terms,
+comparison_axis company/period/복합충돌 — 파일 전체 9→17건). 전체
+`pytest tests/ -m "not slow"` 146 passed, 0 failed(기존 테스트 전부 그대로
+통과, 회귀 없음) — 커밋 해시는 git log 참고.
+
 ---
 
 ## 6. 주요 파일과 역할
@@ -772,6 +831,16 @@ FieldRef화, unit/period hint 실채움)과 packer(split_long_text 안전망)가
   떨어지는지도 아직 실측 안 됨 — 위 표 수치는 원래 다른 함수를 가정하고
   측정된 것일 수 있어 그대로 못 믿는다).
 - char_2gram BM25 토크나이저 재검토
+- **`query_normalizer.py`에 `[YEAR]` placeholder 추가** (2026-08-26, Entity
+  Extraction 확장 §5-C 작업 중 발견, 이번엔 범위 밖이라 미착수) — 지금
+  `normalize_query()`는 회사명만 `[COMPANY]`/`[COMPANY_N]`으로 치환하고
+  연도/기간은 그대로 남긴다. `period_comparison=True`인 질의("OO의 2023년
+  대비 2025년 매출 비교")가 정규화되면 "[COMPANY]의 2023년 대비 2025년
+  매출 비교"처럼 회사만 익명화되고 연도는 그대로 노출돼, semantic
+  router 매칭 시 routes.py 의 `[YEAR_1]`/`[YEAR_2]` placeholder 템플릿과
+  실제 형태가 어긋날 수 있다. 연도를 `[YEAR]`/`[YEAR_1]`/`[YEAR_2]`로
+  치환하는 로직 추가 검토 필요(회사 번호 매기기 로직과 동일한 패턴 재사용
+  가능해 보임).
 - Stage 14 test set 표본 확대(n=10 한계 보완)
 - TOC 버그가 Stage 1~14 지표에 준 영향 재검증(선택적, 비용 큼)
 - `test_dense_retriever.py`의 brittle assertion 완화(§10 참고, 급하지 않음)

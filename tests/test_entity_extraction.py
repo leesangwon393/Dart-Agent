@@ -16,7 +16,12 @@ pytestmark = pytest.mark.skipif(not CORPUS_ROOT.is_dir(), reason="corpus/ 없음
 
 @pytest.fixture(scope="module")
 def extractor():
-    return EntityExtractor(corpus_root=CORPUS_ROOT, metric_terms_path=CONFIG_ROOT / "metric_terms.txt")
+    return EntityExtractor(
+        corpus_root=CORPUS_ROOT,
+        metric_terms_path=CONFIG_ROOT / "metric_terms.txt",
+        event_terms_path=CONFIG_ROOT / "event_terms.txt",
+        ownership_terms_path=CONFIG_ROOT / "ownership_terms.txt",
+    )
 
 
 def test_spec_example_two_companies(extractor):
@@ -75,3 +80,57 @@ def test_query_normalize_repeated_company_reuses_number(extractor):
     normalized = normalize_query(e)
     assert normalized.count("[COMPANY_1]") == 2
     assert normalized.count("[COMPANY_2]") == 1
+
+
+# --- 2026-08-26 확장: period_type / period_comparison / event_terms /
+# ownership_terms / comparison_axis 회귀 테스트 ---
+
+
+def test_period_type_annual(extractor):
+    e = extractor.extract("삼성전자의 2025년 매출액은 얼마야?")
+    assert e.period_type == "annual"
+    assert e.comparison_axis is None
+
+
+def test_period_type_quarter_over_annual_priority(extractor):
+    """"2025년 1분기" 처럼 annual+quarter 가 동시에 매칭되면 더 구체적인
+    quarter 를 채택한다(우선순위 정책, entity_extractor.py 주석 참고)."""
+    e = extractor.extract("삼성전자의 2025년 1분기 실적 알려줘")
+    assert "2025년" in e.period
+    assert "1분기" in e.period
+    assert e.period_type == "quarter"
+
+
+def test_period_comparison_detection(extractor):
+    e = extractor.extract("삼성전자의 당기 대비 전기 영업이익 변화를 정리해줘")
+    assert e.period_comparison is True
+
+
+def test_event_terms_detection(extractor):
+    e = extractor.extract("삼성전자의 자기주식취득 결정 내용 알려줘")
+    assert "자기주식취득" in e.event_terms
+
+
+def test_ownership_terms_detection_and_metrics_unrelated(extractor):
+    e = extractor.extract("삼성전자의 최대주주가 누구야?")
+    assert "최대주주" in e.ownership_terms
+    assert e.metrics == []
+
+
+def test_comparison_axis_company_for_two_company_query(extractor):
+    e = extractor.extract("삼성전자와 SK하이닉스 중 설비투자가 더 큰 곳은?")
+    assert e.comparison_axis == "company"
+
+
+def test_comparison_axis_period_for_single_company_period_comparison(extractor):
+    e = extractor.extract("삼성전자의 당기 대비 전기 영업이익 변화를 정리해줘")
+    assert e.comparison_axis == "period"
+
+
+def test_comparison_axis_prefers_company_when_both_signals_present(extractor):
+    """회사 2개 + 기간 비교 신호가 동시에 있으면 company 를 우선한다(정책은
+    entity_extractor.py 의 comparison_axis 계산부 주석 참고)."""
+    e = extractor.extract("삼성전자와 SK하이닉스의 2023년과 2025년 매출을 비교해줘")
+    assert e.company_count == 2
+    assert len(e.period) >= 2
+    assert e.comparison_axis == "company"

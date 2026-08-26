@@ -61,8 +61,13 @@ def _route_hint_message(entities: ExtractedEntities, route: str | None, route_sc
         f"질문 유형(route): {route or '판단 불가 (직접 분류하세요)'}"
         + (f" (신뢰도 {route_score:.2f})" if route_score is not None else "")
         + f"\n회사: {entities.companies or '명시 안 됨'}\n"
-        f"기간: {entities.period or '명시 안 됨'}\n"
-        f"지표: {entities.metrics or '명시 안 됨'}\n"
+        f"기간: {entities.period or '명시 안 됨'}"
+        + (f" (유형: {entities.period_type})" if entities.period_type else "")
+        + (" (두 기간 비교 질문 — 각 기간을 따로 조회해서 비교하세요)" if entities.period_comparison else "")
+        + f"\n지표: {entities.metrics or '명시 안 됨'}\n"
+        f"이벤트 키워드: {entities.event_terms or '명시 안 됨'}\n"
+        f"지분/지배구조 키워드: {entities.ownership_terms or '명시 안 됨'}\n"
+        f"비교 축: {entities.comparison_axis or '없음'}\n"
         f"공시명: {entities.report_name or '명시 안 됨'}\n"
         f"정정 관련 질문 여부: {entities.explicit_correction}"
     )

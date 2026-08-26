@@ -1,0 +1,22 @@
+# ownership_analysis route 용 지분/지배구조 키워드 (Entity Extraction §35 확장,
+# 2026-08-26). 원래 metric_terms.txt 에 섞여 있던 "지분율"/"최대주주 지분율"/
+# "보유비율"을 여기로 옮기고(중복 매칭 방지를 위해 metric_terms.txt 에서는
+# 제거함), routes.py 의 ownership_analysis utterance 예시를 참고해 확장했다.
+# metrics 필드와 동일하게 substring 매칭한다.
+지분율
+최대주주 지분율
+보유비율
+최대주주
+주요주주
+특수관계자
+특별관계자
+계열회사
+지배회사
+종속기업
+종속회사
+자회사
+출자
+대량보유
+주식등의대량보유
+경영권
+주주구성

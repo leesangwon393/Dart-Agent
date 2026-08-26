@@ -79,7 +79,12 @@ def assemble():
     log(f"manifest={len(manifest)}건 correction_index={len(correction_index)}건 ({time.time()-t4:.0f}s)")
 
     tools = build_all_tools(retriever, manifest, correction_index)
-    extractor = EntityExtractor(corpus_root=CORPUS_ROOT, metric_terms_path=CONFIG_ROOT / "metric_terms.txt")
+    extractor = EntityExtractor(
+        corpus_root=CORPUS_ROOT,
+        metric_terms_path=CONFIG_ROOT / "metric_terms.txt",
+        event_terms_path=CONFIG_ROOT / "event_terms.txt",
+        ownership_terms_path=CONFIG_ROOT / "ownership_terms.txt",
+    )
 
     class RetryableHCXClient(HCXClient):
         """100문항 연속 호출 특성상 429(rate limit) 대비 max_retries 를 6으로
