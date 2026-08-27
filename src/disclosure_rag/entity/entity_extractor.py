@@ -80,6 +80,18 @@ def _classify_period_type(matched: str) -> str | None:
     return None
 
 
+# [YEAR] placeholder 치환 대상 — annual/year_month 만. 2026-08-25 발견된 버그:
+# routes.py 의 utterance 3개가 "[COMPANY]의 [YEAR] 매출액은..."처럼 [YEAR]를
+# 학습하는데, normalize_query() 는 company 만 placeholder 로 치환하고 연도는
+# 절대 치환한 적이 없어서 router 가 그 토큰을 실제 추론에서 한 번도 못 봤다
+# (company 정규화와 똑같은 이유로 만들어둔 장치가 절반만 구현돼 있었음).
+# quarter/half/recent_n_year("1분기"/"상반기"/"최근 3년")는 4자리 연도 숫자를
+# 담지 않아 과적합 위험이 적고, routes.py 도 "[YEAR] 반기보고서"처럼 이
+# 단어들은 리터럴로 그대로 두므로 치환 대상에서 제외한다.
+_YEAR_BEARING_TYPES = {"annual", "year_month"}
+_LEADING_YEAR_NUM = re.compile(r"20\d{2}")
+
+
 class ExtractedEntities(BaseModel):
     raw_query: str
     companies: list[str] = Field(default_factory=list)
@@ -95,8 +107,12 @@ class ExtractedEntities(BaseModel):
     event_terms: list[str] = Field(default_factory=list)
     ownership_terms: list[str] = Field(default_factory=list)
     comparison_axis: str | None = None
-    # (start, end) 는 normalize_query 가 재사용할 수 있도록 company 매칭 위치도 보존
+    # (start, end) 는 normalize_query 가 재사용할 수 있도록 company/period 매칭
+    # 위치도 보존. period_spans 의 3번째 값은 실제 4자리 연도 문자열("2025")
+    # 이며(같은 연도 재언급 시 같은 [YEAR_N] 번호를 재사용하기 위한 dedup 키),
+    # company_spans 와 동일한 패턴이다.
     company_spans: list[tuple[int, int, str]] = Field(default_factory=list, exclude=True)
+    period_spans: list[tuple[int, int, str]] = Field(default_factory=list, exclude=True)
 
 
 def _load_metric_terms(path: str | Path) -> list[str]:
@@ -152,8 +168,18 @@ class EntityExtractor:
             if corp not in companies:
                 companies.append(corp)
 
-        period_matches = [m.group(0).strip() for m in _PERIOD_PAT.finditer(query_nfc)]
+        period_finds = list(_PERIOD_PAT.finditer(query_nfc))
+        period_matches = [m.group(0).strip() for m in period_finds]
         periods = period_matches
+
+        period_spans: list[tuple[int, int, str]] = []
+        for m in period_finds:
+            text = m.group(0).strip()
+            if _classify_period_type(text) not in _YEAR_BEARING_TYPES:
+                continue
+            year_num = _LEADING_YEAR_NUM.match(text)
+            key = year_num.group(0) if year_num else text
+            period_spans.append((m.start(), m.end(), key))
 
         period_types = [t for t in (_classify_period_type(p) for p in period_matches) if t is not None]
         period_type = None
@@ -202,4 +228,5 @@ class EntityExtractor:
             ownership_terms=ownership_terms,
             comparison_axis=comparison_axis,
             company_spans=company_spans,
+            period_spans=period_spans,
         )

@@ -911,16 +911,22 @@ FieldRef화, unit/period hint 실채움)과 packer(split_long_text 안전망)가
   떨어지는지도 아직 실측 안 됨 — 위 표 수치는 원래 다른 함수를 가정하고
   측정된 것일 수 있어 그대로 못 믿는다).
 - char_2gram BM25 토크나이저 재검토
-- **`query_normalizer.py`에 `[YEAR]` placeholder 추가** (2026-08-26, Entity
-  Extraction 확장 §5-C 작업 중 발견, 이번엔 범위 밖이라 미착수) — 지금
-  `normalize_query()`는 회사명만 `[COMPANY]`/`[COMPANY_N]`으로 치환하고
-  연도/기간은 그대로 남긴다. `period_comparison=True`인 질의("OO의 2023년
-  대비 2025년 매출 비교")가 정규화되면 "[COMPANY]의 2023년 대비 2025년
-  매출 비교"처럼 회사만 익명화되고 연도는 그대로 노출돼, semantic
-  router 매칭 시 routes.py 의 `[YEAR_1]`/`[YEAR_2]` placeholder 템플릿과
-  실제 형태가 어긋날 수 있다. 연도를 `[YEAR]`/`[YEAR_1]`/`[YEAR_2]`로
-  치환하는 로직 추가 검토 필요(회사 번호 매기기 로직과 동일한 패턴 재사용
-  가능해 보임).
+- **[완료 2026-08-27]** ~~`query_normalizer.py`에 `[YEAR]` placeholder
+  추가~~ (2026-08-25 최초 발견, 2026-08-26 Entity Extraction 확장 §5-C
+  작업 중 범위 밖으로 미뤄뒀다가 이번에 처리) — `entity_extractor.py`에
+  `period_spans`(company_spans 와 동일 패턴, annual/year_month 매칭만
+  대상 — quarter/half/recent_n_year 는 4자리 연도를 안 담아 과적합 위험이
+  적고 routes.py 도 "[YEAR] 반기보고서"처럼 리터럴로 두므로 제외) 추가.
+  `normalize_query()`를 company_spans+period_spans 를 하나로 합쳐 정렬 후
+  한 번에 치환하도록 재작성(따로 두 번 치환하면 두 번째 시점에 좌표가
+  어긋남). 같은 연도 재언급은 회사명과 동일하게 같은 `[YEAR_N]` 번호
+  재사용. **효과 실측**: "[COMPANY]의 2025년 영업이익은 얼마야?"(수정
+  전, 연도 리터럴)와 "[COMPANY]의 [YEAR] 영업이익은 얼마야?"(수정 후)
+  각각을 routes.py 학습 문장 "[COMPANY]의 [YEAR] 매출액은 얼마야?"와
+  BGE-M3 코사인 유사도 비교 — **0.821 → 0.942로 상승**, 실제로 semantic
+  router 매칭이 더 정확해질 근거 확인. 테스트 5건 추가(tests/
+  test_entity_extraction.py), 기존 `test_query_normalize_single_company`
+  기대값 갱신(의도된 동작 변경). 전체 154 passed.
 - **[완료 2026-08-27]** ~~`ANSWER_SYSTEM_PROMPT`에 "이벤트 발생일과 그
   이벤트가 참조하는 원본 계약/공시의 체결일·제출일이 다를 수 있으니
   혼동하지 말라"는 원칙 추가~~ — 원칙 7번으로 추가(`answer_generator.py`).

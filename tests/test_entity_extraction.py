@@ -59,9 +59,11 @@ def test_no_company_mentioned(extractor):
 
 
 def test_query_normalize_single_company(extractor):
+    # 2026-08-27: 연도도 [YEAR]로 치환되도록 고쳐서 기대값 갱신(아래 참고,
+    # 의도된 동작 변경 — 이전엔 "2025년"이 리터럴로 남아있었다).
     e = extractor.extract("삼성전자 2025년 영업이익 얼마야?")
     normalized = normalize_query(e)
-    assert normalized == "[COMPANY] 2025년 영업이익 얼마야?"
+    assert normalized == "[COMPANY] [YEAR] 영업이익 얼마야?"
 
 
 def test_query_normalize_two_companies_numbered(extractor):
@@ -80,6 +82,47 @@ def test_query_normalize_repeated_company_reuses_number(extractor):
     normalized = normalize_query(e)
     assert normalized.count("[COMPANY_1]") == 2
     assert normalized.count("[COMPANY_2]") == 1
+
+
+# --- 2026-08-27 추가: [YEAR] placeholder 치환 (2026-08-25 발견된 버그 수정) ---
+# routes.py 의 utterance("[COMPANY]의 [YEAR] 매출액은...")가 학습하는 [YEAR]
+# 토큰을 normalize_query() 가 실제로는 한 번도 생성한 적이 없었다 — company
+# 만 치환하고 연도는 리터럴로 남겨뒀다(§12). 아래는 그 수정의 회귀 테스트.
+
+
+def test_query_normalize_single_year(extractor):
+    e = extractor.extract("SK하이닉스의 2025년 영업이익은 얼마야?")
+    normalized = normalize_query(e)
+    assert normalized == "[COMPANY]의 [YEAR] 영업이익은 얼마야?"
+
+
+def test_query_normalize_two_distinct_years_numbered(extractor):
+    e = extractor.extract("삼성전자의 2023년 사업보고서와 2025년 사업보고서를 비교해줘")
+    normalized = normalize_query(e)
+    assert normalized == "[COMPANY]의 [YEAR_1] 사업보고서와 [YEAR_2] 사업보고서를 비교해줘"
+
+
+def test_query_normalize_repeated_year_reuses_number(extractor):
+    e = extractor.extract("삼성전자의 2025년 매출액과 2025년 영업이익을 알려줘")
+    normalized = normalize_query(e)
+    assert normalized == "[COMPANY]의 [YEAR] 매출액과 [YEAR] 영업이익을 알려줘"
+
+
+def test_query_normalize_quarter_and_half_stay_literal():
+    """4자리 연도가 없는 분기/반기/최근N년 표현은 치환 대상이 아니다 —
+    routes.py 도 "[YEAR] 반기보고서"처럼 이 단어들은 리터럴로 그대로 둔다."""
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    e = ExtractedEntities(raw_query="상반기 실적이 어때?", period=["상반기"], period_spans=[])
+    assert normalize_query(e) == "상반기 실적이 어때?"
+
+
+def test_query_normalize_company_and_year_together_offsets_correct(extractor):
+    """company/period span 을 따로 두 번 치환하면 두 번째 치환 시점에 문자열이
+    이미 바뀌어 좌표가 어긋난다 — 한 번에 정렬해서 치환하는지 확인."""
+    e = extractor.extract("현대차와 기아의 2025년 3분기 매출액을 비교해줘")
+    normalized = normalize_query(e)
+    assert normalized == "[COMPANY_1]와 [COMPANY_2]의 [YEAR] 3분기 매출액을 비교해줘"
 
 
 # --- 2026-08-26 확장: period_type / period_comparison / event_terms /
