@@ -30,8 +30,9 @@ logger = logging.getLogger(__name__)
 AGENT_SYSTEM_PROMPT = (
     "당신은 금융공시(DART) 분석 Agent입니다. 추측하지 말고 tool 로 확인하세요. "
     "정정/최신본 확인은 get_correction_history/get_latest_report, 계산(비율/증가율/CAGR/차이)은 "
-    "calculate_*로 하고 암산 금지, 개수를 세는 질문은 검색 결과 개수로 직접 답하세요. 근거가 충분하면 tool "
-    "호출을 멈추세요."
+    "calculate_*로 하고 암산 금지, 개수를 세는 질문은 검색 결과 개수로 직접 답하세요. "
+    "비교·복합 질문은 검색어를 구체적으로 쪼개고 top_k를 넉넉히(10 이상) 잡으세요. "
+    "근거가 충분하면 tool 호출을 멈추세요."
 )
 
 
@@ -63,7 +64,15 @@ def _route_hint_message(entities: ExtractedEntities, route: str | None, route_sc
         + f"\n회사: {entities.companies or '명시 안 됨'}\n"
         f"기간: {entities.period or '명시 안 됨'}"
         + (f" (유형: {entities.period_type})" if entities.period_type else "")
-        + (" (두 기간 비교 질문 — 각 기간을 따로 조회해서 비교하세요)" if entities.period_comparison else "")
+        # 2026-08-27: 기존엔 "당기 대비 전기"류 명시적 비교 문구(period_comparison)에만
+        # 이 지시가 붙어서, "2023년 사업보고서와 2025년 사업보고서를 비교"처럼 기간을
+        # 그냥 나열만 한 질문(period 2개 이상, comparison_axis="period")은 "비교 축: period"
+        # 라는 수동적 표시만 받고 "그래서 어떻게 검색하라"는 지시가 없었다 — 실제로 이
+        # 질문에서 Agent가 top_k=1의 뭉뚱그린 검색 1번으로 끝내버려 정답(같은 인덱스에
+        # BM25로 직접 질의하면 1위로 나옴)을 놓쳤다(§5-D Q6). period_comparison 문구가
+        # 없어도 comparison_axis="period"면 같은 지시가 뜨도록 조건을 넓힌다.
+        + (" (두 기간 비교 질문 — 각 기간을 따로 조회해서 비교하세요)"
+           if entities.period_comparison or entities.comparison_axis == "period" else "")
         + f"\n지표: {entities.metrics or '명시 안 됨'}\n"
         f"이벤트 키워드: {entities.event_terms or '명시 안 됨'}\n"
         f"지분/지배구조 키워드: {entities.ownership_terms or '명시 안 됨'}\n"

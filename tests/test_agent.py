@@ -121,6 +121,32 @@ def test_agent_system_prompt_stays_under_300_chars():
     assert len(AGENT_SYSTEM_PROMPT) < 300
 
 
+def test_route_hint_suggests_split_search_for_period_comparison_axis():
+    """2026-08-27 추가: "당기 대비 전기"처럼 명시적 비교 문구(period_comparison)가
+    없어도, comparison_axis="period"(예: "2023년 사업보고서와 2025년 사업보고서를
+    비교")면 "각 기간을 따로 조회하라"는 지시가 떠야 한다 — 파트 2 실검증(Q6)에서
+    이 지시가 없어서 Agent가 검색 1회(top_k=1)로 끝내고 정답을 놓친 걸 재현/수정."""
+    from disclosure_rag.agent.agent_loop import _route_hint_message
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    entities = ExtractedEntities(
+        raw_query="삼성전자의 2023년 사업보고서와 2025년 사업보고서를 비교했을 때 핵심 사업은 어떻게 변화했는지 설명해줘",
+        companies=["삼성전자"], period=["2023년", "2025년"],
+        period_comparison=False, comparison_axis="period",
+    )
+    hint = _route_hint_message(entities, "multi_compare", 0.8)
+    assert "각 기간을 따로 조회" in hint
+
+
+def test_answer_system_prompt_distinguishes_event_date_from_document_date():
+    """2026-08-27 추가: Q5(§5-D) 재현 — evidence 안에 "정정관련 공시서류제출일"
+    처럼 사건 자체와 다른 날짜가 있을 때, 답변모델이 둘을 안 헷갈리게 하라는
+    원칙이 실제로 프롬프트에 있는지 고정."""
+    from disclosure_rag.agent.answer_generator import ANSWER_SYSTEM_PROMPT
+
+    assert "발생일" in ANSWER_SYSTEM_PROMPT or "체결일" in ANSWER_SYSTEM_PROMPT
+
+
 def test_validator_catches_hallucinated_citation():
     """실측 재현: 답변이 evidence 에 없는 report_id 를 인용하면 has_citation=False 가 돼야 한다."""
     from disclosure_rag.agent.evidence import EvidencePack
