@@ -25,3 +25,7 @@ gpu_embeddings_v2/
 *.log
 chunks_v2_build.log
 gpu_embeddings_v2_stdout.log
+
+# 팀원(Kim)에게 받은 전체 코퍼스 임베딩 결과(2026-08-27, 수 GB, 로컬 전용).
+pipeline_kim_v2/
+임베딩결과_v2_20260827.zip
