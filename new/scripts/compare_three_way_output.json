@@ -1,0 +1,656 @@
+{
+  "new_phase1": [
+    {
+      "question": "삼성전자 2024년 영업이익은?",
+      "route": "single_lookup",
+      "entity_scope": "explicit_companies",
+      "companies": [
+        "삼성전자"
+      ],
+      "sector": "반도체·전자부품",
+      "periods": [
+        2024
+      ],
+      "section_candidates": [
+        "재무에 관한 사항"
+      ],
+      "evidence_types": [
+        "quantitative"
+      ],
+      "llm_call_count": 0
+    },
+    {
+      "question": "삼성전자와 SK하이닉스의 2024년 HBM 투자 전략을 비교해줘",
+      "route": "comparison",
+      "entity_scope": "explicit_companies",
+      "companies": [
+        "삼성전자",
+        "SK하이닉스"
+      ],
+      "sector": "반도체·전자부품",
+      "periods": [
+        2024
+      ],
+      "section_candidates": [
+        "사업의 내용",
+        "재무에 관한 사항",
+        "이사의 경영진단 및 분석의견"
+      ],
+      "evidence_types": [
+        "business",
+        "quantitative",
+        "management_commentary"
+      ],
+      "llm_call_count": 0
+    },
+    {
+      "question": "삼성전자 2023년 대비 2024년 영업이익 증가율은?",
+      "route": "calculation",
+      "entity_scope": "explicit_companies",
+      "companies": [
+        "삼성전자"
+      ],
+      "sector": "반도체·전자부품",
+      "periods": [
+        2023,
+        2024
+      ],
+      "section_candidates": [
+        "재무에 관한 사항"
+      ],
+      "evidence_types": [
+        "quantitative"
+      ],
+      "llm_call_count": 0
+    },
+    {
+      "question": "삼성전자 사업보고서에서 정정된 내용 알려줘",
+      "route": "correction",
+      "entity_scope": "explicit_companies",
+      "companies": [
+        "삼성전자"
+      ],
+      "sector": "반도체·전자부품",
+      "periods": [],
+      "section_candidates": [],
+      "evidence_types": [
+        "event"
+      ],
+      "llm_call_count": 0
+    },
+    {
+      "question": "반도체 기업들의 최근 설비투자 전략을 비교해줘",
+      "route": "comparison",
+      "entity_scope": "sector",
+      "companies": [
+        "삼성전자",
+        "SK하이닉스",
+        "삼성전기",
+        "한미반도체",
+        "LG이노텍"
+      ],
+      "sector": "반도체·전자부품",
+      "periods": [],
+      "section_candidates": [
+        "사업의 내용",
+        "재무에 관한 사항",
+        "이사의 경영진단 및 분석의견"
+      ],
+      "evidence_types": [
+        "business",
+        "quantitative",
+        "management_commentary"
+      ],
+      "llm_call_count": 0
+    },
+    {
+      "question": "주요 방산기업 3곳의 수주 전략을 비교해줘",
+      "route": "comparison",
+      "entity_scope": "sector",
+      "companies": [
+        "한화에어로스페이스",
+        "현대로템",
+        "LIG디펜스앤에어로스페이스"
+      ],
+      "sector": "방산·항공우주",
+      "periods": [],
+      "section_candidates": [
+        "사업의 내용",
+        "재무에 관한 사항",
+        "이사의 경영진단 및 분석의견"
+      ],
+      "evidence_types": [
+        "business",
+        "quantitative",
+        "management_commentary"
+      ],
+      "llm_call_count": 0
+    },
+    {
+      "question": "삼성전자 최대주주 관련 내용 알려줘",
+      "route": "ownership",
+      "entity_scope": "explicit_companies",
+      "companies": [
+        "삼성전자"
+      ],
+      "sector": "반도체·전자부품",
+      "periods": [],
+      "section_candidates": [
+        "주주에 관한 사항",
+        "최대주주 등의 주식소유현황",
+        "주식의 대량보유 상황"
+      ],
+      "evidence_types": [
+        "ownership"
+      ],
+      "llm_call_count": 0
+    },
+    {
+      "question": "현대차 최근 유상증자 공시가 있어?",
+      "route": "event",
+      "entity_scope": "explicit_companies",
+      "companies": [
+        "현대자동차"
+      ],
+      "sector": "자동차·모빌리티",
+      "periods": [],
+      "section_candidates": [],
+      "evidence_types": [
+        "event"
+      ],
+      "llm_call_count": 0
+    }
+  ],
+  "legacy_cascading": [
+    {
+      "question": "삼성전자 2024년 영업이익은?",
+      "route": "calculation",
+      "route_source": "semantic_fast_path",
+      "route_score": 0.8688190421951956,
+      "companies": [
+        "삼성전자"
+      ],
+      "period": [
+        "2024년"
+      ],
+      "comparison_axis": null,
+      "llm_call_count": 0
+    },
+    {
+      "question": "삼성전자와 SK하이닉스의 2024년 HBM 투자 전략을 비교해줘",
+      "route": "multi_compare",
+      "route_source": "semantic_fast_path",
+      "route_score": 0.7479748812892433,
+      "companies": [
+        "삼성전자",
+        "SK하이닉스"
+      ],
+      "period": [
+        "2024년"
+      ],
+      "comparison_axis": "company",
+      "llm_call_count": 0
+    },
+    {
+      "question": "삼성전자 2023년 대비 2024년 영업이익 증가율은?",
+      "route": "calculation",
+      "route_source": "hcx_escalation",
+      "route_score": null,
+      "companies": [
+        "삼성전자"
+      ],
+      "period": [
+        "2023년",
+        "2024년"
+      ],
+      "comparison_axis": "period",
+      "llm_call_count": 1
+    },
+    {
+      "question": "삼성전자 사업보고서에서 정정된 내용 알려줘",
+      "route": "correction_analysis",
+      "route_source": "semantic_fast_path",
+      "route_score": 0.8507737824008498,
+      "companies": [
+        "삼성전자"
+      ],
+      "period": [],
+      "comparison_axis": null,
+      "llm_call_count": 0
+    },
+    {
+      "question": "반도체 기업들의 최근 설비투자 전략을 비교해줘",
+      "route": "event_analysis",
+      "route_source": "semantic_fast_path",
+      "route_score": 0.6424571709425156,
+      "companies": [],
+      "period": [],
+      "comparison_axis": null,
+      "llm_call_count": 0
+    },
+    {
+      "question": "주요 방산기업 3곳의 수주 전략을 비교해줘",
+      "route": "multi_compare",
+      "route_source": "semantic_fast_path",
+      "route_score": 0.5869843689506304,
+      "companies": [],
+      "period": [],
+      "comparison_axis": null,
+      "llm_call_count": 0
+    },
+    {
+      "question": "삼성전자 최대주주 관련 내용 알려줘",
+      "route": "ownership_analysis",
+      "route_source": "semantic_fast_path",
+      "route_score": 0.758274128622271,
+      "companies": [
+        "삼성전자"
+      ],
+      "period": [],
+      "comparison_axis": null,
+      "llm_call_count": 0
+    },
+    {
+      "question": "현대차 최근 유상증자 공시가 있어?",
+      "route": "event_analysis",
+      "route_source": "hcx_escalation",
+      "route_score": null,
+      "companies": [
+        "현대자동차"
+      ],
+      "period": [],
+      "comparison_axis": null,
+      "llm_call_count": 1
+    }
+  ],
+  "hybrid": [
+    {
+      "question": "삼성전자 2024년 영업이익은?",
+      "route": "single_lookup",
+      "entity_scope": "explicit_companies",
+      "companies": [
+        "삼성전자"
+      ],
+      "sector": "반도체·전자부품",
+      "periods": [
+        2024
+      ],
+      "report_types": [
+        "사업보고서"
+      ],
+      "section_candidates": [
+        "사업의 내용",
+        "재무에 관한 사항"
+      ],
+      "evidence_types": [
+        "quantitative"
+      ],
+      "query_concepts": [
+        "삼성전자",
+        "2024",
+        "영업이익"
+      ],
+      "is_complex": false,
+      "complexity_reasons": [],
+      "decomposition": null,
+      "llm_call_count": 2
+    },
+    {
+      "question": "삼성전자와 SK하이닉스의 2024년 HBM 투자 전략을 비교해줘",
+      "route": "comparison",
+      "entity_scope": "explicit_companies",
+      "companies": [
+        "삼성전자",
+        "SK하이닉스"
+      ],
+      "sector": "반도체·전자부품",
+      "periods": [
+        2024
+      ],
+      "report_types": [
+        "사업보고서"
+      ],
+      "section_candidates": [
+        "사업의 내용",
+        "이사의 경영진단 및 분석의견"
+      ],
+      "evidence_types": [
+        "business",
+        "management_commentary"
+      ],
+      "query_concepts": [
+        "삼성전자",
+        "SK하이닉스",
+        "HBM",
+        "투자 전략"
+      ],
+      "is_complex": false,
+      "complexity_reasons": [
+        "multi_company"
+      ],
+      "decomposition": null,
+      "llm_call_count": 2
+    },
+    {
+      "question": "삼성전자 2023년 대비 2024년 영업이익 증가율은?",
+      "route": "calculation",
+      "entity_scope": "explicit_companies",
+      "companies": [
+        "삼성전자"
+      ],
+      "sector": "반도체·전자부품",
+      "periods": [
+        2023,
+        2024
+      ],
+      "report_types": [
+        "사업보고서"
+      ],
+      "section_candidates": [
+        "사업의 내용",
+        "재무에 관한 사항"
+      ],
+      "evidence_types": [
+        "quantitative"
+      ],
+      "query_concepts": [
+        "삼성전자",
+        "영업이익",
+        "2023년",
+        "2024년"
+      ],
+      "is_complex": false,
+      "complexity_reasons": [
+        "multi_period"
+      ],
+      "decomposition": null,
+      "llm_call_count": 2
+    },
+    {
+      "question": "삼성전자 사업보고서에서 정정된 내용 알려줘",
+      "route": "correction",
+      "entity_scope": "explicit_companies",
+      "companies": [
+        "삼성전자"
+      ],
+      "sector": "반도체·전자부품",
+      "periods": [],
+      "report_types": [
+        "사업보고서",
+        "정정신고서"
+      ],
+      "section_candidates": [
+        "사업의 내용",
+        "재무에 관한 사항",
+        "주주에 관한 사항",
+        "임원 및 직원 등에 관한 사항"
+      ],
+      "evidence_types": [
+        "business",
+        "quantitative",
+        "ownership",
+        "event"
+      ],
+      "query_concepts": [
+        "삼성전자",
+        "사업보고서",
+        "정정된 내용"
+      ],
+      "is_complex": false,
+      "complexity_reasons": [],
+      "decomposition": null,
+      "llm_call_count": 2
+    },
+    {
+      "question": "반도체 기업들의 최근 설비투자 전략을 비교해줘",
+      "route": "comparison",
+      "entity_scope": "sector",
+      "companies": [
+        "삼성전자",
+        "SK하이닉스",
+        "삼성전기",
+        "한미반도체",
+        "LG이노텍"
+      ],
+      "sector": "반도체·전자부품",
+      "periods": [],
+      "report_types": [
+        "사업보고서"
+      ],
+      "section_candidates": [
+        "사업의 내용",
+        "management_commentary"
+      ],
+      "evidence_types": [
+        "business",
+        "management_commentary"
+      ],
+      "query_concepts": [
+        "설비투자",
+        "반도체 기업",
+        "삼성전자",
+        "SK하이닉스",
+        "삼성전기",
+        "한미반도체",
+        "LG이노텍"
+      ],
+      "is_complex": false,
+      "complexity_reasons": [
+        "multi_company",
+        "multi_entity_scope"
+      ],
+      "decomposition": null,
+      "llm_call_count": 2
+    },
+    {
+      "question": "주요 방산기업 3곳의 수주 전략을 비교해줘",
+      "route": "comparison",
+      "entity_scope": "sector",
+      "companies": [
+        "한화에어로스페이스",
+        "현대로템",
+        "LIG디펜스앤에어로스페이스"
+      ],
+      "sector": "방산·항공우주",
+      "periods": [],
+      "report_types": [
+        "사업보고서"
+      ],
+      "section_candidates": [
+        "사업의 내용"
+      ],
+      "evidence_types": [
+        "business"
+      ],
+      "query_concepts": [
+        "주요 방산기업 3곳의 수주 전략"
+      ],
+      "is_complex": false,
+      "complexity_reasons": [
+        "multi_company",
+        "multi_entity_scope"
+      ],
+      "decomposition": null,
+      "llm_call_count": 2
+    },
+    {
+      "question": "삼성전자 최대주주 관련 내용 알려줘",
+      "route": "ownership",
+      "entity_scope": "explicit_companies",
+      "companies": [
+        "삼성전자"
+      ],
+      "sector": "반도체·전자부품",
+      "periods": [],
+      "report_types": [
+        "사업보고서",
+        "주식등의대량보유상황보고서"
+      ],
+      "section_candidates": [
+        "사업의 내용",
+        "재무에 관한 사항",
+        "주주에 관한 사항",
+        "최대주주 등의 주식소유현황",
+        "임원 및 직원 등에 관한 사항",
+        "주식의 대량보유 상황"
+      ],
+      "evidence_types": [
+        "ownership",
+        "event",
+        "management_commentary"
+      ],
+      "query_concepts": [
+        "삼성전자",
+        "최대주주"
+      ],
+      "is_complex": false,
+      "complexity_reasons": [],
+      "decomposition": null,
+      "llm_call_count": 2
+    },
+    {
+      "question": "현대차 최근 유상증자 공시가 있어?",
+      "route": "event",
+      "entity_scope": "explicit_companies",
+      "companies": [
+        "현대자동차"
+      ],
+      "sector": "자동차·모빌리티",
+      "periods": [],
+      "report_types": [
+        "주요사항보고서"
+      ],
+      "section_candidates": [
+        "사업의 내용",
+        "재무에 관한 사항",
+        "주주에 관한 사항",
+        "이사의 경영진단 및 분석의견"
+      ],
+      "evidence_types": [
+        "event"
+      ],
+      "query_concepts": [
+        "유상증자"
+      ],
+      "is_complex": false,
+      "complexity_reasons": [],
+      "decomposition": null,
+      "llm_call_count": 2
+    },
+    {
+      "question": "삼성전자의 2023년 대비 2024년 반도체 사업 수익성이 왜 개선됐어?",
+      "route": "comparison",
+      "entity_scope": "explicit_companies",
+      "companies": [
+        "삼성전자"
+      ],
+      "sector": "반도체·전자부품",
+      "periods": [
+        2023,
+        2024
+      ],
+      "report_types": [
+        "사업보고서"
+      ],
+      "section_candidates": [
+        "사업의 내용",
+        "재무에 관한 사항",
+        "이사의 경영진단 및 분석의견"
+      ],
+      "evidence_types": [
+        "quantitative",
+        "business",
+        "management_commentary"
+      ],
+      "query_concepts": [
+        "삼성전자",
+        "반도체 사업",
+        "수익성",
+        "2023년 대비 2024년"
+      ],
+      "is_complex": true,
+      "complexity_reasons": [
+        "explanation_keyword",
+        "multi_period"
+      ],
+      "decomposition": [
+        {
+          "id": 1,
+          "company": "삼성전자",
+          "period": 2023,
+          "topic": "반도체 사업 수익성 수치",
+          "evidence_types": [
+            "quantitative"
+          ]
+        },
+        {
+          "id": 2,
+          "company": "삼성전자",
+          "period": 2024,
+          "topic": "반도체 사업 수익성 수치",
+          "evidence_types": [
+            "quantitative"
+          ]
+        }
+      ],
+      "llm_call_count": 3
+    },
+    {
+      "question": "SK하이닉스와 삼성전자의 영업이익률 차이가 나는 이유가 뭐야?",
+      "route": "comparison",
+      "entity_scope": "explicit_companies",
+      "companies": [
+        "SK하이닉스",
+        "삼성전자"
+      ],
+      "sector": "반도체·전자부품",
+      "periods": [],
+      "report_types": [
+        "사업보고서"
+      ],
+      "section_candidates": [
+        "사업의 내용",
+        "재무에 관한 사항"
+      ],
+      "evidence_types": [
+        "quantitative",
+        "business"
+      ],
+      "query_concepts": [
+        "SK하이닉스",
+        "삼성전자",
+        "영업이익률"
+      ],
+      "is_complex": true,
+      "complexity_reasons": [
+        "explanation_keyword",
+        "multi_company"
+      ],
+      "decomposition": [
+        {
+          "id": 1,
+          "company": "SK하이닉스",
+          "period": null,
+          "topic": "영업이익률",
+          "evidence_types": [
+            "quantitative",
+            "market",
+            "business"
+          ]
+        },
+        {
+          "id": 2,
+          "company": "삼성전자",
+          "period": null,
+          "topic": "영업이익률",
+          "evidence_types": [
+            "quantitative",
+            "market",
+            "business"
+          ]
+        }
+      ],
+      "llm_call_count": 3
+    }
+  ]
+}

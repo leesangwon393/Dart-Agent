@@ -1,0 +1,134 @@
+[
+  {
+    "query": "[COMPANY] 감사의견이 뭐였어?",
+    "bucket": "low",
+    "margin": 0.0152,
+    "expected": "single_lookup",
+    "legacy_route": "single_lookup",
+    "legacy_source": "hcx_escalation",
+    "legacy_ok": true,
+    "hybrid_route": "single_lookup",
+    "hybrid_ok": true
+  },
+  {
+    "query": "[COMPANY] 부채비율이 몇 퍼센트인지 계산해줘",
+    "bucket": "low",
+    "margin": 0.0185,
+    "expected": "calculation",
+    "legacy_route": "calculation",
+    "legacy_source": "hcx_escalation",
+    "legacy_ok": true,
+    "hybrid_route": "calculation",
+    "hybrid_ok": true
+  },
+  {
+    "query": "[COMPANY] 최근 공시 중에 이벤트성 뉴스 있어?",
+    "bucket": "low",
+    "margin": 0.0094,
+    "expected": "event_analysis",
+    "legacy_route": "event_analysis",
+    "legacy_source": "hcx_escalation",
+    "legacy_ok": true,
+    "hybrid_route": "event",
+    "hybrid_ok": true
+  },
+  {
+    "query": "[COMPANY] 자사주 비율이 어떻게 돼?",
+    "bucket": "low",
+    "margin": 0.0102,
+    "expected": "ownership_analysis",
+    "legacy_route": "ownership_analysis",
+    "legacy_source": "hcx_escalation",
+    "legacy_ok": true,
+    "hybrid_route": "single_lookup",
+    "hybrid_ok": false
+  },
+  {
+    "query": "[COMPANY] 재무제표 수치가 바뀐 부분이 있어?",
+    "bucket": "low",
+    "margin": 0.0188,
+    "expected": "correction_analysis",
+    "legacy_route": "correction_analysis",
+    "legacy_source": "hcx_escalation",
+    "legacy_ok": true,
+    "hybrid_route": "correction",
+    "hybrid_ok": true
+  },
+  {
+    "query": "[COMPANY] 재무제표 좀 보여줘",
+    "bucket": "mid",
+    "margin": 0.0457,
+    "expected": "single_lookup",
+    "legacy_route": "single_lookup",
+    "legacy_source": "semantic_fast_path",
+    "legacy_ok": true,
+    "hybrid_route": "single_lookup",
+    "hybrid_ok": true
+  },
+  {
+    "query": "[COMPANY] 매출 감소폭이 얼마야?",
+    "bucket": "mid",
+    "margin": 0.0491,
+    "expected": "calculation",
+    "legacy_route": "calculation",
+    "legacy_source": "semantic_fast_path",
+    "legacy_ok": true,
+    "hybrid_route": "calculation",
+    "hybrid_ok": true
+  },
+  {
+    "query": "[COMPANY_1], [COMPANY_2], [COMPANY_3] 매출 규모 순서대로 알려줘",
+    "bucket": "mid",
+    "margin": 0.0396,
+    "expected": "multi_compare",
+    "legacy_route": "multi_compare",
+    "legacy_source": "semantic_fast_path",
+    "legacy_ok": true,
+    "hybrid_route": "comparison",
+    "hybrid_ok": true
+  },
+  {
+    "query": "[COMPANY] 기재정정 사유 알려줘",
+    "bucket": "high",
+    "margin": 0.0621,
+    "expected": "correction_analysis",
+    "legacy_route": "correction_analysis",
+    "legacy_source": "semantic_fast_path",
+    "legacy_ok": true,
+    "hybrid_route": "correction",
+    "hybrid_ok": true
+  },
+  {
+    "query": "[COMPANY_1] vs [COMPANY_2] 부채비율 어디가 낮아?",
+    "bucket": "high",
+    "margin": 0.8218,
+    "expected": "multi_compare",
+    "legacy_route": "multi_compare",
+    "legacy_source": "semantic_fast_path",
+    "legacy_ok": true,
+    "hybrid_route": "comparison",
+    "hybrid_ok": true
+  },
+  {
+    "query": "[COMPANY] 공장 증설 계획 있어?",
+    "bucket": "high",
+    "margin": 0.8077,
+    "expected": "event_analysis",
+    "legacy_route": "event_analysis",
+    "legacy_source": "semantic_fast_path",
+    "legacy_ok": true,
+    "hybrid_route": "single_lookup",
+    "hybrid_ok": false
+  },
+  {
+    "query": "[COMPANY] 지분 5% 이상 가진 사람 있어?",
+    "bucket": "high",
+    "margin": 0.7577,
+    "expected": "ownership_analysis",
+    "legacy_route": "ownership_analysis",
+    "legacy_source": "semantic_fast_path",
+    "legacy_ok": true,
+    "hybrid_route": "ownership",
+    "hybrid_ok": true
+  }
+]
