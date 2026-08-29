@@ -581,6 +581,78 @@ escalate_acc가 0.833~0.846(hint 없음) → 0.958~0.970(hint 있음)으로
 message 불변, 있을 때 포함 확인, CascadingRouter가 실제로 hint를 만들어
 넘기는지, hint 미지원 Router에도 안전하게 fallback하는지 등) 추가.
 
+### 5-G. [완료] 3파전 라우터 아키텍처 실험 결론 + sector/peer 선택 로직 프로덕션 이식 (2026-08-29)
+
+`new/` 아래에서 독립적으로 구현한 3개 아키텍처(기존 CascadingRouter / `new/`
+Phase 1 순수 rule 프로토타입 / Entity Resolver+Task Router+Evidence
+Router+ComplexityDetector 하이브리드)를 비교한 실험의 최종 결론과, 그 실험에서
+유일하게 검증된 이식 가치가 있던 부분(sector/peer 선택)을 실제 프로덕션에
+반영했다.
+
+**3파전 결론**: `EVAL_SET` 55건 전체 기준 **기존 CascadingRouter(margin=0.03+
+hint) 55/55(1.000) vs 하이브리드 HCX-005 zero-shot Task Router 45/55(0.818)**
+— 매번 LLM으로 분류하는 게 더 정확할 거라는 직관과 반대로, 오래 튜닝된 기존
+시스템이 정확도와 호출 비용(하이브리드는 질문당 최소 2회, 기존은 평균 0.29회)
+양쪽에서 압승했다. 하이브리드 오분류 10건 중 7건이 "event_analysis →
+single_lookup" 한 방향으로 쏠린 체계적 오류(예: "공장 증설 계획 있어?"를
+단순조회로 오인)였다 — Task/Evidence Router를 LLM으로 교체하는 안은 폐기.
+
+유일하게 가치가 검증된 부분은 `new/app/query/entity_resolver.py` +
+`peer_selector.py`의 **"주요 OO기업 N곳"** 처리 — sector filter → market_cap
+내림차순 → top N을 LLM 없이 deterministic하게 계산하는 규칙. 기존 시스템은
+이 개념 자체가 없어서 회사명이 명시 안 된 sector/peer 질문은
+`companies=[]`로 그냥 실패했었다(§37 Case 5/6 대응 불가).
+
+**이식 내용** (`src/disclosure_rag/entity/entity_extractor.py`,
+`new/`를 import하지 않고 동일 로직을 독립적으로 재구현 — `new/`는 비교
+실험용 격리 코드로 계속 남겨둠):
+
+- `EntityExtractor.__init__`이 이미 로딩하던 `universe.csv`(`load_universe`)
+  순회에서 `sector`/`sector_no`/`industry`/`market_cap` 컬럼도 함께 읽어
+  `sector → [(corp_name, market_cap, sector_no), ...]`(market_cap 내림차순
+  정렬 완료) 인덱스를 미리 만든다 — 별도 sector alias 사전 불필요(Company
+  Master 자체가 유일한 출처, `new/`와 동일 원칙).
+- `_TOP_N_PAT`("주요 OO기업/업체/회사 N곳/개/사"), `_detect_sector`("·"로
+  쪼갠 부분 문자열 substring 매칭, 가장 긴 매칭 우선), `_detect_industry`
+  ─ `new/app/query/entity_resolver.py`에서 그대로 이식.
+- `extract()`: 명시적 회사명이 하나도 없을 때만 순서대로 시도 —
+  ① top_n 패턴+sector 매칭 시 그 sector의 top N(`peer_selection=
+  "market_cap_top_n"`, `requested_top_n`), ② top_n 없이 sector만 매칭되면
+  sector 전체, ③ industry만 매칭되면 industry 전체, ④ 전부 실패하면
+  `entity_scope="market"`. 채워진 회사 목록은 기존 `companies`/`company_count`
+  필드에 그대로 들어가므로(신규 필드 `entity_scope`/`sector`/`sector_no`/
+  `industry`/`peer_selection`/`requested_top_n`는 provenance 기록용 부가
+  정보), `comparison_axis`(`company_count>=2`) 계산도 자동으로 올바르게
+  작동한다.
+- sector/industry로 채워진 회사는 원문에 리터럴로 등장하지 않으므로
+  `company_spans`는 비워둔다 — `query_normalizer.normalize_query()`가
+  존재하지 않는 span을 잘못 치환하는 사고를 원천 차단.
+- `agent_loop.py`의 `_route_hint_message()`에 provenance 안내문 추가 —
+  `entity_scope in ("sector","industry")`면 "회사명이 직접 언급되지 않아
+  'OO' 업종 기준으로 자동 선정된 목록"임을 Agent에게 명시한다(사용자가
+  직접 지정한 회사 목록으로 오인해 임의로 좁히거나 다른 회사를 빠뜨렸다고
+  착각하는 것 방지).
+
+**실측 확인**(실제 `corpus/universe.csv` 기준, 2026-08-29 스냅샷):
+"주요 방산기업 3곳 비교해줘" → `한화에어로스페이스(504,806) >
+현대로템(172,881) > LIG디펜스앤에어로스페이스(167,640)` (방산·항공우주,
+sector_no=14, top 3), "2차전지 기업들 매출 비교해줘" → sector 전체
+(`LG에너지솔루션/삼성SDI/에코프로비엠`, peer_selection=None), "삼성전자랑
+SK하이닉스 비교해줘"는 명시적 회사가 있으므로 sector 추론을 건너뜀 —
+전부 의도대로 동작.
+
+**아직 이식하지 않은 것(범위 밖)**: `routes.py`에는 sector/peer형 질문에
+대응하는 utterance가 아직 없다 — 이런 질문이 실제로 router 앞단에 들어오면
+현재는 예시 부재로 margin이 낮게 나와 HCX escalation으로 넘어갈 가능성이
+높다(오답은 아니지만 라우팅 비용 증가). 필요성이 실측으로 확인되면 다음
+후보로 진행.
+
+**테스트**: `tests/test_entity_extraction.py`에 7건(top N 선택, market_cap
+내림차순 순서 고정, top_n 없는 sector 전체, 명시적 회사 있을 때 sector 추론
+건너뜀, market scope, span 비어있음/normalize_query 불변), `tests/test_agent.py`에
+2건(hint에 자동선정 안내 포함/명시적 회사엔 안내 없음) 추가. 전체 스위트
+178→180 통과(`pytest tests/ -m "not slow"`).
+
 ## 6. 주요 파일과 역할
 
 ```

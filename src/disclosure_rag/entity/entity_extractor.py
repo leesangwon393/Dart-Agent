@@ -4,6 +4,15 @@
 기업명은 universe.csv 의 corp_name + listed_name(통용명, 예: 현대차→현대자동차)
 를 alias map 으로 써서 매칭하고, 전부 NFC 로 정규화한다 (§35 "기업명 metadata 는
 NFC normalize").
+
+2026-08-29: `new/` Phase 1 프로토타입(3파전 라우터 실험, PROJECT_STATE 참고)에서
+검증된 sector/peer 선택 로직을 이식했다 — "주요 방산기업 3곳 비교해줘"처럼 회사명이
+전혀 등장하지 않는 질문을, universe.csv 의 sector/market_cap 컬럼만으로
+deterministic 하게(LLM 없이) "sector filter → market_cap 내림차순 → top N"
+규칙으로 실제 회사 목록으로 바꾼다. 기존 시스템엔 이 개념이 아예 없어서 이런
+질문은 companies=[] 로 실패했다. 라우터 자체(Task/Evidence Router)는 3파전
+실험에서 기존 CascadingRouter가 55/55로 하이브리드(45/55)를 압도해 그대로 두고,
+이 sector/peer 부분만 검증된 채로 가져온다.
 """
 
 from __future__ import annotations
@@ -71,6 +80,46 @@ _REPORT_NAME_TERMS = [
     "감사보고서", "연결감사보고서",
 ]
 
+# sector/peer 선택 (new/app/query/entity_resolver.py 이식). 캡처그룹1은
+# sector/industry 힌트 단어(비탐욕적), 그룹2는 top N. "주요 방산기업 3곳",
+# "주요 2차전지 업체 5개" 등을 커버한다.
+_TOP_N_PAT = re.compile(
+    r"주요\s*([가-힣A-Za-z0-9]+?)\s*(?:기업|업체|회사)\s*(\d+)\s*(?:곳|개|사)"
+)
+
+
+def _is_nan(value) -> bool:
+    return isinstance(value, float) and value != value
+
+
+def _sector_parts(sector: str) -> list[str]:
+    """sector 이름을 "·"로 쪼갠 부분 문자열들. "반도체·전자부품" -> ["반도체", "전자부품"]."""
+    return [p.strip() for p in sector.split("·") if len(p.strip()) >= 2]
+
+
+def _detect_sector(text: str, sector_names: list[str]) -> str | None:
+    """sector 이름의 부분 문자열이 질문에 등장하는지 본다.
+
+    universe.csv 자체에서 후보를 뽑으므로 별도 sector alias 사전이 필요 없다.
+    여러 sector 가 매칭되면 가장 긴 부분 문자열이 매칭된 sector 를 우선한다
+    (짧은 2글자 일반명사 오탐 완화).
+    """
+    best: tuple[int, str] | None = None
+    for sector in sector_names:
+        for part in _sector_parts(sector):
+            if part in text:
+                if best is None or len(part) > best[0]:
+                    best = (len(part), sector)
+                break
+    return best[1] if best else None
+
+
+def _detect_industry(text: str, industry_names: list[str]) -> str | None:
+    for industry in industry_names:
+        if len(industry) >= 2 and industry in text:
+            return industry
+    return None
+
 
 def _classify_period_type(matched: str) -> str | None:
     """하나의 _PERIOD_PAT 매칭 문자열이 어떤 sub-pattern 인지 fullmatch 로 분류."""
@@ -107,6 +156,18 @@ class ExtractedEntities(BaseModel):
     event_terms: list[str] = Field(default_factory=list)
     ownership_terms: list[str] = Field(default_factory=list)
     comparison_axis: str | None = None
+    # --- 2026-08-29 확장: sector/peer 선택 (new/ Phase 1 이식) ---
+    # entity_scope: "explicit_companies"(질문에 회사명이 직접 등장) |
+    # "sector"/"industry"(회사명 없이 업종으로만 지정돼 자동 선택됨) | "market"(둘 다 없음).
+    entity_scope: str | None = None
+    sector: str | None = None
+    sector_no: int | None = None
+    industry: str | None = None
+    # peer_selection="market_cap_top_n" 이면 companies 는 "주요 OO기업 N곳"의
+    # sector 내 market_cap 상위 N 결과다(requested_top_n=N). None 이면 sector/industry
+    # 전체 목록(개수 제한 없는 "OO 기업들" 질문)이다.
+    peer_selection: str | None = None
+    requested_top_n: int | None = None
     # (start, end) 는 normalize_query 가 재사용할 수 있도록 company/period 매칭
     # 위치도 보존. period_spans 의 3번째 값은 실제 4자리 연도 문자열("2025")
     # 이며(같은 연도 재언급 시 같은 [YEAR_N] 번호를 재사용하기 위한 dedup 키),
@@ -133,17 +194,51 @@ class EntityExtractor:
     ):
         universe = load_universe(corpus_root)
         alias_map: dict[str, str] = {}
+        sector_names: list[str] = []
+        industry_names: list[str] = []
+        sector_pool: dict[str, list[tuple[str, float, int | None]]] = {}
+        industry_pool: dict[str, list[tuple[str, float]]] = {}
         for _, row in universe.iterrows():
             corp = normalize_nfc(row["corp_name"])
             alias_map[corp] = corp
             listed = normalize_nfc(row.get("listed_name"))
             if listed and listed != corp:
                 alias_map[listed] = corp
+
+            sector = row.get("sector")
+            sector = normalize_nfc(sector) if not _is_nan(sector) else None
+            sector_no = row.get("sector_no")
+            sector_no = int(sector_no) if not _is_nan(sector_no) else None
+            industry = row.get("industry")
+            industry = normalize_nfc(industry) if not _is_nan(industry) else None
+            market_cap = row.get("market_cap")
+            market_cap = float(market_cap) if not _is_nan(market_cap) else 0.0
+
+            if sector:
+                if sector not in sector_names:
+                    sector_names.append(sector)
+                sector_pool.setdefault(sector, []).append((corp, market_cap, sector_no))
+            if industry:
+                if industry not in industry_names:
+                    industry_names.append(industry)
+                industry_pool.setdefault(industry, []).append((corp, market_cap))
+
         self._alias_map = alias_map
         self._sorted_aliases = sorted(alias_map.keys(), key=len, reverse=True)
         self._metric_terms = _load_metric_terms(metric_terms_path) if metric_terms_path else []
         self._event_terms = _load_metric_terms(event_terms_path) if event_terms_path else []
         self._ownership_terms = _load_metric_terms(ownership_terms_path) if ownership_terms_path else []
+
+        # sector/peer 선택용 인덱스 — market_cap 내림차순으로 미리 정렬해둔다.
+        self._sector_names = sector_names
+        self._industry_names = industry_names
+        self._sector_companies: dict[str, list[tuple[str, float, int | None]]] = {
+            s: sorted(rows, key=lambda r: r[1], reverse=True) for s, rows in sector_pool.items()
+        }
+        self._industry_companies: dict[str, list[str]] = {
+            i: [c for c, _mc in sorted(rows, key=lambda r: r[1], reverse=True)]
+            for i, rows in industry_pool.items()
+        }
 
     def _extract_companies(self, query_nfc: str) -> list[tuple[int, int, str]]:
         spans: list[tuple[int, int, str]] = []
@@ -164,9 +259,53 @@ class EntityExtractor:
 
         company_spans = self._extract_companies(query_nfc)
         companies: list[str] = []
+        # (아래에서 채움)
+        entity_scope: str | None = None
+        sector: str | None = None
+        sector_no: int | None = None
+        industry: str | None = None
+        peer_selection: str | None = None
+        requested_top_n: int | None = None
         for _s, _e, corp in company_spans:
             if corp not in companies:
                 companies.append(corp)
+
+        # sector/peer 선택 (2026-08-29, new/ Phase 1 이식): 질문에 회사명이 직접
+        # 등장하지 않을 때만 시도한다 — "삼성전자랑 SK하이닉스 비교해줘"처럼 이미
+        # 명시적 회사가 있으면 sector 추론은 하지 않는다.
+        if not companies:
+            top_n_match = _TOP_N_PAT.search(query_nfc)
+            if top_n_match:
+                hint_word, n_str = top_n_match.group(1), int(top_n_match.group(2))
+                matched_sector = _detect_sector(hint_word, self._sector_names) or _detect_sector(
+                    query_nfc, self._sector_names
+                )
+                if matched_sector:
+                    pool = self._sector_companies.get(matched_sector, [])[:n_str]
+                    companies = [c for c, _mc, _sn in pool]
+                    entity_scope = "sector"
+                    sector = matched_sector
+                    sector_no = pool[0][2] if pool else None
+                    peer_selection = "market_cap_top_n"
+                    requested_top_n = n_str
+
+            if entity_scope is None:
+                matched_sector = _detect_sector(query_nfc, self._sector_names)
+                if matched_sector:
+                    pool = self._sector_companies.get(matched_sector, [])
+                    companies = [c for c, _mc, _sn in pool]
+                    entity_scope = "sector"
+                    sector = matched_sector
+                    sector_no = pool[0][2] if pool else None
+                else:
+                    matched_industry = _detect_industry(query_nfc, self._industry_names)
+                    if matched_industry:
+                        companies = list(self._industry_companies.get(matched_industry, []))
+                        entity_scope = "industry"
+                        industry = matched_industry
+
+        if entity_scope is None:
+            entity_scope = "explicit_companies" if companies else "market"
 
         period_finds = list(_PERIOD_PAT.finditer(query_nfc))
         period_matches = [m.group(0).strip() for m in period_finds]
@@ -240,4 +379,10 @@ class EntityExtractor:
             comparison_axis=comparison_axis,
             company_spans=company_spans,
             period_spans=period_spans,
+            entity_scope=entity_scope,
+            sector=sector,
+            sector_no=sector_no,
+            industry=industry,
+            peer_selection=peer_selection,
+            requested_top_n=requested_top_n,
         )

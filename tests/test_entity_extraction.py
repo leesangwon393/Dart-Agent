@@ -204,3 +204,62 @@ def test_comparison_axis_prefers_company_when_both_signals_present(extractor):
     assert e.company_count == 2
     assert len(e.period) >= 2
     assert e.comparison_axis == "company"
+
+
+# --- 2026-08-29: sector/peer 선택 (new/ Phase 1 프로토타입 이식) ---
+# universe.csv 실측값 기준(방산·항공우주: 한화에어로스페이스 > 현대로템 >
+# LIG디펜스앤에어로스페이스 > 한국항공우주 market_cap 내림차순, 2026-08-29
+# 스냅샷) — universe.csv 가 갱신되면 순위가 바뀔 수 있으나, sector 자체가
+# 사라지지 않는 한 상위 3개 회사 "집합"은 안정적이라고 보고 set 비교로 짠다.
+
+def test_sector_top_n_peer_selection(extractor):
+    """"주요 방산기업 3곳" -> sector 필터 -> market_cap 내림차순 top 3."""
+    e = extractor.extract("주요 방산기업 3곳 비교해줘")
+    assert e.entity_scope == "sector"
+    assert e.sector == "방산·항공우주"
+    assert e.sector_no == 14
+    assert e.peer_selection == "market_cap_top_n"
+    assert e.requested_top_n == 3
+    assert len(e.companies) == 3
+    assert e.company_count == 3
+    assert e.comparison_axis == "company"
+
+
+def test_sector_top_n_is_market_cap_descending(extractor):
+    """top N 은 market_cap 내림차순이어야 한다 — 순서 자체가 계약의 일부."""
+    e = extractor.extract("주요 반도체 업체 2곳 실적 비교해줘")
+    assert e.companies == ["삼성전자", "SK하이닉스"]  # 반도체·전자부품 시총 1/2위
+
+
+def test_sector_full_list_without_top_n(extractor):
+    """개수 제한 없는 "OO 기업들" 은 sector 전체를 반환한다(peer_selection=None)."""
+    e = extractor.extract("2차전지 기업들 매출 비교해줘")
+    assert e.entity_scope == "sector"
+    assert e.sector == "2차전지"
+    assert e.peer_selection is None
+    assert e.requested_top_n is None
+    assert set(e.companies) >= {"LG에너지솔루션", "삼성SDI"}
+
+
+def test_explicit_companies_skip_sector_inference(extractor):
+    """회사명이 이미 명시됐으면 sector 추론을 하지 않는다."""
+    e = extractor.extract("삼성전자랑 SK하이닉스 비교해줘")
+    assert e.entity_scope == "explicit_companies"
+    assert e.sector is None
+    assert e.companies == ["삼성전자", "SK하이닉스"]
+
+
+def test_no_company_no_sector_scope_is_market(extractor):
+    e = extractor.extract("영업이익 얼마야?")
+    assert e.entity_scope == "market"
+    assert e.sector is None
+    assert e.industry is None
+
+
+def test_sector_derived_companies_have_no_placeholder_spans(extractor):
+    """sector 로 채워진 회사는 원문에 리터럴로 등장하지 않으므로 company_spans
+    가 비어있어야 하고(정규화 placeholder 치환 대상이 아님), normalize_query
+    는 원문을 그대로 반환해야 한다."""
+    e = extractor.extract("주요 방산기업 3곳 비교해줘")
+    assert e.company_spans == []
+    assert normalize_query(e) == "주요 방산기업 3곳 비교해줘"

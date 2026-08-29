@@ -138,6 +138,38 @@ def test_route_hint_suggests_split_search_for_period_comparison_axis():
     assert "각 기간을 따로 조회" in hint
 
 
+def test_route_hint_marks_sector_derived_companies_as_auto_selected():
+    """2026-08-29 추가: sector/peer 선택(entity_extractor의 new/ Phase 1 이식)으로
+    채워진 companies 는 사용자가 직접 지정한 게 아니라는 걸 Agent에게 밝혀야
+    한다 — 안 밝히면 "사용자가 이 회사들을 콕 집었다"고 오인해 다른 회사를
+    빠뜨렸다고 착각하거나 반대로 임의로 목록을 더 좁힐 위험이 있다."""
+    from disclosure_rag.agent.agent_loop import _route_hint_message
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    entities = ExtractedEntities(
+        raw_query="주요 방산기업 3곳 비교해줘",
+        companies=["한화에어로스페이스", "현대로템", "LIG디펜스앤에어로스페이스"],
+        entity_scope="sector", sector="방산·항공우주", sector_no=14,
+        peer_selection="market_cap_top_n", requested_top_n=3,
+    )
+    hint = _route_hint_message(entities, "multi_compare", 0.8)
+    assert "자동 선정" in hint
+    assert "방산·항공우주" in hint
+    assert "시가총액 상위 3곳" in hint
+
+
+def test_route_hint_no_auto_selection_note_for_explicit_companies():
+    from disclosure_rag.agent.agent_loop import _route_hint_message
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    entities = ExtractedEntities(
+        raw_query="삼성전자 영업이익 얼마야?",
+        companies=["삼성전자"], entity_scope="explicit_companies",
+    )
+    hint = _route_hint_message(entities, "single_lookup", 0.9)
+    assert "자동 선정" not in hint
+
+
 def test_answer_system_prompt_distinguishes_event_date_from_document_date():
     """2026-08-27 추가: Q5(§5-D) 재현 — evidence 안에 "정정관련 공시서류제출일"
     처럼 사건 자체와 다른 날짜가 있을 때, 답변모델이 둘을 안 헷갈리게 하라는

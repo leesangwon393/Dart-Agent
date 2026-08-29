@@ -62,8 +62,18 @@ def _route_hint_message(entities: ExtractedEntities, route: str | None, route_sc
         "[질의 분석 결과 — 참고용 힌트, 최종 판단은 직접 하세요]\n"
         f"질문 유형(route): {route or '판단 불가 (직접 분류하세요)'}"
         + (f" (신뢰도 {route_score:.2f})" if route_score is not None else "")
-        + f"\n회사: {entities.companies or '명시 안 됨'}\n"
-        f"기간: {entities.period or '명시 안 됨'}"
+        + f"\n회사: {entities.companies or '명시 안 됨'}"
+        # 2026-08-29: sector/peer 자동 선택(entity_extractor의 new/ Phase 1 이식)
+        # 결과임을 밝혀야 Agent가 "사용자가 지정한 회사"로 오인해 그 목록을
+        # 임의로 재해석하지 않는다.
+        + (
+            f" (참고: 회사명이 직접 언급되지 않아 '{entities.sector or entities.industry}' 업종"
+            + (f" 시가총액 상위 {entities.requested_top_n}곳" if entities.requested_top_n else " 전체")
+            + " 자동 선정)"
+            if entities.entity_scope in ("sector", "industry")
+            else ""
+        )
+        + f"\n기간: {entities.period or '명시 안 됨'}"
         + (f" (유형: {entities.period_type})" if entities.period_type else "")
         # 2026-08-27: 기존엔 "당기 대비 전기"류 명시적 비교 문구(period_comparison)에만
         # 이 지시가 붙어서, "2023년 사업보고서와 2025년 사업보고서를 비교"처럼 기간을
