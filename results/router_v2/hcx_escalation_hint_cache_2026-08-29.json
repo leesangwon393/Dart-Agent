@@ -1,0 +1,134 @@
+{
+  "[COMPANY] 재무제표 좀 보여줘": {
+    "route": "single_lookup",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 올해 매출 규모가 어느 정도야?": {
+    "route": "single_lookup",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 감사의견이 뭐였어?": {
+    "route": "single_lookup",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 본사가 어디 있어?": {
+    "route": "single_lookup",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 계열회사가 몇 개야?": {
+    "route": "ownership_analysis",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 최근 분기 순이익 알려줘": {
+    "route": "single_lookup",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 설립일이 언제야": {
+    "route": "single_lookup",
+    "source": "semantic_fast_path"
+  },
+  "[COMPANY] 종업원 평균 근속연수는?": {
+    "route": "single_lookup",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 재무제표 수치가 바뀐 부분이 있어?": {
+    "route": "correction_analysis",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 가장 최근 정정본 기준으로 알려줘": {
+    "route": "correction_analysis",
+    "source": "semantic_fast_path"
+  },
+  "[COMPANY] 기재정정 사유 알려줘": {
+    "route": "correction_analysis",
+    "source": "semantic_fast_path"
+  },
+  "[COMPANY] 지난 분기랑 이번 분기 실적 어떻게 달라졌어": {
+    "route": "multi_compare",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY_1], [COMPANY_2], [COMPANY_3] 매출 규모 순서대로 알려줘": {
+    "route": "multi_compare",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 연도별 매출 흐름 정리해줘": {
+    "route": "multi_compare",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 최근 몇 년간 실적 트렌드 알려줘": {
+    "route": "multi_compare",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 매출 증가율 몇 %야?": {
+    "route": "calculation",
+    "source": "semantic_fast_path"
+  },
+  "[COMPANY] 부채비율이 몇 퍼센트인지 계산해줘": {
+    "route": "calculation",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 최근 3개년 연평균성장률 알려줘": {
+    "route": "calculation",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 영업이익이 작년보다 얼마나 늘었어?": {
+    "route": "calculation",
+    "source": "semantic_fast_path"
+  },
+  "[COMPANY] R&D 비중이 매출의 몇 %인지 계산해줘": {
+    "route": "calculation",
+    "source": "semantic_fast_path"
+  },
+  "[COMPANY] 매출 감소폭이 얼마야?": {
+    "route": "calculation",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] ROE 얼마인지 구해줘": {
+    "route": "calculation",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 부채가 전년 대비 몇 % 늘었어": {
+    "route": "calculation",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 대주주가 누구야?": {
+    "route": "ownership_analysis",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 특수관계인 보유 현황 알려줘": {
+    "route": "ownership_analysis",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 대량보유 신고 있었어?": {
+    "route": "ownership_analysis",
+    "source": "semantic_fast_path"
+  },
+  "[COMPANY] 주식 보유 목적이 경영참여야 단순투자야?": {
+    "route": "ownership_analysis",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 자사주 비율이 어떻게 돼?": {
+    "route": "ownership_analysis",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 채권 발행한 적 있어?": {
+    "route": "event_analysis",
+    "source": "semantic_fast_path"
+  },
+  "[COMPANY] 다른 회사 인수했어?": {
+    "route": "event_analysis",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 합병 관련 이슈 있었어?": {
+    "route": "event_analysis",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 최근 공시 중에 이벤트성 뉴스 있어?": {
+    "route": "event_analysis",
+    "source": "hcx_escalation"
+  },
+  "[COMPANY] 시설투자 규모 얼마야?": {
+    "route": "event_analysis",
+    "source": "semantic_fast_path"
+  }
+}

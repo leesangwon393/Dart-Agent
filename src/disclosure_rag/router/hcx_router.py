@@ -101,10 +101,18 @@ class HCXStructuredRouter:
         self._client = client
         self._max_retries = max_retries
 
-    def route(self, normalized_query: str) -> RouteResult:
+    def route(self, normalized_query: str, *, hint: str | None = None) -> RouteResult:
+        """`hint`: CascadingRouter가 escalate할 때 semantic router의 top1/top2
+        추측을 참고 정보로 넘기는 선택적 파라미터(§12 개선 후보 4). 기본값
+        None이면 기존과 100% 동일하게 동작(하위호환). system prompt(300자
+        제약 대상)가 아니라 user message에 덧붙인다 — user message는 이
+        길이 제약 대상이 아님이 이미 라이브 호출로 확인돼 있다."""
+        content = normalized_query
+        if hint:
+            content += f"\n\n[참고: 로컬 임베딩 분류 후보]\n{hint}"
         messages = [
             {"role": "system", "content": _SYSTEM_PROMPT},
-            {"role": "user", "content": normalized_query},
+            {"role": "user", "content": content},
         ]
         msg = self._client.chat(
             messages, tools=[_ROUTE_TOOL], tool_choice=_TOOL_CHOICE,
@@ -124,11 +132,23 @@ class CascadingRouter:
 
     name = "cascading"
 
-    def __init__(self, semantic_router, hcx_router: Router, *, margin_threshold: float = 0.05):
+    def __init__(self, semantic_router, hcx_router: Router, *, margin_threshold: float = 0.03):
         """`semantic_router`: `build_semantic_router(..., threshold=0.0)`로 만든
         raw `SemanticRouter` 객체를 넘길 것 — 라이브러리 자체의 절대 threshold
         게이팅이 아니라 여기서 top1-top2 margin으로 직접 게이팅하기 때문에,
-        내부 threshold는 0으로 열어둬야 top-2 후보가 항상 나온다."""
+        내부 threshold는 0으로 열어둬야 top-2 후보가 항상 나온다.
+
+        `margin_threshold=0.03`(2026-08-29 재조정, 기존 0.05): EVAL_SET 55건
+        실측 재조정(`results/router_v2/margin_threshold_resweep_2026-08-29.md`)
+        결과 margin<0.04 구간에서는 semantic top1이 틀렸을 때 HCX가 100%
+        정확히 구제했지만(escalate_acc=1.0), margin>=0.0422부터는 semantic이
+        이미 100% 정확한데도 HCX로 넘기면 HCX 자체 오류가 섞여 들어와
+        정확도가 오히려 떨어졌다(0.05 기준 overall=0.927 vs 0.03 기준
+        overall=1.000, 그것도 escalate 비율은 0.03이 29%로 0.05의 44%보다
+        낮음 — 정확도·RPM 위험 둘 다 0.03이 우위). 0.03은 관측된 "확실히
+        틀리는 최고 margin"(0.0266)과 "이미 확실히 맞는 최저 margin"(0.0377)
+        사이에 여유 있게 위치한다. n=55로 표본이 작아 경계값 자체는
+        불확실성이 있다는 점은 위 문서에 명시."""
         self._semantic = semantic_router
         self._hcx = hcx_router
         self._margin_threshold = margin_threshold
@@ -147,13 +167,27 @@ class CascadingRouter:
             # SemanticRouterAdapter.route()와 동일한 의미로 "semantic_fast_path".
             return RouteResult(route=top1.name, score=top1_score, source="semantic_fast_path")
         # escalate: 하위 HCXStructuredRouter(또는 다른 Router 구현)가 이미
-        # source 를 세팅한 RouteResult 를 그대로 통과시킨다.
-        return self._hcx.route(normalized_query)
+        # source 를 세팅한 RouteResult 를 그대로 통과시킨다. semantic router의
+        # top1/top2 추측을 참고 힌트로 같이 넘긴다(§12 개선 후보 4) — 최종
+        # 판단은 HCX가 직접 하라는 톤을 유지(_route_hint_message 와 동일 원칙,
+        # Agent/Router가 힌트에 맹종하면 안 됨).
+        top2_name = choices[1].name if len(choices) > 1 else None
+        hint = (
+            f"1순위 후보: {top1.name}(유사도 {top1_score:.2f}), "
+            f"2순위 후보: {top2_name or '없음'}(유사도 {top2_score:.2f}) "
+            "— 참고용이며 최종 판단은 직접 하세요."
+        )
+        try:
+            return self._hcx.route(normalized_query, hint=hint)
+        except TypeError:
+            # 하위호환: hint 파라미터를 지원하지 않는 Router 구현(예: 기존
+            # 테스트의 stub, 다른 Router 구현체)은 그대로 hint 없이 호출한다.
+            return self._hcx.route(normalized_query)
 
 
 def build_cascading_router(
     embed_provider: EmbeddingProvider, hcx_client: HCXClient, *,
-    margin_threshold: float = 0.05, hcx_max_retries: int = 6,
+    margin_threshold: float = 0.03, hcx_max_retries: int = 6,
 ) -> CascadingRouter:
     """§12 "CascadingRouter를 ask.py 진입점에 실제 배선" — production 조립용
     단일 진입점. 여태까지 이 프로젝트의 모든 배치 스크립트가 (a) 이 CascadingRouter

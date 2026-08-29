@@ -129,6 +129,73 @@ def test_hcx_structured_router_unknown_value_also_falls_back():
     assert result.route is None
 
 
+# ── 2026-08-29 회귀 테스트: HCX escalation hint(§12 개선 후보 4) ──
+
+
+class _RecordingHCXClient:
+    """실제 API 호출 없이 HCXStructuredRouter 에 전달된 messages 를 그대로
+    기록해두는 스텁 — hint 가 user message 에 실제로 포함되는지 검증용."""
+
+    def __init__(self, route_value: str):
+        self._route_value = route_value
+        self.last_messages: list[dict] | None = None
+
+    def chat(self, messages, *, tools=None, tool_choice=None, max_retries=6, **kwargs):
+        self.last_messages = messages
+        return {"toolCalls": [{"function": {"arguments": {"route": self._route_value}}}]}
+
+
+def test_hcx_structured_router_without_hint_is_backward_compatible():
+    """hint 파라미터를 아예 안 주면(기존 호출부 전부) user message 가 예전과
+    100% 동일해야 한다 — 하위호환의 핵심 보장."""
+    client = _RecordingHCXClient("single_lookup")
+    router = HCXStructuredRouter(client)
+    router.route("[COMPANY] 영업이익 알려줘")
+    assert client.last_messages[1]["content"] == "[COMPANY] 영업이익 알려줘"
+
+
+def test_hcx_structured_router_hint_is_appended_to_user_message():
+    """hint 가 있으면 user message 에 덧붙어야 하고, system prompt(300자 제약
+    대상)는 건드리지 않아야 한다."""
+    client = _RecordingHCXClient("calculation")
+    router = HCXStructuredRouter(client)
+    hint = "1순위 후보: single_lookup(유사도 0.80), 2순위 후보: calculation(유사도 0.78) — 참고용이며 최종 판단은 직접 하세요."
+    router.route("[COMPANY] 매출 증가율 몇 %야?", hint=hint)
+    user_content = client.last_messages[1]["content"]
+    assert "[COMPANY] 매출 증가율 몇 %야?" in user_content
+    assert "[참고: 로컬 임베딩 분류 후보]" in user_content
+    assert hint in user_content
+    assert client.last_messages[0]["role"] == "system"
+    assert len(client.last_messages[0]["content"]) < 300  # system prompt 자체는 불변
+
+
+def test_cascading_router_passes_semantic_candidates_as_hint_on_escalate():
+    """CascadingRouter 가 escalate 할 때 top1/top2 이름+점수를 hint 로 만들어
+    넘기는지 확인."""
+    semantic = _StubSemanticRouter("calculation", 0.82, 0.80)  # margin=0.02 -> escalate
+    hcx_client = _RecordingHCXClient("calculation")
+    hcx = HCXStructuredRouter(hcx_client)
+    router = CascadingRouter(semantic, hcx, margin_threshold=0.05)
+    router.route("정정된 영업이익이 몇 % 줄었어?")
+    user_content = hcx_client.last_messages[1]["content"]
+    assert "calculation" in user_content
+    assert "other_route" in user_content
+    assert "0.82" in user_content
+    assert "0.80" in user_content
+    assert "참고용" in user_content
+
+
+def test_cascading_router_escalate_still_works_when_hcx_router_lacks_hint_support():
+    """hint 키워드를 아예 모르는 Router 구현(예: 기존 stub)이 escalate 대상
+    이어도 TypeError 로 죽지 않고 hint 없이 정상 동작해야 한다(하위호환)."""
+    semantic = _StubSemanticRouter("calculation", 0.82, 0.80)  # margin=0.02 -> escalate
+    hcx = _StubRouter("correction_analysis")  # route(self, normalized_query) 만 받음
+    router = CascadingRouter(semantic, hcx, margin_threshold=0.05)
+    result = router.route("정정된 영업이익이 몇 % 줄었어?")
+    assert result.route == "correction_analysis"
+    assert hcx.called
+
+
 class _StubRouteChoice:
     def __init__(self, name, similarity_score):
         self.name = name
@@ -309,6 +376,27 @@ def test_semantic_router_adapter_source_is_semantic_fast_path():
     router = _try_build_router(threshold=0.0)
     result = router.route("[COMPANY] 영업이익 알려줘")
     assert result.source == "semantic_fast_path"
+
+
+def test_cascading_router_default_margin_threshold_is_0_03():
+    """회귀(§12 개선 후보 1, 2026-08-29 재조정): EVAL_SET 55건 실측
+    (`results/router_v2/margin_threshold_resweep_2026-08-29.md`) 결과
+    margin_threshold=0.03이 기존 0.05보다 accuracy(1.000 vs 0.927)와
+    escalate 비율(29% vs 44%, RPM 위험) 둘 다 우위였다 — 기본값을
+    바꿨다면 실수로 되돌아가지 않도록 고정."""
+    import inspect
+
+    default = inspect.signature(CascadingRouter.__init__).parameters["margin_threshold"].default
+    assert default == 0.03
+
+
+def test_build_cascading_router_default_margin_threshold_is_0_03():
+    from disclosure_rag.router.hcx_router import build_cascading_router
+
+    import inspect
+
+    default = inspect.signature(build_cascading_router).parameters["margin_threshold"].default
+    assert default == 0.03
 
 
 def test_build_cascading_router_wires_semantic_and_hcx():

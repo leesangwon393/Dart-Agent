@@ -480,7 +480,106 @@ loader.py`), 같은 `questions.json` 100문항 재사용. 커밋 `8da607b`.
 게 아니라, 표본이 커지면서 안 보이던 문제가 보이기 시작한 것"으로 해석.
 다음 우선순위는 §12 참고.
 
----
+### 5-F. [완료] Router 개선 후보 5건 — provenance/threshold 재조정/comparison_axis 오탐/HCX escalation hint (2026-08-29)
+
+사용자가 우선순위 순으로 지정한 라우터 개선 후보 5개를 전부 진행(2번
+provenance를 1번 threshold 재조정보다 먼저 처리 — 후자를 제대로 측정하려면
+전자가 필요).
+
+**1) RouteResult.source(provenance) 추가**: `semantic_router_wrapper.py`의
+`RouteResult`에 `source: str | None = None`(하위호환 기본값) 추가.
+`SemanticRouterAdapter`/`CascadingRouter`의 fast-path는 `"semantic_fast_path"`,
+`HCXStructuredRouter`는 유효 route면 `"hcx_escalation"`, unclear/무효값이면
+`"hcx_unclear"`, `CascadingRouter`의 escalate 경로는 하위 라우터가 세팅한
+source를 그대로 통과(새로 안 만듦). "confidence" 요구사항(후보 5)은 새
+필드를 추가하지 않고 `source=="hcx_unclear"`로 흡수 — HCX tool schema를
+더 건드리는 건 위험 대비 효용이 낮다고 판단(사용자에게 사전 설명한 방향
+그대로 진행). `agent_loop.py`의 `AgentTrace`에도 `route_source` 필드 추가.
+회귀 테스트 8건(`tests/test_router.py`).
+
+**2) margin_threshold 재조정**: 아래 §5-F-1(별도 소절) 참고 — 재현 확인,
+sweep 결과, 최종 권고를 상세 기록.
+
+**3) comparison_axis 오탐 수정** — §12의 "[신규, 2026-08-27 재검증에서도
+재확인]" 항목이 바로 이것. 완료 처리는 위 §12 해당 항목 참고(중복 기재
+방지).
+
+**4) CascadingRouter → HCXStructuredRouter escalation hint** — 아래
+§5-F-2(별도 소절) 참고.
+
+전체 회귀 스위트: 작업 1(164)/작업 3(166) 시점 각각 통과 확인, 최종
+카운트는 문서 하단 커밋 로그 참고.
+
+#### 5-F-1. margin_threshold 재조정 (개선 후보 1)
+
+**방법론**: `EVAL_SET`(55건)에 대해 semantic router(BGE-M3, threshold=0.0)로
+top1/top2/margin을 실측 추출하고, margin<0.15인 33건 전체를 실제
+`HCXStructuredRouter`(HCX-007, production과 동일 client)로 분류해 캐싱한 뒤
+0.00~0.15(0.01 간격)로 sweep했다. 상세: `results/router_v2/margin_threshold_resweep_2026-08-29.md`.
+
+**재현 확인**: PROJECT_STATE가 인용하던 "margin>=0.05: 23/55(42%),
+accuracy=1.000"은 **재현되지 않았다** — 이번 실측은 31/55(56.4%),
+accuracy=1.000. 원인은 새 버그가 아니라, "23/55"가 `routes.py`에 19개
+utterance를 추가하기 **이전**(2026-08-18 13:03, 커밋 `8c5c555`)의 1차
+측정값이었기 때문이다. 같은 날 바로 이어진 utterance 추가(13:11, 커밋
+`c562220`) 이후 값은 `results/router_v2/summary.md`에 이미 "31/55"로
+기록돼 있었고, `routes.py`는 그 이후 변경 이력이 없다(git log 확인) — 즉
+이번 재현치는 최신 코드 기준 정답과 정확히 일치한다.
+
+**Sweep 핵심 결과**: overall accuracy가 **margin_threshold=0.03~0.04에서
+1.000으로 정점**을 찍고, 현재 기본값 0.05에서는 0.927로 떨어진다. 메커니즘이
+명확하다 — margin<0.0266인 예시는 semantic이 전부 틀렸는데 HCX가 escalate로
+10/10 전부 구제했지만, margin>=0.0377인 예시는 semantic이 이미 100% 정답인데
+그걸 다시 HCX에게 물으면(threshold를 0.05 이상으로 올리면) HCX 자체 오류가
+섞여 들어온다(실측: 단순조회→ownership_analysis 오분류 등 4건). 즉 0.05는
+정확도(0.927<1.000)와 escalate 비율(44%>29~33%, RPM 위험)**양쪽 다** 0.03~0.04에
+지배당하는 선택이었다 — trade-off가 아니었다.
+
+**최종 권고 및 조치**: `margin_threshold` 기본값을 **0.05 → 0.03**으로
+변경(`CascadingRouter.__init__`, `build_cascading_router()` 둘 다,
+`src/disclosure_rag/router/hcx_router.py`). 회귀 테스트 2건 추가(기본값
+고정, `tests/test_router.py`). n=55라 정확한 경계값(0.03 vs 0.04)의
+정밀도는 제한적이라는 점은 결과 문서에 명시 — 방향성(0.05보다 낮은 게
+낫다)은 메커니즘이 명확해 신뢰할 만함.
+
+**부수 발견(API 신뢰성)**: 33건 HCX 호출 중 5건이 400("Unsupported
+function")을 반환했고, 그중 1건은 `HCXClient`의 6회 재시도(최대 96초 대기)
+로도 못 뚫어 스크립트 레벨에서 추가 재시도가 필요했다. 격리 재현 결과 같은
+질의를 몇 분 후 다시 보내면 즉시 성공해서, 특정 질의 문구 문제가 아니라
+확률적/일시적 API 현상으로 판단(§12 기존 RPM 관찰과 같은 계열, 이번엔 기존
+재시도 상한을 넘는 사례가 실측됨 — 후속 후보로 §12에 기록).
+
+#### 5-F-2. CascadingRouter → HCXStructuredRouter escalation hint (개선 후보 4)
+
+**구현**: `HCXStructuredRouter.route()`에 선택적 키워드 `hint: str | None =
+None` 추가(기본값 None이면 기존과 100% 동일 — 하위호환). hint가 있으면
+user message(시스템 프롬프트 300자 제약과 무관한 필드)에
+`f"\n\n[참고: 로컬 임베딩 분류 후보]\n{hint}"` 형태로 덧붙인다.
+`CascadingRouter.route()`는 escalate 직전에 semantic top1/top2 이름+점수로
+"참고용이며 최종 판단은 직접 하세요"라는 톤의 hint를 만들어 넘긴다
+(`_route_hint_message`와 동일 원칙 — 힌트에 맹종 금지). 하위 라우터가
+`hint` 키워드를 지원 안 하면(TypeError) hint 없이 호출하는 fallback도 있어
+기존 stub 기반 테스트는 전부 무변경 통과.
+
+**라이브 검증**: escalate 후보 33건(margin<0.15, 작업 2와 동일 데이터)을
+실제 CascadingRouter(hint 포함)로 재라우팅 — **400 에러 0건**(33/33 성공).
+margin<0.05(현재 production 기본 threshold 0.03 이전 실측 시점 기준 escalate
+대상, 24건)의 정확도가 **hint 없음 0.833(20/24) → hint 있음 0.958(23/24)**로
+개선됐다. 개별 대조 결과 3건이 hint로 새로 정답이 됐고(HCX가 unclear로
+답했거나 다른 route로 오분류했던 케이스가 semantic의 이미 옳은 추측을
+참고해 정답으로 수정됨), 1건은 hint가 있어도 여전히 오답, **hint 때문에
+새로 틀린 케이스는 0건**이었다 — 순수 개선, 회귀 없음.
+
+hint를 반영해 threshold sweep을 다시 계산하면 margin>=0.05 구간의
+escalate_acc가 0.833~0.846(hint 없음) → 0.958~0.970(hint 있음)으로
+전반적으로 개선되지만, **그래도 0.03~0.04(정확도 1.000)가 여전히 최적**이다
+— hint는 threshold 선택을 덜 민감하게 만드는 안전판이지 §5-F-1의 권고를
+뒤집을 근거는 아니다. 상세 표: `results/router_v2/margin_threshold_resweep_2026-08-29.md`
+"참고: HCX escalation hint 도입 시 재계산" 절.
+
+**테스트**: `tests/test_router.py`에 hint 하위호환(6건: 없을 때 user
+message 불변, 있을 때 포함 확인, CascadingRouter가 실제로 hint를 만들어
+넘기는지, hint 미지원 Router에도 안전하게 fallback하는지 등) 추가.
 
 ## 6. 주요 파일과 역할
 
@@ -959,6 +1058,13 @@ Kim이 전체 70개사(626,497 leaf chunk)를 재청킹+재임베딩 완료해�
 6. `_verify_derived_number()`가 음수(손실) evidence 부호를 처리 못 해
    정확한 산술도 ungrounded로 남는 문제(알테오젠 재확인) — 기존 O(n²)
    cap 이슈와 별개로 부호 처리 버그가 하나 더 있다는 게 새로 확인됨.
+7. **[신규, 2026-08-29]** `HCXClient.chat()`의 6회 재시도(최대 96초
+   backoff)로도 못 뚫는 400("Unsupported function") 사례 실측(§5-F-1,
+   margin_threshold 재조정 중 33건 HCX 호출 중 1건). 같은 질의를 몇 분 뒤
+   재시도하면 즉시 성공해서 질의 문구 문제는 아니고, 확률적/일시적 API
+   현상으로 추정(§12 기존 RPM pacing 관찰과 같은 계열이지만 이번엔 기존
+   재시도 상한을 실제로 넘는 사례). 재시도 횟수 상향 또는 최대 backoff
+   시간 연장 검토 후보 — 이번 작업 범위에서는 관찰만 하고 코드는 안 고침.
 
 ### 후보 (우선순위순 아님, 사용자 요청 시 진행)
 - **[완료 2026-08-18] ~~routes.py의 calculation/event_analysis ↔
@@ -1049,14 +1155,17 @@ Kim이 전체 70개사(626,497 leaf chunk)를 재청킹+재임베딩 완료해�
   top_k를 넉넉히(10 이상) 잡으라"는 문구 추가(248자, 300자 제약 안에서
   live HCX 호출로 tool-calling 안 깨짐 확인). Q5/Q6 재검증에서 실제로
   top_k=10 사용 확인됨(수정 전엔 Q6이 top_k=1).
-- **[신규, 2026-08-27 재검증에서도 재확인]** `comparison_axis` 계산에서
-  "period 매칭 2개 이상 = period 비교"로 보는 지금 휴리스틱이 "2026년
-  1분기"처럼 **한 기간을 연도+분기 두 조각으로 표현한 경우**와 "2023년과
-  2025년"처럼 **진짜 두 기간을 비교하는 경우**를 구분 못 한다(§5-D 발견,
-  entity_extractor.py). 두 매칭 사이에 "대비/비교/vs" 류 연결어가 없고
-  단순히 연도 바로 뒤에 분기/반기/월이 붙어 있으면(연월 표현의 자연스러운
-  구성요소) period 비교로 세지 않는 정교화 필요 — 이번엔 무해했지만, 위
-  항목에서 이 신호에 새 지시까지 얹었으니 우선순위를 올려서 볼 것.
+- **[완료 2026-08-29]** ~~`comparison_axis` 계산에서 "period 매칭 2개
+  이상 = period 비교"로 보는 휴리스틱이 "2026년 1분기"(한 기간을 연도+
+  분기 두 조각으로 표현)와 "2023년과 2025년"(진짜 두 기간 비교)을 구분
+  못 하는 문제~~ — `len(period_matches) >= 2`를 `period_spans`(연도를
+  담은 매칭만 모아둔 것, `_YEAR_BEARING_TYPES`)의 **서로 다른 연도 dedup
+  key 개수 >= 2**로 교체(`entity_extractor.py`). "2026년 1분기"는
+  `period_spans`에 "2026" 하나만 들어있어(quarter는 non-year-bearing) 자동
+  해소. 회귀 테스트 2건 추가(`tests/test_entity_extraction.py`:
+  `test_comparison_axis_none_for_year_plus_quarter_single_period`,
+  `test_comparison_axis_period_for_single_company_two_distinct_years`),
+  기존 comparison_axis 테스트 전부 무변경 통과. 전체 스위트 166 passed.
 - **[부분 완료, 잔여 이슈로 재기록]** 복합문서추론 Open 질문에서 Agent가
   지나치게 일반적인 검색어를 쓰는 문제 — top_k/기간분리는 위에서
   고쳤으나, **검색어 자체를 더 구체적인 하위 키워드로 쪼개는 것**은
