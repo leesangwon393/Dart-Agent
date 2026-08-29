@@ -15,6 +15,12 @@ from disclosure_rag.entity.entity_extractor import ExtractedEntities
 _NUMBER_PAT = re.compile(r"\d[\d,]*\.?\d*")
 _APPROX_PAREN_PAT = re.compile(r"\(약[^)]*\)")
 _DOC_ID_PAT = re.compile(r"\b(?:periodic|major|exchange|holding)_\d{10,}\b")
+# has_citation 손상 진단용(2026-08-29): _DOC_ID_PAT보다 느슨하게 매칭해서
+# "형식이 깨진" 인용 시도를 잡아낸다 — 예: periodic_20260515001572 를
+# periodic_20260515_01572 로 자릿수를 지우고 언더스코어를 끼워넣는 경우
+# (한미반도체 실측 사례) 뒤 그룹이 \d{10,} 조건을 못 채워 _DOC_ID_PAT 에는
+# 아예 안 걸린다.
+_CITATION_CANDIDATE_PAT = re.compile(r"\b(periodic|major|exchange|holding)_([\d_]{8,})\b")
 
 
 _MAX_VERIFY_NUMBERS = 200  # 안전장치: evidence 숫자가 너무 많으면 O(n^2) 검산을 생략
@@ -96,6 +102,32 @@ def _extract_numbers(text: str, *, min_digits: int = 3) -> set[str]:
     return out
 
 
+def _citation_looks_corrupted(answer: str, real_doc_ids: set[str]) -> bool:
+    """`answer`에 실제 report_id 는 없지만, "같은 보고서를 가리키는데 형식만
+    깨진" 인용 시도가 있는지 본다 (2026-08-29, 한미반도체 실측 사례:
+    periodic_20260515001572 -> periodic_20260515_01572).
+
+    report_id 형식은 항상 `{doc_group}_{YYYYMMDD}{일련번호}` 이므로, 앞 8자리
+    (접수일자)와 doc_group 이 일치하면 "같은 문서를 가리키다가 뒷자리(일련
+    번호)가 깨졌다"고 판단한다 — 뒷자리까지 완전히 다시 맞추려는 시도는
+    안 한다(일련번호 자체가 손상돼 원본 복원이 불가능한 경우가 실측된
+    손상 패턴이었으므로, 여기서는 "인용을 시도는 했다"는 신호만 잡으면
+    충분하다: has_citation=False 로 그대로 실패 처리하되 경고 문구를
+    "인용 누락"과 "인용 손상"으로 구분해서 디버깅에 쓴다)."""
+    real_group_dates = set()
+    for doc_id in real_doc_ids:
+        m = re.match(r"(periodic|major|exchange|holding)_(\d{8})", doc_id)
+        if m:
+            real_group_dates.add((m.group(1), m.group(2)))
+    if not real_group_dates:
+        return False
+    for group, digits in _CITATION_CANDIDATE_PAT.findall(answer):
+        digits_only = digits.replace("_", "")
+        if len(digits_only) >= 8 and (group, digits_only[:8]) in real_group_dates:
+            return True
+    return False
+
+
 @dataclass
 class ValidationResult:
     numbers_grounded: bool
@@ -149,13 +181,23 @@ def validate_answer(answer: str, evidence_pack: EvidencePack, entities: Extracte
         m.group(0) for tr in evidence_pack.tool_results_summary for m in _DOC_ID_PAT.finditer(str(tr))
     }
     has_any_evidence = bool(evidence_pack.citations) or bool(tool_result_doc_ids)
+    real_doc_ids = {c.report_id for c in evidence_pack.citations} | tool_result_doc_ids
+
+    # 2026-08-29 수정(§7 우선순위 3): 기존엔 마지막에 `or "근거" in answer`
+    # 폴백이 있어서, evidence 가 하나라도 있으면 답변에 "근거"라는 글자만
+    # 있어도 report_id 실제 일치 여부와 무관하게 has_citation=True 로
+    # 통과시켰다 — 그래서 report_id 인용이 손상돼도(한미반도체 사례:
+    # periodic_20260515001572 -> periodic_20260515_01572) 전혀 안 걸렸다.
+    # 이제는 report_id/chunk_id 문자열이 답변에 실제로 등장해야만 True다.
     has_citation = has_any_evidence and (
         any(c.report_id in answer or c.chunk_id in answer for c in evidence_pack.citations)
         or any(doc_id in answer for doc_id in tool_result_doc_ids)
-        or "근거" in answer
     )
     if has_any_evidence and not has_citation:
-        warnings.append("답변에 근거(report_id/chunk_id) 인용이 없음")
+        if _citation_looks_corrupted(answer, real_doc_ids):
+            warnings.append("답변의 근거 인용(report_id)이 실제 evidence와 같은 문서를 가리키는 듯하지만 형식이 손상됨(자릿수 누락/언더스코어 삽입 등) — has_citation=False로 처리")
+        else:
+            warnings.append("답변에 근거(report_id/chunk_id) 인용이 없음")
 
     correction_evidence_complete: bool | None = None
     if entities.explicit_correction:

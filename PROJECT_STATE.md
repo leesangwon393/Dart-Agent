@@ -457,15 +457,17 @@ loader.py`), 같은 `questions.json` 100문항 재사용. 커밋 `8da607b`.
    새 버그가 아니라 기존에 알려진 RPM rate-limit이 CascadingRouter의
    추가 HCX 호출(100건 중 60건)로 처음 실제 발현된 것 — `hcx_client.py`
    에 pacing 추가로 해결. §12 참고.
-2. **[신규] 연결/별도 재무제표 혼동**(SK하이닉스) — 질문에 기준 명시가
-   없으면 별도(개별)재무제표 수치를 연결기준인 양 답함, validator가
-   못 잡음(grounded=True로 통과).
+2. **[완료 2026-08-29]** ~~연결/별도 재무제표 혼동~~(SK하이닉스) — 질문에
+   기준 명시가 없으면 별도(개별)재무제표 수치를 연결기준인 양 답함,
+   validator가 못 잡음(grounded=True로 통과). `ANSWER_SYSTEM_PROMPT`
+   원칙 추가로 수정(§5-H).
 3. **[재발] 10배 단위환산 자기모순**(아모레퍼시픽) — 같은 문장 안에서
    정답과 10배 축소값을 동시 제시. 회사를 바꿔도 계속 발생 — 알테오젠/
    레인보우로보틱스와 같은 계열의 구조적 문제로 재확인.
-4. **[신규] report_id 재포맷 손상**(한미반도체) — 답변모델이 인용 시
-   `periodic_20260515001572`를 `periodic_20260515_01572`로 자릿수를
-   지우고 언더스코어를 삽입 — 인용 자체가 깨짐.
+4. **[완료 2026-08-29]** ~~report_id 재포맷 손상~~(한미반도체) — 답변모델이
+   인용 시 `periodic_20260515001572`를 `periodic_20260515_01572`로
+   자릿수를 지우고 언더스코어를 삽입 — 인용 자체가 깨짐. `has_citation`의
+   느슨한 폴백 제거 + 손상 탐지로 수정(§5-H).
 5. **[잔여] 검색 실패 2~3건** — 셀트리온/현대건설 등 원문에 답이 명시적
    으로 존재하는데도 "확인할 수 없음" (11건 중 부분 개선됐지만 완전
    해결은 아님).
@@ -652,6 +654,42 @@ SK하이닉스 비교해줘"는 명시적 회사가 있으므로 sector 추론�
 건너뜀, market scope, span 비어있음/normalize_query 불변), `tests/test_agent.py`에
 2건(hint에 자동선정 안내 포함/명시적 회사엔 안내 없음) 추가. 전체 스위트
 178→180 통과(`pytest tests/ -m "not slow"`).
+
+### 5-H. [완료] §7 우선순위 1·3 — 연결/별도 재무제표 구분 원칙 + has_citation 손상 탐지 강화 (2026-08-29)
+
+사용자가 파이프라인 아티팩트의 "다음 우선순위" 목록에서 1번과 3번을 지정해
+바로 진행.
+
+**우선순위 1 — 연결/별도 재무제표 혼동**(SK하이닉스 사례, §12 문제 2번):
+`answer_generator.py`의 `ANSWER_SYSTEM_PROMPT`에 원칙 8번 추가 — 질문에
+연결/별도 명시가 없으면 evidence의 Section 경로/표 제목에서 "연결" 여부를
+확인해 연결기준을 우선 사용하고, 별도기준 수치를 쓸 때는 반드시
+"(별도기준)"이라고 표시하며, 어느 쪽인지 확인이 안 되면 그 사실 자체를
+밝히도록 지시(연결기준으로 함부로 단정 금지). `generate_answer()`가
+`tools=`를 안 쓰는 경로라 300자 system prompt 제약과 무관 — 안전하게 확장.
+테스트: `tests/test_agent.py::test_answer_system_prompt_requires_
+consolidated_vs_standalone_distinction`.
+
+**우선순위 3 — report_id 인용 형식 손상 + `has_citation` 느슨한 폴백**(한미
+반도체 사례, §10/§12 기존 약점): `validator.py`의 `has_citation` 판정에서
+`or "근거" in answer` 폴백을 완전히 제거 — 이제 evidence가 있는 한
+report_id/chunk_id 문자열이 답변에 실제로 등장해야만 `has_citation=True`다.
+동시에 "인용을 아예 안 함"과 "인용은 시도했는데 형식이 깨짐"을 구분하기
+위해 `_citation_looks_corrupted()`를 새로 추가했다 — report_id 형식이
+`{doc_group}_{YYYYMMDD}{일련번호}`로 고정이라는 점을 이용해, 답변 안에서
+같은 doc_group + 같은 접수일자(앞 8자리)를 가리키는 손상된 토큰(예:
+`periodic_20260515_01572`가 실제 `periodic_20260515001572`를 가리킴)을
+찾으면 "형식 손상" 경고를, 그런 토큰조차 없으면 "인용 누락" 경고를 남긴다.
+**주의**: 손상된 인용도 `has_citation=False`로 그대로 실패 처리한다(사용자가
+실제로 그 report_id를 찾아 검증할 수 없는 건 마찬가지이므로) — 경고 문구만
+구분해서 원인 추적을 돕는 것이지 pass 조건을 완화하는 게 아니다.
+
+기존 `test_validator_catches_hallucinated_citation`(evidence 자체가 없는
+경우)은 `has_any_evidence` 게이트에서 이미 False였으므로 폴백 제거의
+영향을 안 받아 그대로 통과 확인. 신규 테스트 2건 추가(`tests/test_agent.py`
+`test_validator_rejects_citation_word_without_matching_report_id`,
+`test_validator_flags_corrupted_report_id_citation_distinctly`). 전체
+스위트 180→183 통과.
 
 ## 6. 주요 파일과 역할
 
@@ -1112,18 +1150,17 @@ Kim이 전체 70개사(626,497 leaf chunk)를 재청킹+재임베딩 완료해�
    (`tests/test_hcx_client.py`, pacing 강제/인스턴스간 공유/0으로 비활성화
    확인). **정확한 계정 RPM을 몰라서 1초는 보수적 추정치** — 다시 400이
    재발하면 값을 올리거나, 반대로 배치가 너무 느려지면 실측하며 낮출 것.
-2. **연결/별도 재무제표 혼동**(SK하이닉스 사례로 발견) — 질문에 "연결
-   기준"을 명시 안 하면 별도(개별)재무제표 수치를 연결기준인 것처럼
-   답변. validator가 못 잡음(grounded=True로 통과). `ANSWER_SYSTEM_PROMPT`
-   에 "질문에 연결/별도 명시가 없으면 연결기준(있으면)을 우선하고, 어느
-   기준인지 답변에 명시하라" 원칙 추가 검토.
+2. **[완료 2026-08-29]** ~~연결/별도 재무제표 혼동~~(SK하이닉스 사례로
+   발견) — `ANSWER_SYSTEM_PROMPT`에 원칙 8번 추가(§5-H 참고). validator
+   레벨 검증(grounded=True로 통과하던 것 포함)까지는 손 안 댐 — 프롬프트
+   원칙만으로 해소되는지는 실사용 재관찰 필요.
 3. **10배 단위환산 자기모순 재발**(아모레퍼시픽, 알테오젠/레인보우로보틱스
    와 동일 계열) — 회사를 바꿔가며 계속 나타나는 구조적 문제. 답변모델이
    같은 문장 안에서 정답과 10배 축소값을 동시 제시하는 패턴 자체를
    조사할 가치 있음(어느 단계에서 자릿수가 밀리는지).
-4. **report_id 인용 형식 손상**(한미반도체) — `has_citation`을 "근거"
-   문자열 존재 여부가 아니라 실제 report_id가 evidence의 report_id 목록과
-   일치하는지로 승격(§10에 이미 기록된 기존 약점과 같은 근본원인).
+4. **[완료 2026-08-29]** ~~report_id 인용 형식 손상~~(한미반도체) —
+   `has_citation`의 `"근거" in answer` 느슨한 폴백 제거 + report_id 실제
+   일치 요구로 승격, "인용 손상" vs "인용 누락" 경고 구분 추가(§5-H 참고).
 5. **잔여 검색 실패 2~3건**(셀트리온/현대건설 등, 원문에 답이 명시적으로
    있는데도 "확인 불가") — 11건 중 9건은 개선됐지만 완전 해결 아님, 근본
    원인 추가 조사 필요.
@@ -1315,8 +1352,8 @@ Kim이 전체 70개사(626,497 leaf chunk)를 재청킹+재임베딩 완료해�
 - `validator._verify_derived_number()`의 O(n²) 안전장치(`_MAX_VERIFY_
   NUMBERS=200`)를 O(n) 알고리즘으로 재작성 — 숫자 밀집 evidence(재무제표)에서
   정확한 계산도 검산을 건너뛰어 ungrounded로 남는 문제(알테오젠 사례) 해소.
-- `has_citation`의 `"근거" in answer` 느슨한 폴백을 report_id/chunk_id 실제
-  일치 요구로 강화 — 지금은 인용 형식만 있으면 내용 일치와 무관하게 통과.
+- **[완료 2026-08-29]** ~~`has_citation`의 `"근거" in answer` 느슨한 폴백을
+  report_id/chunk_id 실제 일치 요구로 강화~~ — §5-H 참고.
 - citation=False 7건처럼 답변이 "근거:" 인용 문구 자체를 빠뜨리는 경우를
   줄이기 위해 `ANSWER_SYSTEM_PROMPT`에 문구 보강 검토(재현 빈도 7/95=7.4%).
 - API 타임아웃 정책 재검토 — 지금은 실패까지 45~97분 hang(5건 실측). 실사용

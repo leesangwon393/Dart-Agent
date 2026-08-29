@@ -179,6 +179,16 @@ def test_answer_system_prompt_distinguishes_event_date_from_document_date():
     assert "발생일" in ANSWER_SYSTEM_PROMPT or "체결일" in ANSWER_SYSTEM_PROMPT
 
 
+def test_answer_system_prompt_requires_consolidated_vs_standalone_distinction():
+    """2026-08-29 추가(§7 우선순위 1): SK하이닉스 사례 재현 — 질문에 "연결기준"
+    명시가 없으면 별도(개별)재무제표 수치를 연결기준인 것처럼 답변해버리는
+    문제. "연결/별도를 구분하고 명시하라"는 원칙이 프롬프트에 있는지 고정."""
+    from disclosure_rag.agent.answer_generator import ANSWER_SYSTEM_PROMPT
+
+    assert "연결" in ANSWER_SYSTEM_PROMPT
+    assert "별도" in ANSWER_SYSTEM_PROMPT
+
+
 def test_validator_catches_hallucinated_citation():
     """실측 재현: 답변이 evidence 에 없는 report_id 를 인용하면 has_citation=False 가 돼야 한다."""
     from disclosure_rag.agent.evidence import EvidencePack
@@ -267,6 +277,52 @@ def test_validator_has_citation_from_correction_history_tool_result():
     answer = "정정이 4번 있었습니다.\n근거: report_id(major_20250519000120)"
     result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
     assert result.has_citation is True
+
+
+def test_validator_rejects_citation_word_without_matching_report_id():
+    """2026-08-29 추가(§7 우선순위 3): 기존엔 `"근거" in answer` 라는 느슨한
+    폴백이 있어서, evidence가 있고 답변에 "근거"라는 글자만 있으면 인용된
+    report_id가 실제로 존재하는지와 무관하게 has_citation=True로 통과됐다.
+    이제는 report_id/chunk_id 문자열이 실제로 답변에 등장해야 한다 — 아예
+    다른 report_id(형식 손상도 아닌 완전히 무관한 값)를 대면 실패해야 함."""
+    from disclosure_rag.agent.evidence import Citation, EvidencePack
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    pack = EvidencePack(
+        question="q", prompt_text="[EVIDENCE 1]\n내용: 영업이익 100억원\n",
+        citations=[Citation(
+            chunk_id="c1", report_id="periodic_20260515001572", company="한미반도체",
+            report_name="사업보고서", filing_date="20260515", section_path=[],
+            is_correction=False, is_latest=True,
+        )],
+    )
+    answer = "영업이익은 100억원입니다.\n근거: 사업보고서 내용을 참고했습니다."
+    result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
+    assert result.has_citation is False
+    assert any("근거(report_id/chunk_id) 인용이 없음" in w for w in result.warnings)
+
+
+def test_validator_flags_corrupted_report_id_citation_distinctly():
+    """2026-08-29 추가(§7 우선순위 3): 한미반도체 실측 사례 재현 — 답변모델이
+    periodic_20260515001572 를 periodic_20260515_01572 로 자릿수를 지우고
+    언더스코어를 삽입해서 인용하면, has_citation은 여전히 False(신뢰 가능한
+    인용이 아니므로)이되, "인용 자체가 없음"과는 다른 "형식 손상" 경고를
+    따로 남겨야 한다(디버깅/원인 추적용)."""
+    from disclosure_rag.agent.evidence import Citation, EvidencePack
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    pack = EvidencePack(
+        question="q", prompt_text="[EVIDENCE 1]\n내용: 영업이익 100억원\n",
+        citations=[Citation(
+            chunk_id="c1", report_id="periodic_20260515001572", company="한미반도체",
+            report_name="사업보고서", filing_date="20260515", section_path=[],
+            is_correction=False, is_latest=True,
+        )],
+    )
+    answer = "영업이익은 100억원입니다.\n근거: report_id(periodic_20260515_01572)"
+    result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
+    assert result.has_citation is False
+    assert any("형식이 손상" in w for w in result.warnings)
 
 
 # ── 2026-08-18 회귀 테스트: 답변 모델이 tool 없이 evidence 숫자를 직접 조합해
