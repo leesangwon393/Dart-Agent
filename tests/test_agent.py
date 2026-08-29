@@ -368,6 +368,75 @@ def test_validator_still_flags_incorrect_ad_hoc_arithmetic():
     assert result.verified_derived_numbers == {}
 
 
+# ── 2026-08-29 회귀 테스트(§7 우선순위 6): O(n^2) 안전장치(_MAX_VERIFY_
+# NUMBERS=200이 검산 자체를 건너뛰게 만들던 문제)와 음수(손실) evidence
+# 부호 처리 버그. 실측(matrix.csv): 알테오젠 "당기 대비 전기 영업이익"
+# 계산이 산술은 100% 정확한데 위 두 이유로 ungrounded로 남았었다.
+
+def test_validator_verifies_subtraction_with_over_200_evidence_numbers():
+    """기존 `_MAX_VERIFY_NUMBERS=200` cap 때문에 evidence 숫자가 200개를
+    넘으면 검산 자체가 생략돼, 정확한 뺄셈도 ungrounded로 남았다(알테오젠
+    사례). O(n log n) 재작성 이후엔 숫자가 많아도 검산이 동작해야 한다."""
+    from disclosure_rag.agent.evidence import EvidencePack
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    filler = "\n".join(f"항목{i}: {1_000_000 + i}원" for i in range(300))
+    pack = EvidencePack(
+        question="q",
+        prompt_text=f"{filler}\n당기 영업이익 2164043백만원, 전기 영업이익 1795249백만원\nreport_id: r1\n",
+        citations=[],
+    )
+    answer = "영업이익은 2164043백만원으로 전기 1795249백만원 대비 368794백만원 증가했습니다. 근거: r1"
+    result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
+    assert result.numbers_grounded, f"숫자가 많다는 이유로 검산이 생략됨: {result.ungrounded_numbers}"
+    assert "368794" in result.verified_derived_numbers
+
+
+def test_validator_verifies_subtraction_across_negative_evidence_number():
+    """실측 재현(2026-08-27, 100문항 v2 배치): 알테오젠 전기(제16기) 영업이익이
+    적자라 evidence에 "(9,736,838,487)원"처럼 괄호로 표기됐다. 답변이
+    "당기 25,403,990,856원 - 전기(적자) = 35,140,829,343원 증가"를 정확히
+    계산해도, 부호를 못 읽으면(괄호를 무시하고 +9,736,838,487로만 다루면
+    이 특정 뺄셈은 우연히 같은 값이 나오지만) 그 위의 성장률(%) 계산은
+    검증할 수 없었다."""
+    from disclosure_rag.agent.evidence import EvidencePack
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    pack = EvidencePack(
+        question="q",
+        prompt_text=(
+            "[EVIDENCE 1]\n내용: 당기(제17기) 영업이익 25403990856원, "
+            "전기(제16기) 영업이익 (9,736,838,487)원\nreport_id: r1\nchunk_id: c1\n"
+        ),
+        citations=[],
+    )
+    answer = (
+        "당기(제17기) 영업이익: 25,403,990,856원\n전기(제16기) 영업이익: (9,736,838,487)원\n"
+        "전기 대비 35,140,829,343원 증가했으며, 약 360.92% 증가한 수치입니다. 근거: r1"
+    )
+    result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
+    assert result.numbers_grounded, f"부호(손실) 처리 실패로 오탐: {result.ungrounded_numbers}"
+    assert "35140829343" in result.verified_derived_numbers
+    assert "360.92" in result.verified_derived_numbers
+
+
+def test_extract_signed_numbers_treats_parenthesized_and_minus_as_negative():
+    from disclosure_rag.agent.validator import _extract_signed_numbers
+
+    assert ("368794", -368794.0) in _extract_signed_numbers("당기순손실 -368,794백만원 기록")
+    assert ("9736838487", -9736838487.0) in _extract_signed_numbers("전기 영업이익 (9,736,838,487)원")
+
+
+def test_extract_signed_numbers_does_not_misread_year_ranges_as_negative():
+    """"2020-2023"처럼 하이픈이 범위 표기일 때(바로 앞이 숫자) 뒤 숫자를
+    음수로 잘못 읽으면 안 된다."""
+    from disclosure_rag.agent.validator import _extract_signed_numbers
+
+    signed = dict(_extract_signed_numbers("사업기간은 2020-2023년입니다"))
+    assert signed["2020"] == 2020.0
+    assert signed["2023"] == 2023.0
+
+
 def test_ask_retries_answer_generation_when_numbers_dont_verify():
     """핵심 회귀: ask() 가 검산 실패한 답변을 그냥 로그만 남기고 사용자에게
     그대로 돌려주면 안 된다 — 교정 지시를 덧붙여 재생성을 시도하고, 재생성된

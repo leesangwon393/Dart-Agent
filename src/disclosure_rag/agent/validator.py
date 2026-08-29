@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import bisect
 import re
 from dataclasses import dataclass, field
 
@@ -23,10 +24,91 @@ _DOC_ID_PAT = re.compile(r"\b(?:periodic|major|exchange|holding)_\d{10,}\b")
 _CITATION_CANDIDATE_PAT = re.compile(r"\b(periodic|major|exchange|holding)_([\d_]{8,})\b")
 
 
-_MAX_VERIFY_NUMBERS = 200  # 안전장치: evidence 숫자가 너무 많으면 O(n^2) 검산을 생략
+_NEG_PREFIX_CHARS = "-−–"
 
 
-def _verify_derived_number(claimed: str, evidence_numbers: set[str]) -> str | None:
+# 2026-08-29 수정(§7 우선순위 6): 기존 O(n^2) 전수조사(모든 (v1,v2) 쌍을
+# 직접 대입)를 O(n log n) 이분탐색으로 바꾸면서 이 cap의 의미가 "성능
+# 안전장치"에서 "병리적 입력 방어용 상한"으로 바뀌었다 — 실제 재무제표
+# evidence(수백~수천 개 숫자)에서도 이제 문제 없이 검산 가능하므로 크게
+# 올렸다. 알테오젠 "당기 대비 전기" 사례(evidence 숫자 200개 초과로 검산
+# 자체가 생략돼 정확한 뺄셈도 ungrounded로 남음, matrix.csv 실측)가 바로
+# 이 cap 때문이었다.
+_MAX_VERIFY_NUMBERS = 4000
+# 흑자/적자 전환 성장률(예: "전기 적자 9,736,838,487원 -> 당기 흑자
+# 25,403,990,856원, 약 360.92% 증가")처럼 세 항(v1, v2, v2)을 조합하는
+# 공식은 O(1) 대수적 역산이 아니라 여전히 전수조사가 필요해서(아래
+# _find_swing_growth_expr 참고) 별도의 더 작은 상한을 둔다 — 실제 evidence
+# 청크가 이 상한을 넘는 경우는 드물고, 넘으면 이 케이스만 건너뛴다(다른
+# 두 케이스는 그대로 O(n log n)으로 계속 검산됨).
+_MAX_SWING_PAIR_NUMBERS = 300
+
+
+def _is_negative_prefixed(text: str, start: int) -> bool:
+    """`start` 위치의 숫자 앞에 실제 마이너스 부호가 붙어있는지 본다
+    (공백은 건너뜀). "2020-2023"처럼 하이픈 바로 앞이 또 다른 숫자/쉼표면
+    범위 표기의 하이픈일 가능성이 높으므로 음수로 보지 않는다."""
+    j = start
+    while j > 0 and text[j - 1] in " \t":
+        j -= 1
+    if j > 0 and text[j - 1] in _NEG_PREFIX_CHARS:
+        if j - 1 > 0 and text[j - 2] in "0123456789,":
+            return False
+        return True
+    return False
+
+
+def _extract_signed_numbers(text: str, *, min_digits: int = 3) -> set[tuple[str, float]]:
+    """산술 검산 전용 — `_extract_numbers()`(근거 존재 여부 확인용, 부호
+    무시)와 달리 괄호로 감싼 숫자(한국 회계 관행상 손실/음수 표기, 예:
+    "(9,736,838,487)")나 명시적 마이너스 부호가 붙은 숫자를 음수로 인식해서
+    (문자열, signed float) 쌍으로 반환한다.
+
+    2026-08-29 도입 배경: 알테오젠 "당기 대비 전기 영업이익" 사례(전기가
+    적자)에서, evidence의 "(9,736,838,487)"을 부호 없이 +9,736,838,487로만
+    읽으면 "당기 - 전기" 자체는 우연히 같은 결과가 나오지만(둘 다 시도하는
+    +/- 후보 중 하나가 맞아떨어짐), 그 위에서 파생되는 2차 계산(흑자전환
+    성장률 등)은 실제 부호를 모르면 검증할 수 없다."""
+    out: set[tuple[str, float]] = set()
+    for m in _NUMBER_PAT.finditer(text):
+        norm = m.group(0).replace(",", "")
+        digits_only = norm.replace(".", "")
+        if len(digits_only) < min_digits:
+            continue
+        try:
+            value = float(norm)
+        except ValueError:
+            continue
+        prefix = text[max(0, m.start() - 2):m.start()].rstrip()
+        suffix = text[m.end():m.end() + 2].lstrip()
+        is_paren_negative = prefix.endswith("(") and suffix.startswith(")")
+        is_negative = is_paren_negative or _is_negative_prefixed(text, m.start())
+        out.add((norm, -value if is_negative else value))
+    return out
+
+
+def _find_swing_growth_expr(
+    target: float, evidence_numbers: list[tuple[str, float]], tol: float,
+) -> str | None:
+    """흑자/적자 전환처럼 (v1 - v2) / |v2| * 100 = target 형태(v1, v2 는
+    evidence 숫자, v2는 부호가 반대인 손실/이익)를 찾는다. 대수적으로
+    v2를 O(1)에 역산하면 target의 반올림 오차가 크게 증폭돼(분모가 1에
+    가까워질수록 민감) 오탐/누락이 잦으므로, 후보 쌍을 전수조사한 뒤
+    "정방향"으로 다시 계산해 tol 이내인지 검증한다 — 그래서 여전히
+    O(n^2)이고 `_MAX_SWING_PAIR_NUMBERS`로 상한을 둔다."""
+    if len(evidence_numbers) > _MAX_SWING_PAIR_NUMBERS:
+        return None
+    for s1, v1 in evidence_numbers:
+        for s2, v2 in evidence_numbers:
+            if s1 == s2 or v2 == 0:
+                continue
+            recomputed = (v1 - v2) / abs(v2) * 100
+            if abs(recomputed - target) <= tol:
+                return f"({s1} - {s2}) / |{s2}| * 100(%)"
+    return None
+
+
+def _verify_derived_number(claimed: str, evidence_numbers: list[tuple[str, float]]) -> str | None:
     """`claimed` 가 evidence 안의 서로 다른 두 숫자로 정확히 설명되는
     사칙연산/비율 결과인지 검산한다. 설명되면 그 식을 문자열로 반환하고
     (grounded 로 인정), 아니면 None(여전히 근거 없음).
@@ -47,27 +129,45 @@ def _verify_derived_number(claimed: str, evidence_numbers: set[str]) -> str | No
     except ValueError:
         return None
 
-    parsed: list[tuple[str, float]] = []
-    for n in evidence_numbers:
-        try:
-            parsed.append((n, float(n)))
-        except ValueError:
-            continue
+    parsed = list(evidence_numbers)
     if len(parsed) > _MAX_VERIFY_NUMBERS:
-        return None  # 성능 안전장치 — 이 경우는 검산 없이 기존 방식(근거없음 의심)으로 처리
+        return None  # 병리적 입력 방어 — 이 경우는 검산 없이 기존 방식(근거없음 의심)으로 처리
+    if not parsed:
+        return None
 
     tol = max(abs(target) * 0.005, 0.5)  # 반올림 오차 허용: 상대 0.5% 또는 절대 0.5
+
+    # 2026-08-29 재작성: 기존 O(n^2) 전수조사를 O(n log n) 이분탐색으로 바꿨다.
+    # v1 - v2 = target, v1 + v2 = target, v1 / v2 * 100 = target 세 형태 모두
+    # "v1을 고르면 필요한 v2 값이 대수적으로 정확히 하나로 정해진다"는 성질이
+    # 있으므로(3항 조합인 흑자전환 성장률과 달리 역산 시 오차 증폭이 없다),
+    # v1마다 필요한 v2를 O(1)로 계산해 정렬된 값 배열에서 이분탐색하면 된다.
+    sorted_pairs = sorted(parsed, key=lambda p: p[1])
+    sorted_values = [v for _s, v in sorted_pairs]
+
+    def _find_near(want: float) -> tuple[str, float] | None:
+        idx = bisect.bisect_left(sorted_values, want - tol)
+        while idx < len(sorted_values) and sorted_values[idx] <= want + tol:
+            if abs(sorted_values[idx] - want) <= tol:
+                return sorted_pairs[idx]
+            idx += 1
+        return None
+
     for s1, v1 in parsed:
-        for s2, v2 in parsed:
-            if s1 == s2:
-                continue
-            candidates = {f"{s1} - {s2}": v1 - v2, f"{s1} + {s2}": v1 + v2}
-            if v2 != 0:
-                candidates[f"{s1} / {s2} * 100(%)"] = v1 / v2 * 100
-            for expr, val in candidates.items():
-                if abs(val - target) <= tol:
-                    return expr
-    return None
+        hit = _find_near(v1 - target)  # v1 - v2 = target
+        if hit is not None and hit[0] != s1:
+            return f"{s1} - {hit[0]}"
+        hit = _find_near(target - v1)  # v1 + v2 = target
+        if hit is not None and hit[0] != s1:
+            return f"{s1} + {hit[0]}"
+        if target != 0:
+            hit = _find_near(v1 * 100 / target)  # v1 / v2 * 100 = target
+            if hit is not None and hit[0] != s1:
+                return f"{s1} / {hit[0]} * 100(%)"
+
+    # 흑자/적자 전환 성장률(3항 조합, O(1) 역산 불가) — 별도 상한으로 방어된
+    # 전수조사. 위 세 형태로 못 찾았을 때만 시도(흔한 케이스가 아니므로).
+    return _find_swing_growth_expr(target, parsed, tol)
 
 
 def _extract_numbers(text: str, *, min_digits: int = 3) -> set[str]:
@@ -153,13 +253,22 @@ def validate_answer(answer: str, evidence_pack: EvidencePack, entities: Extracte
     for tr in evidence_pack.tool_results_summary:
         evidence_numbers |= _extract_numbers(str(tr))
 
+    # 산술 검산(_verify_derived_number)은 존재 확인용 evidence_numbers(부호
+    # 무시)가 아니라 부호를 보존한 별도 집합을 쓴다 — "(9,736,838,487)" 같은
+    # 회계 관행상 음수(손실) 표기를 실제로 음수로 다뤄야 알테오젠 "당기 대비
+    # 전기 영업이익"(전기 적자) 같은 계산이 정확히 검증된다.
+    evidence_signed_numbers: set[tuple[str, float]] = _extract_signed_numbers(evidence_pack.prompt_text)
+    for tr in evidence_pack.tool_results_summary:
+        evidence_signed_numbers |= _extract_signed_numbers(str(tr))
+    evidence_signed_list = list(evidence_signed_numbers)
+
     answer_numbers = _extract_numbers(answer)
     not_literally_present = answer_numbers - evidence_numbers
 
     ungrounded: set[str] = set()
     verified_derived: dict[str, str] = {}
     for n in not_literally_present:
-        expr = _verify_derived_number(n, evidence_numbers)
+        expr = _verify_derived_number(n, evidence_signed_list)
         if expr is not None:
             verified_derived[n] = expr
         else:
