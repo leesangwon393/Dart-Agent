@@ -189,6 +189,17 @@ def test_answer_system_prompt_requires_consolidated_vs_standalone_distinction():
     assert "별도" in ANSWER_SYSTEM_PROMPT
 
 
+def test_answer_system_prompt_forbids_ad_hoc_unit_conversion():
+    """2026-08-29 추가(§7 우선순위 3): 알테오젠/레인보우로보틱스/아모레퍼시픽
+    3개사에서 반복 재현된 10배 단위환산 자기모순(원/천원/백만원/억원 사이를
+    암산으로 변환하다 자릿수를 잘못 옮김) — evidence의 숫자/단위를 그대로
+    쓰고 임의로 재환산하지 말라는 원칙이 프롬프트에 있는지 고정."""
+    from disclosure_rag.agent.answer_generator import ANSWER_SYSTEM_PROMPT
+
+    assert "단위" in ANSWER_SYSTEM_PROMPT
+    assert "10배" in ANSWER_SYSTEM_PROMPT
+
+
 def test_validator_catches_hallucinated_citation():
     """실측 재현: 답변이 evidence 에 없는 report_id 를 인용하면 has_citation=False 가 돼야 한다."""
     from disclosure_rag.agent.evidence import EvidencePack
@@ -435,6 +446,53 @@ def test_extract_signed_numbers_does_not_misread_year_ranges_as_negative():
     signed = dict(_extract_signed_numbers("사업기간은 2020-2023년입니다"))
     assert signed["2020"] == 2020.0
     assert signed["2023"] == 2023.0
+
+
+# ── 2026-08-29 회귀 테스트(§7 우선순위 3): 10배 단위환산 자기모순.
+# 실측(matrix.csv): 레인보우로보틱스 실제 투자금액 28,178,420,000원인데
+# 답변이 "281,784백만원"으로 10만분의 1(=단위환산 실수)로 잘못 표기, 아모레
+# 퍼시픽은 같은 문장 안에서 "335,827백만원"과 "335억 8,270만원"(1000분의 1)을
+# 동시에 제시. 두 경우 다 grounded=False로 남아야 하고(실제로 틀린 숫자),
+# 원인을 짚어주는 별도 경고가 있어야 한다.
+
+def test_validator_flags_unit_scale_error_distinctly_from_generic_ungrounded():
+    from disclosure_rag.agent.evidence import EvidencePack
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    pack = EvidencePack(
+        question="q",
+        prompt_text="[EVIDENCE 1]\n내용: 투자금액 28,178,420,000원\nreport_id: r1\nchunk_id: c1\n",
+        citations=[],
+    )
+    answer = "투자금액은 약 281,784백만 원입니다. 근거: r1"
+    result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
+    assert not result.numbers_grounded, "단위환산 오류로 실제 틀린 숫자인데 grounded로 통과되면 안 됨"
+    assert "281784" in result.ungrounded_numbers
+    assert any("단위환산 오류 의심" in w for w in result.warnings)
+
+
+def test_validator_flags_unit_scale_error_for_self_contradicting_restatement():
+    """아모레퍼시픽 실측 재현: 같은 문장 안에서 "335,827백만원"과 그걸 다시
+    푼 "335억 8,270만원"(정확히는 3,358억 2,700만원이어야 함)을 동시에
+    제시 — 두 번째 값이 evidence 숫자의 1/1000임을 잡아내야 한다."""
+    from disclosure_rag.agent.evidence import EvidencePack
+    from disclosure_rag.entity.entity_extractor import ExtractedEntities
+
+    pack = EvidencePack(
+        question="q", prompt_text="[EVIDENCE 1]\n내용: 영업이익 335827백만원\nreport_id: r1\n", citations=[],
+    )
+    answer = "영업이익은 335,827백만원(또는 335억 8,270만원)입니다. 근거: r1"
+    result = validate_answer(answer, pack, ExtractedEntities(raw_query="q"))
+    assert not result.numbers_grounded
+    assert any("단위환산 오류 의심" in w for w in result.warnings)
+
+
+def test_looks_like_unit_scale_error_ignores_unrelated_numbers():
+    """진짜 아무 관련 없는(우연히 비율이 안 맞는) 숫자까지 단위환산 오류로
+    오탐하면 안 된다."""
+    from disclosure_rag.agent.validator import _looks_like_unit_scale_error
+
+    assert _looks_like_unit_scale_error(123456.0, [987654.0]) is None
 
 
 def test_ask_retries_answer_generation_when_numbers_dont_verify():

@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import bisect
+import math
 import re
 from dataclasses import dataclass, field
 
@@ -105,6 +106,44 @@ def _find_swing_growth_expr(
             recomputed = (v1 - v2) / abs(v2) * 100
             if abs(recomputed - target) <= tol:
                 return f"({s1} - {s2}) / |{s2}| * 100(%)"
+    return None
+
+
+_MAX_UNIT_SCALE_EXPONENT = 9  # 원<->조원(10^12) 안쪽 범위까지 커버, 그 이상은 우연의 일치로 간주
+
+
+def _looks_like_unit_scale_error(claimed: float, evidence_values: list[float]) -> str | None:
+    """`claimed`가 evidence 숫자 중 하나의 정확히 10^k배(k != 0, |k|<=9)인지
+    본다 — k는 log10(claimed/v)를 반올림해서 구한다(원/천원/만원/백만원/
+    억원/조원 사이 어떤 조합의 환산 실수든, 실수로 밀린 자릿수가 몇 개든
+    한 번에 잡기 위해 — 실제 재현 사례의 비율은 10배(단순 10배 부풀림)도,
+    100,000배(원 단위 evidence를 "백만원"으로 환산하다 자릿수 하나를 더
+    밀린 경우, 28,178,420,000원 -> "281,784백만원")도 있었다).
+
+    2026-08-29 도입(§7 우선순위 3): 알테오젠/레인보우로보틱스/아모레퍼시픽
+    3개사에서 반복 재현된 실측 버그 — 답변모델이 evidence의 숫자를 다른
+    단위로 다시 풀어 쓰다가 자릿수를 잘못 옮기는 패턴. `_verify_derived_
+    number()`와 달리 이건 "다른 두 숫자의 조합"이 아니라 "숫자 하나의
+    단위를 잘못 옮긴 것"이므로 grounded로 인정하지 않는다 — 실제로 틀린
+    숫자이기 때문에 ungrounded는 유지하되, 경고 문구로 원인을 구체적으로
+    짚어준다(디버깅/모니터링용, has_citation의 "손상 vs 누락" 구분과
+    같은 취지)."""
+    if claimed == 0:
+        return None
+    for v in evidence_values:
+        if v == 0:
+            continue
+        ratio = abs(claimed / v)
+        if ratio <= 0:
+            continue
+        k = round(math.log10(ratio))
+        if k == 0 or abs(k) > _MAX_UNIT_SCALE_EXPONENT:
+            continue
+        factor = 10.0 ** k
+        if abs(ratio - factor) <= factor * 0.01:
+            if k > 0:
+                return f"{v:g}의 {int(factor)}배로 보임"
+            return f"{v:g}의 1/{int(1 / factor)}로 보임"
     return None
 
 
@@ -276,6 +315,24 @@ def validate_answer(answer: str, evidence_pack: EvidencePack, entities: Extracte
 
     numbers_grounded = not ungrounded
     if ungrounded:
+        # 2026-08-29(§7 우선순위 3): 근거 없는 숫자 중 evidence 숫자의
+        # 정확히 10^n배로 보이는 게 있으면(알테오젠/레인보우로보틱스/
+        # 아모레퍼시픽에서 반복 재현된 단위환산 자기모순) grounded로 인정하진
+        # 않되(실제로 틀린 숫자이므로) 원인을 구체적으로 짚어주는 경고를
+        # 따로 남긴다 — "근거가 아예 없음"과 "단위를 잘못 옮김"은 디버깅
+        # 관점에서 다른 문제다.
+        evidence_values = [v for _s, v in evidence_signed_list]
+        scale_errors = {}
+        for n in sorted(ungrounded):
+            try:
+                claimed_val = float(n)
+            except ValueError:
+                continue
+            hit = _looks_like_unit_scale_error(claimed_val, evidence_values)
+            if hit:
+                scale_errors[n] = hit
+        if scale_errors:
+            warnings.append(f"[단위환산 오류 의심] 근거 숫자의 10^n배로 보이는 값(자릿수 밀림 가능성, 여전히 근거 없음으로 처리): {scale_errors}")
         warnings.append(f"[근거 없는 숫자 의심] 답변에 있지만 Evidence/Tool Result 로 검산도 안 되는 숫자: {sorted(ungrounded)}")
     if verified_derived:
         warnings.append(f"[참고] 답변이 evidence 수치를 직접 조합해 계산한 값(검산 통과): {verified_derived}")
