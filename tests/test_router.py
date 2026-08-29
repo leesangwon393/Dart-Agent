@@ -249,6 +249,68 @@ def test_classify_route_tool_description_covers_every_route():
         assert name in desc, f"{name} 이 tool description에서 빠짐"
 
 
+# ── 2026-08-29 회귀 테스트: RouteResult.source(provenance, §12 개선 후보 2) ──
+
+
+def test_hcx_structured_router_source_is_escalation_when_confident():
+    router = HCXStructuredRouter(_StubHCXClient("single_lookup"))
+    result = router.route("[COMPANY] 영업이익 알려줘")
+    assert result.source == "hcx_escalation"
+
+
+def test_hcx_structured_router_source_is_unclear_for_unclear_value():
+    router = HCXStructuredRouter(_StubHCXClient("unclear"))
+    result = router.route("정정된 영업이익이 몇 % 줄었어?")
+    assert result.source == "hcx_unclear"
+
+
+def test_hcx_structured_router_source_is_unclear_for_invalid_value():
+    router = HCXStructuredRouter(_StubHCXClient("garbage_value"))
+    result = router.route("아무 질문")
+    assert result.source == "hcx_unclear"
+
+
+def test_no_router_source_is_none():
+    result = NoRouter().route("[COMPANY] 영업이익 얼마야?")
+    assert result.source is None
+
+
+def test_cascading_router_fast_path_source_is_semantic_fast_path():
+    semantic = _StubSemanticRouter("single_lookup", 0.80, 0.60)  # margin=0.20
+    hcx = _StubRouter("event_analysis")
+    router = CascadingRouter(semantic, hcx, margin_threshold=0.05)
+    result = router.route("[COMPANY] 영업이익 알려줘")
+    assert result.source == "semantic_fast_path"
+
+
+def test_cascading_router_escalation_source_passes_through_hcx_source():
+    """CascadingRouter 자체는 source 를 새로 만들지 않고 하위 라우터가 세팅한
+    걸 그대로 통과시켜야 한다 — 여기서는 실제 HCXStructuredRouter 를 스텁
+    클라이언트로 물려서 hcx_escalation 이 그대로 나오는지 확인."""
+    semantic = _StubSemanticRouter("calculation", 0.82, 0.80)  # margin=0.02 -> escalate
+    hcx = HCXStructuredRouter(_StubHCXClient("correction_analysis"))
+    router = CascadingRouter(semantic, hcx, margin_threshold=0.05)
+    result = router.route("정정된 영업이익이 몇 % 줄었어?")
+    assert result.route == "correction_analysis"
+    assert result.source == "hcx_escalation"
+
+
+def test_cascading_router_escalation_source_is_hcx_unclear_when_hcx_unclear():
+    semantic = _StubSemanticRouter("calculation", 0.82, 0.80)  # margin=0.02 -> escalate
+    hcx = HCXStructuredRouter(_StubHCXClient("unclear"))
+    router = CascadingRouter(semantic, hcx, margin_threshold=0.05)
+    result = router.route("애매한 질문")
+    assert result.route is None
+    assert result.source == "hcx_unclear"
+
+
+@pytest.mark.slow
+def test_semantic_router_adapter_source_is_semantic_fast_path():
+    router = _try_build_router(threshold=0.0)
+    result = router.route("[COMPANY] 영업이익 알려줘")
+    assert result.source == "semantic_fast_path"
+
+
 def test_build_cascading_router_wires_semantic_and_hcx():
     """§12 "CascadingRouter를 ask.py 진입점에 실제 배선" — 팩토리 함수가
     실제로 동작하는 CascadingRouter를 만드는지(semantic margin 게이팅 +

@@ -112,11 +112,11 @@ class HCXStructuredRouter:
         )
         tool_calls = msg.get("toolCalls") or []
         if not tool_calls:
-            return RouteResult(route=None, score=None)
+            return RouteResult(route=None, score=None, source="hcx_unclear")
         route = tool_calls[0]["function"]["arguments"].get("route")
         if route not in ROUTE_NAMES:  # "unclear" 뿐 아니라 모델이 뭔가 이상한 값을 줘도 안전하게 fallback
-            return RouteResult(route=None, score=None)
-        return RouteResult(route=route, score=None)
+            return RouteResult(route=None, score=None, source="hcx_unclear")
+        return RouteResult(route=route, score=None, source="hcx_escalation")
 
 
 class CascadingRouter:
@@ -142,7 +142,12 @@ class CascadingRouter:
         top2_score = (choices[1].similarity_score or 0.0) if len(choices) > 1 else 0.0
         margin = top1_score - top2_score
         if top1.name is not None and margin >= self._margin_threshold:
-            return RouteResult(route=top1.name, score=top1_score)
+            # CascadingRouter 자체는 새 source 를 만들지 않는다 — 여기서 만드는
+            # RouteResult 는 raw SemanticRouter choice 를 감싸는 것뿐이라
+            # SemanticRouterAdapter.route()와 동일한 의미로 "semantic_fast_path".
+            return RouteResult(route=top1.name, score=top1_score, source="semantic_fast_path")
+        # escalate: 하위 HCXStructuredRouter(또는 다른 Router 구현)가 이미
+        # source 를 세팅한 RouteResult 를 그대로 통과시킨다.
         return self._hcx.route(normalized_query)
 
 

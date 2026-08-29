@@ -50,6 +50,7 @@ class AgentTrace:
     normalized_query: str
     route: str | None
     route_score: float | None
+    route_source: str | None = None  # 2026-08-29: RouteResult.source 그대로 기록(§12 개선 후보 2)
     tool_calls: list[ToolCallRecord] = field(default_factory=list)
     iterations: int = 0
     stopped_reason: str = ""  # "no_more_tool_calls" | "max_iterations"
@@ -96,10 +97,11 @@ def run_agent_loop(
     route_result = router.route(normalized) if router is not None else None
     route = route_result.route if route_result else None
     route_score = route_result.score if route_result else None
+    route_source = route_result.source if route_result else None
 
     trace = AgentTrace(
         question=question, entities=entities, normalized_query=normalized,
-        route=route, route_score=route_score,
+        route=route, route_score=route_score, route_source=route_source,
     )
 
     messages = [
