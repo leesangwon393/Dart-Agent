@@ -179,6 +179,24 @@ def test_comparison_axis_period_for_single_company_period_comparison(extractor):
     assert e.comparison_axis == "period"
 
 
+def test_comparison_axis_none_for_year_plus_quarter_single_period(extractor):
+    """회귀(§12 개선 후보 3): "2026년 1분기"는 연도+분기로 두 조각 매칭되지만
+    (period_matches=["2026년","1분기"]) 실제로는 하나의 시점이다 — 예전 로직
+    (len(period_matches)>=2)은 이걸 "두 기간 비교"로 오탐해 comparison_axis
+    를 "period"로 잘못 세팅했다. period_spans 의 연도 dedup key 로 판정하면
+    "2026" 하나뿐이라 오탐이 해소돼야 한다."""
+    e = extractor.extract("삼성전자의 2026년 1분기 매출액은?")
+    assert e.comparison_axis is None
+
+
+def test_comparison_axis_period_for_single_company_two_distinct_years(extractor):
+    """진짜 두 시점 비교("2023년과 2025년")는 여전히 "period"로 잡혀야 한다
+    — 연도 dedup key 가 "2023"/"2025" 두 개로 서로 달라야 함."""
+    e = extractor.extract("삼성전자의 2023년과 2025년 매출을 비교해줘")
+    assert e.company_count == 1
+    assert e.comparison_axis == "period"
+
+
 def test_comparison_axis_prefers_company_when_both_signals_present(extractor):
     """회사 2개 + 기간 비교 신호가 동시에 있으면 company 를 우선한다(정책은
     entity_extractor.py 의 comparison_axis 계산부 주석 참고)."""

@@ -206,7 +206,18 @@ class EntityExtractor:
         # 축을 놓치면 아예 다른 회사 데이터를 섞어버리는 치명적 오류가 나지만, 기간
         # 축을 놓쳐도 "일단 최근 기간으로 회사별 조회"까지는 절반은 맞는 답이 나옴
         # — 실패 시 피해가 더 큰 축을 우선한다는 원칙).
-        has_period_comparison_signal = period_comparison or len(period_matches) >= 2
+        #
+        # 2026-08-29 수정(§12 개선 후보 3): 기존엔 "period_matches(원본 매칭 문자열)
+        # 2개 이상"으로 판정했는데, 이러면 "2026년 1분기"(연도+분기 — 하나의 시점을
+        # 두 조각(annual "2026년" + quarter "1분기")으로 표현한 것뿐)가 오탐으로
+        # comparison_axis="period"가 됐다. "2023년과 2025년"(진짜 두 시점 비교)과
+        # 구분하려면 "서로 다른 연도 값이 2개 이상"이어야 한다 — period_spans 는
+        # 이미 연도를 담은 매칭(annual/year_month, _YEAR_BEARING_TYPES)만 모아
+        # dedup key(3번째 원소, 4자리 연도 문자열)를 붙여둔 것이므로 그대로 쓴다.
+        # "2026년 1분기"는 period_spans 에 "2026" 하나만 들어있어(quarter는
+        # non-year-bearing이라 span에 안 잡힘) 자동으로 오탐이 해소된다.
+        distinct_years = {key for _s, _e, key in period_spans}
+        has_period_comparison_signal = period_comparison or len(distinct_years) >= 2
         if len(companies) >= 2:
             comparison_axis = "company"
         elif has_period_comparison_signal:
