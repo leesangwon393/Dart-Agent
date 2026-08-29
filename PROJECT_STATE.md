@@ -451,9 +451,12 @@ loader.py`), 같은 `questions.json` 100문항 재사용. 커밋 `8da607b`.
 - "2025년 재무지표 확인불가" 11건 중 9건이 실제 수치를 답변(부분 개선).
 
 **나쁜 소식 — 새로 발견되거나 여전한 문제(§10에 상세 기록)**:
-1. **[신규, 최우선] CascadingRouter의 HCX escalation에서 간헐적 400
-   "Unsupported function" 에러** — v1엔 없던 새 실패 유형. 5회 중 3회는
-   6회 재시도(최대 199~215초)로도 영구 실패.
+1. **[완료 2026-08-29]** ~~CascadingRouter의 HCX escalation에서 간헐적
+   400 "Unsupported function" 에러~~ — v1엔 없던 새 실패 유형(5회 중
+   3회는 6회 재시도(최대 199~215초)로도 영구 실패)이었지만, 원인은
+   새 버그가 아니라 기존에 알려진 RPM rate-limit이 CascadingRouter의
+   추가 HCX 호출(100건 중 60건)로 처음 실제 발현된 것 — `hcx_client.py`
+   에 pacing 추가로 해결. §12 참고.
 2. **[신규] 연결/별도 재무제표 혼동**(SK하이닉스) — 질문에 기준 명시가
    없으면 별도(개별)재무제표 수치를 연결기준인 양 답함, validator가
    못 잡음(grounded=True로 통과).
@@ -920,12 +923,24 @@ Kim이 전체 70개사(626,497 leaf chunk)를 재청킹+재임베딩 완료해�
 
 ### [최우선, 실행 필요] §5-E 전체 규모 재검증에서 발견된 문제 5건 (2026-08-27)
 우선순위 순:
-1. **CascadingRouter의 HCX escalation(`classify_route`)에서 간헐적 400
-   "Unsupported function" 에러** — v1엔 없던 신규 실패 유형, 100문항 중
-   3건을 완전 실패로 만듦(재시도 6회/최대 215초를 다 써도 복구 안 됨).
-   `router/hcx_router.py`의 tool schema(어제 route별 description을
-   추가한 부분)나 요청 페이로드 자체를 의심, 재현 스크립트부터 작성해
-   원인 분리 필요.
+1. **[완료 2026-08-29]** ~~CascadingRouter의 HCX escalation에서 간헐적
+   400 "Unsupported function" 에러~~ — 원인 조사 결과 **새 버그가 아니라
+   기존에 이미 `hcx_client.py` docstring에 문서화돼 있던 RPM(분당
+   요청수) rate-limit 현상**이 처음 실제 영향을 준 것으로 확인됨. v1은
+   라우팅에 HCX를 아예 안 썼는데(SemanticRouterAdapter 단독),
+   CascadingRouter 배선(§12, 2026-08-25) 이후 100문항 중 **60건**에서
+   `route_score=None`(=HCX escalation 경유, `results.json` 직접 집계로
+   확인)이 추가로 발생 — 이 추가 호출량이 누적 요청 빈도를 밀어올렸다.
+   트레이스백이 매번 `agent_loop.py`의 `router.route()` 호출 지점이고
+   재시도로 종종 성공하는 걸로 보아 어제 추가한 tool description(route별
+   구별 기준)은 원인이 아님을 재확인. **수정**: `hcx_client.py`에
+   `min_interval_sec`(기본 1.0초) 기반 pacing 추가 — 모듈 레벨 타이머를
+   써서 이 프로세스 안의 *모든* `HCXClient` 인스턴스(agent_client/
+   answer_client처럼 모델이 달라도)가 하나의 최소 호출 간격을 공유한다
+   (RPM은 계정/API 키 단위지 인스턴스 단위가 아니므로). 테스트 3건 추가
+   (`tests/test_hcx_client.py`, pacing 강제/인스턴스간 공유/0으로 비활성화
+   확인). **정확한 계정 RPM을 몰라서 1초는 보수적 추정치** — 다시 400이
+   재발하면 값을 올리거나, 반대로 배치가 너무 느려지면 실측하며 낮출 것.
 2. **연결/별도 재무제표 혼동**(SK하이닉스 사례로 발견) — 질문에 "연결
    기준"을 명시 안 하면 별도(개별)재무제표 수치를 연결기준인 것처럼
    답변. validator가 못 잡음(grounded=True로 통과). `ANSWER_SYSTEM_PROMPT`

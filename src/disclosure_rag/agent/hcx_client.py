@@ -18,12 +18,28 @@ LLM 을 online Agent 용도로 쓰지 않는다 (§57). Semantic Router 는 embe
   RPM(분당 요청수) rate-limit 로 추정(에러 메시지 자체는 이유를 설명하지 않음).
   지수 백오프 재시도로 대부분 우회되지만, Phase 15+ 실사용 시 요청 빈도를
   스로틀링하거나 tier 상향이 필요할 수 있다.
+- **2026-08-29 실측 확인**: 100문항 전체 코퍼스 재검증(§5-E)에서 위 현상이
+  처음으로 실제 영향을 줬다 — CascadingRouter 배선(2026-08-25) 이후
+  라우팅 자체가 100문항 중 60건에서 HCX escalation(`HCXStructuredRouter.
+  route()`)을 추가로 호출하게 됐고(v1의 SemanticRouterAdapter 단독 구성은
+  라우팅에 HCX를 아예 안 썼음), 이 추가 호출량이 누적 요청 빈도를 밀어올려
+  400("Unsupported function")이 3건에서 재시도(6회, 최대 200초)를 다 써도
+  복구가 안 됐다. 트레이스백은 매번 `agent_loop.py`의 `router.route()`
+  호출 지점이었다 — 페이로드는 매번 동일한데 재시도로 종종 성공하는 걸로
+  보아 라우터 tool description(2026-08-25 추가) 자체는 원인이 아니고
+  순수 호출 빈도 문제로 재확인됐다. **해결**: 아래 `min_interval_sec`
+  기반 클래스 레벨 pacing 추가 — 이 프로세스 안의 모든 `HCXClient` 인스턴스
+  (agent_client/answer_client 등 서로 다른 모델이어도) 사이에 최소 간격을
+  강제한다. RPM 은 계정/API 키 단위지 클라이언트 인스턴스 단위가 아니므로
+  인스턴스별이 아니라 클래스 변수로 공유해야 실제 계정 레벨 호출 빈도를
+  줄일 수 있다.
 """
 
 from __future__ import annotations
 
 import logging
 import os
+import threading
 import time
 from pathlib import Path
 from typing import Any
@@ -33,6 +49,14 @@ import requests
 logger = logging.getLogger(__name__)
 
 _ENDPOINT_TMPL = "https://clovastudio.stream.ntruss.com/v3/chat-completions/{model}"
+
+# RPM(분당 요청수) rate-limit 는 API 키(=계정) 단위지 파이썬 객체 단위가 아니다
+# (agent_client/answer_client 처럼 모델이 다른 별도 인스턴스라도 같은 키를 쓰면
+# 같은 한도를 공유한다) — 그래서 pacing 상태를 인스턴스 필드가 아니라 클래스
+# 변수로 둬서, 이 프로세스 안의 *모든* HCXClient 인스턴스가 하나의 타이머를
+# 공유하게 한다. 스레드는 안 쓰지만(전부 순차 호출) 락은 값싸니 방어적으로 둔다.
+_pacing_lock = threading.Lock()
+_last_request_at: float = 0.0
 
 
 class HCXError(RuntimeError):
@@ -47,7 +71,13 @@ class HCXClient:
         model: str | None = None,
         env_path: str | Path = ".env",
         timeout: float = 60.0,
+        min_interval_sec: float = 1.0,
     ):
+        """`min_interval_sec`: 이 값만큼 이전 HCX 호출(이 프로세스의 어떤
+        HCXClient 인스턴스가 보낸 것이든) 이후 최소 간격을 보장한다 — 위
+        docstring "2026-08-29 실측" 참고. 계정 tier 의 정확한 RPM 을 모르는
+        상태에서 고른 보수적 기본값(1초)이라, 이후 실측으로 더 줄이거나
+        늘릴 수 있다. 0으로 주면 기존처럼 pacing 없이 동작(테스트/디버깅용)."""
         if api_key is None or model is None:
             self._load_env(env_path)
         self.api_key = api_key or os.environ.get("HCX_API_KEY")
@@ -57,6 +87,7 @@ class HCXClient:
         if not self.model:
             raise HCXError("HCX_MODEL 이 없습니다 (.env 확인)")
         self.timeout = timeout
+        self.min_interval_sec = min_interval_sec
         self._url = _ENDPOINT_TMPL.format(model=self.model)
         # HCX-007(reasoning 모델)은 thinking 모드 기본 on 상태에서 tools 와 같이
         # 쓰면 400 이 난다(실측, Stage 10) — 모델명으로 감지해 자동으로 꺼준다.
@@ -74,6 +105,20 @@ class HCXClient:
         from dotenv import load_dotenv
 
         load_dotenv(dotenv_path=str(env_path))
+
+    def _wait_for_pacing(self) -> None:
+        """모듈 레벨 `_last_request_at`(클래스 인스턴스가 아니라 프로세스
+        전체 공유)을 기준으로 `min_interval_sec` 이상 간격을 강제한다.
+        `min_interval_sec=0`이면(테스트 등) 즉시 통과한다."""
+        if self.min_interval_sec <= 0:
+            return
+        global _last_request_at
+        with _pacing_lock:
+            now = time.monotonic()
+            wait = self.min_interval_sec - (now - _last_request_at)
+            if wait > 0:
+                time.sleep(wait)
+            _last_request_at = time.monotonic()
 
     def chat(
         self,
@@ -119,6 +164,7 @@ class HCXClient:
 
         last_error: Exception | None = None
         for attempt in range(max_retries + 1):
+            self._wait_for_pacing()
             resp = requests.post(self._url, headers=headers, json=payload, timeout=self.timeout)
             if resp.status_code == 200:
                 body = resp.json()
