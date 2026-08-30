@@ -57,6 +57,15 @@ def build_qdrant_filter(flt: RetrievalFilter | None) -> Filter | None:
     if flt is None:
         return None
     must: list[FieldCondition] = []
+    # 2026-08-30 버그 수정: report_ids 조건이 여기 빠져 있었다 — search_disclosures가
+    # 특정 문서를 report_id로 정확히 지정해도(RetrievalFilter(report_ids=[...])),
+    # BM25Retriever.search()는 매 후보마다 flt.matches()를 직접 호출해 올바르게
+    # 걸러졌지만, Dense 쪽은 이 함수가 만든 Filter로만 Qdrant에 질의하는데 여기에
+    # report_ids 매핑이 없어 조건이 통째로 빠졌다(must=[]면 build_qdrant_filter가
+    # None을 반환) — 그래서 Dense 검색은 필터 없이 전체 코퍼스를 뒤졌고, RRF로
+    # BM25(정상 필터링됨) 결과와 합쳐지면서 다른 문서의 chunk가 섞여 들어왔다.
+    if flt.report_ids:
+        must.append(FieldCondition(key="report_id", match=MatchAny(any=flt.report_ids)))
     if flt.companies:
         must.append(FieldCondition(key="company", match=MatchAny(any=flt.companies)))
     if flt.doc_groups:

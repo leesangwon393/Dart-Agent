@@ -776,6 +776,48 @@ log10 반올림 방식을 쓴 이유: 실제 관찰된 비율이 10배(단순 �
 **테스트**: `tests/test_agent.py`에 4건 추가(프롬프트 원칙 고정, 두
 실측 사례 재현, 무관한 숫자 오탐 방지). 전체 스위트 187→191 통과.
 
+### 5-K. [완료] Dense 검색이 report_id 필터를 무시하고 다른 문서 chunk를 섞어오는 버그 수정 (2026-08-30)
+
+사용자 실사용 중 발견 — "라우터가 잘 뽑아 뒀는데(회사/기간/문서를 정확히
+식별했는데) 리트리버가 다른 문서의 청킹을 보는 문제"를 직접 재현/근본원인
+규명 후 수정.
+
+**근본원인**: `qdrant_store.py`의 `build_qdrant_filter()`가
+`RetrievalFilter`의 다른 필드(companies/doc_groups/periods/latest_only
+등)는 전부 Qdrant `FieldCondition`으로 옮기면서 **`report_ids`만 빠뜨리고
+있었다**. `search_disclosures`가 `report_id` 파라미터로 특정 문서를 정확히
+지정해도(예: `get_latest_report`로 doc_id를 알아낸 뒤 그 본문만 보려는
+호출, `tools.py`의 `RetrievalFilter(report_ids=[report_id])`), 이 조건이
+Qdrant 필터 변환 과정에서 통째로 사라져(`must=[]`가 되면 `None` 반환)
+Dense(BGE-M3+Qdrant) 검색은 **필터 없이 전체 코퍼스를 검색**했다. BM25는
+`BM25Retriever.search()`가 후보마다 `flt.matches(chunk)`를 직접 호출하는
+구조라 정상적으로 문서를 제한했지만, `HybridRetriever`가 BM25(정상
+필터링됨)와 Dense(필터 안 걸림, 전체 코퍼스에서 온 결과)를 RRF로 합치는
+순간 다른 문서의 chunk가 최종 evidence에 섞여 들어왔다 — "BM25 절반은
+맞는데 Dense 절반이 새는" 구조라 원인이 한눈에 안 보였던 버그.
+
+**수정**: `build_qdrant_filter()`에 `report_ids` → `FieldCondition(key=
+"report_id", match=MatchAny(any=flt.report_ids))` 매핑 추가.
+
+**"특정 문서 안에서 10개" 요구사항**: `tools.py`의 `search_disclosures`
+핸들러는 `report_id`가 주어지면 이미 `retriever.search(query,
+k=max(top_k, 10), flt=flt)`로 **최소 10개**를 가져오도록 짜여 있었다 —
+문제는 그 `flt`가 Dense 쪽에서 무시됐다는 것뿐이었으므로, 위 필터 수정만
+으로 "특정지은 문서 안에서 10개"가 그대로 충족된다(별도 로직 추가 불필요).
+
+**실측 확인**: 수정 전/후 직접 대조 — 두 문서(r1 15개, r2 15개 chunk,
+전부 동일 방향 벡터로 삽입해 필터가 안 걸리면 반드시 섞이게 설계)에서
+`report_ids=["r1"]`로 검색한 결과, **패치 전에는 실제로 r2::c14/r2::c13
+등이 top-10에 섞여 나왔고**, 패치 후에는 10개 전부 r1로만 나옴을 직접
+재현/확인. `make_search_disclosures_tool()` 핸들러를 통한 end-to-end
+테스트(BM25+Dense 결합 HybridRetriever, report_id로 조회)로도 재확인.
+
+**테스트**: `tests/test_dense_retriever.py`에 3건 추가(`build_qdrant_
+filter`가 report_ids를 옮기는지, Qdrant store 레벨 cross-document 누출
+방지, `search_disclosures` 핸들러 end-to-end 격리 확인 — 마지막 2건은
+패치 되돌려서 실제로 실패하는 것까지 확인한 진성 회귀 테스트). 전체
+스위트 191→194 통과.
+
 ## 6. 주요 파일과 역할
 
 ```
